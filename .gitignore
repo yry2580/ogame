@@ -1,0 +1,7 @@
+.vs
+/packages/
+/*/bin/Debug/
+/*/bin/Release/
+/*/bin/x86/
+/*/bin/x64/
+/*/obj/
