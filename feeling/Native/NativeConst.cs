@@ -7,10 +7,9 @@ namespace feeling
     class NativeConst
     {
         public static string Homepage = "http://www.cicihappy.com/";
-        public static string Account = "zoz666";
-        public static string Password = "yaya520184";
-        public static int Universe = 18;
-        public static string FileDirectory = AppDomain.CurrentDomain.BaseDirectory + "Out/";
+
+        public static string CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
+        public static string FileDirectory = CurrentDirectory + "Out/";
     }
 
     enum OperStatus

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using AngleSharp.Html.Parser;
 using CefSharp;
 using CefSharp.WinForms;
 
@@ -18,7 +20,7 @@ namespace feeling
         public OperStatus MyOperStatus = OperStatus.None;
         public volatile bool IsWorking = false;
 
-        public string MyUrl = "";
+        public string MyAddress = "";
         public DelegateStatusChange StatusChangeEvent;
         public DelegateScanGalaxy ScanGalaxyEvent;
         public ChromiumWebBrowser MyWebBrowser;
@@ -28,14 +30,16 @@ namespace feeling
         string mScanPage = "";
         string mScanUniverse = "";
 
+        public static User User = new User();
+
         public void HandleWebBrowserFrameEnd(string url)
         {
-            MyUrl = url;
+            MyAddress = MyWebBrowser.Address;
         }
 
         public void RunJs(string jsCode)
         {
-            MyWebBrowser?.ExecuteScriptAsync(jsCode);
+            MyWebBrowser?.GetBrowser()?.MainFrame.ExecuteJavaScriptAsync(jsCode);
         }
 
         public void FrameRunJs(string jsCode)
@@ -59,7 +63,7 @@ namespace feeling
             Thread.Sleep(1500);
 
             int universe = 0;
-            var mat = Regex.Match(MyUrl, $@"u(?<universe>\S*).cicihappy.com");
+            var mat = Regex.Match(MyAddress, $@"u(?<universe>\S*).cicihappy.com");
             if (mat.Success)
             {
                 universe = int.Parse(mat.Groups["universe"].Value);
@@ -91,6 +95,9 @@ namespace feeling
         {
             int count = 0;
             bool lastError = false;
+
+            mScanDesc = "开始";
+            FireScanGalaxy();
 
             try
             {
@@ -130,6 +137,10 @@ namespace feeling
                         lastError = true;
                         FrameRunJs(NativeScript.ToGalaxy());
                         await Task.Delay(1500);
+                    }
+                    else
+                    {
+                        lastError = false;
                     }
 
                 } while (true);
@@ -181,6 +192,93 @@ namespace feeling
         protected void FireScanGalaxy()
         {
             ScanGalaxyEvent?.Invoke(mScanDesc, mScanPage, mScanUniverse);
+        }
+
+        public async Task LoginAsync(string account, string psw, int universe)
+        {
+            if (account.Length <= 0 || psw.Length <= 0 || universe <= 0 || universe > 24)
+            {
+                MessageBox.Show("请输入正确的账号、密码或宇宙");
+                return;
+            }
+
+            if (HtmlUtil.IsGameUrl(MyAddress))
+            {
+                var source = await GetHauptframe().GetSourceAsync();
+                if (HtmlUtil.IsInGame(source))
+                {
+                    MessageBox.Show("已经是登录状态");
+                    return;
+                }
+
+                await DoLoginAsync(account, psw, universe);
+            } else
+            {
+                await DoLoginAsync(account, psw, universe);
+            }
+        }
+
+        protected async Task DoLoginAsync(string account, string psw, int universe)
+        {
+            if (!HtmlUtil.IsHomeUrl(MyAddress))
+            {
+                MyWebBrowser.Load(NativeConst.Homepage);
+                await Task.Delay(2000);
+            }
+
+            await MyWebBrowser.GetSourceAsync();
+            await Task.Delay(100);
+
+            var jsAccount = $"document.getElementsByName('username')[0].value ='{account}'";
+            var jsPassword = $"document.getElementsByName('password')[0].value = '{psw}'";
+            var jsUniverse = $"document.getElementsByName('universe')[0][{universe}].selected=true";
+            var jsSubmit = "document.getElementsByClassName('loginanniu')[0].click()";
+
+            // input account
+            RunJs(jsAccount);
+
+            // input password
+            RunJs(jsPassword);
+
+            RunJs(jsUniverse);
+
+            Thread.Sleep(100);
+
+            // submit
+            RunJs(jsSubmit);
+
+            User.SetUserData(account, psw, universe);
+        }
+
+        public async Task LogoutAsync()
+        {
+            if (!HtmlUtil.IsGameUrl(MyAddress))
+            {
+                MessageBox.Show("退出失败，可能不在游戏页");
+                return;
+            }
+
+            if (OperStatus.Galaxy == MyOperStatus)
+            {
+                MessageBox.Show("当前正在刷图，不建议退出");
+                return;
+            }
+
+            var source = await GetHauptframe().GetSourceAsync();
+            if (!HtmlUtil.HasLogoutBtn(source))
+            {
+                FrameRunJs(NativeScript.ToHome());
+                await Task.Delay(1500);
+            }
+
+            if (!HtmlUtil.IsInGame(source))
+            {
+                MessageBox.Show("退出失败，无退出按钮");
+                return;
+            }
+
+            FrameRunJs(NativeScript.ToLogout());
+            await Task.Delay(500);
         }
     }
 }

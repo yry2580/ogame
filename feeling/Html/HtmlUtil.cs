@@ -1,4 +1,5 @@
-﻿using System;
+﻿using AngleSharp.Html.Parser;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -23,6 +24,41 @@ namespace feeling
                 }
             }
             return source.Trim();
+        }
+
+        public static bool IsHomeUrl(string url = "")
+        {
+            return url.Contains("www.cicihappy.com");
+        }
+
+        public static bool IsGameUrl(string url = "")
+        {
+            return url.Contains(".cicihappy.com/ogame/frames.php");
+        }
+
+        public static bool IsInGame(string source)
+        {
+            if (string.IsNullOrWhiteSpace(source)) return false;
+
+            var parser = new HtmlParser();
+            var doc = parser.ParseDocument(source);
+            var logout = doc.QuerySelector("#header_top a[accesskey=s]");
+            if (null != logout) return true;
+
+            var home = doc.QuerySelector("#menuTable .menubutton_table a[target=Hauptframe]");
+            if (null != home) return true;
+
+            return false;
+        }
+
+        public static bool HasLogoutBtn(string source)
+        {
+            if (string.IsNullOrWhiteSpace(source)) return false;
+
+            var parser = new HtmlParser();
+            var doc = parser.ParseDocument(source);
+            var logout = doc.QuerySelector("#header_top a[accesskey=s]");
+            return null != logout;
         }
     }
 }

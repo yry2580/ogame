@@ -30,6 +30,16 @@ namespace feeling
 
             NativeController.Instance.StatusChangeEvent += OnStatusChange;
             NativeController.Instance.ScanGalaxyEvent += OnScanGalaxyEvent;
+
+            InitData();
+        }
+
+        protected void InitData()
+        {
+            w_user_account.Text = NativeController.User.Account;
+            w_user_password.Text = NativeController.User.Password;
+            w_user_universe.Text = NativeController.User.Universe.ToString();
+            RedrawAccount();
         }
 
         protected void InitWebHandler()
@@ -96,17 +106,38 @@ namespace feeling
 
         }
 
+        public void SetUserButton(bool enabled)
+        {
+            w_user_account.Enabled = enabled;
+            btn_user_login.Enabled = enabled;
+            btn_user_logout.Enabled = enabled;
+        }
+
+        protected void RedrawAccount()
+        {
+            var lists = NativeController.User.GetAccountLists();
+            lists.Sort();
+
+            w_user_account.Items.Clear();
+
+            lists.ForEach(e =>
+            {
+                if (string.IsNullOrWhiteSpace(e)) return;
+                w_user_account.Items.Add(e);
+            });
+        }
+
         private void Web_OnFrameEnd(object sender, FrameLoadEndEventArgs e)
         {
-            Console.WriteLine($"Web_OnFrameEnd", e.Url);
+            Console.WriteLine($"Web_OnFrameEnd {e.Url}");
             NativeController.Instance.HandleWebBrowserFrameEnd(e.Url);
         }
 
         private void Web_OnFrameStart(object sender, FrameLoadStartEventArgs e)
         {
             Console.WriteLine("Web_OnFrameStart");
-#if Debug
-            mWebBrowser.GetBrowser().ShowDevTools();
+#if DEBUG
+            // mWebBrowser.GetBrowser().ShowDevTools();
 #endif
         }
 
@@ -157,6 +188,44 @@ namespace feeling
 
             NativeController.Instance.SaveGalaxy();
             Redraw();
+        }
+
+        private void w_user_universe_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            if (e.KeyChar != '\b')//这是允许输入退格键
+            {
+                if ((e.KeyChar < '0') || (e.KeyChar > '9'))//这是允许输入0-9数字
+                {
+                    e.Handled = true;
+                }
+            }
+        }
+
+        private async void btn_user_login_Click(object sender, EventArgs e)
+        {
+            var account = w_user_account.Text.Trim();
+            var psw = w_user_password.Text.Trim();
+            var str = w_user_universe.Text.Trim();
+            int universe = str.Length <= 0 ? 0 : int.Parse(str);
+
+            SetUserButton(false);
+            await NativeController.Instance.LoginAsync(account, psw, universe);
+            SetUserButton(true);
+            RedrawAccount();
+        }
+
+        private async void btn_user_logout_Click(object sender, EventArgs e)
+        {
+            SetUserButton(false);
+            await NativeController.Instance.LogoutAsync();
+            SetUserButton(true);
+        }
+
+        private void w_user_account_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var psw = NativeController.User.GetPassword(w_user_account.Text.Trim());
+            if (string.IsNullOrEmpty(psw)) return;
+            w_user_password.Text = psw;
         }
     }
 }

@@ -103,7 +103,7 @@ namespace feeling
 
             var pagexy = list[0];
             var xy = pagexy?.TextContent.Replace("太阳系", "").Split(':');
-            if (null == xy) return true;
+            if (null == xy) return false;
             int x = int.Parse(xy[0]);
             int y = int.Parse(xy[1]);
 

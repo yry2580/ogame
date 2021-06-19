@@ -13,6 +13,20 @@ namespace feeling
             return script;
         }
 
+        public static string ToHome()
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += "doc.querySelectorAll('#menuTable .menubutton_table a')[0].click();";
+            return script;
+        }
+
+        public static string ToLogout()
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += "doc.querySelector('#header_top a[accesskey=s]').click()";
+            return script;
+        }
+
         public static string TestMenuTable()
         {
             var script = "doc = window.parent.frames['Hauptframe'].document;";
