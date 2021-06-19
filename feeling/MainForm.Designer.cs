@@ -29,6 +29,7 @@ namespace feeling
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.w_split_container = new System.Windows.Forms.SplitContainer();
             this.w_galaxy_box = new System.Windows.Forms.GroupBox();
             this.btn_galaxy_open = new System.Windows.Forms.Button();
@@ -285,6 +286,7 @@ namespace feeling
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(1153, 861);
             this.Controls.Add(this.w_split_container);
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "情怀";
