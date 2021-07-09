@@ -157,6 +157,9 @@ namespace feeling
                 }
 
                 File.WriteAllText(name, sb.ToString(), Encoding.Default);
+                string xlsx = NativeConst.FileDirectory + $"{UniverseName}_{DateTime.Now:yyyyMMdd}.xlsx";
+                IoUtil.CsvToXlsx(name, xlsx);
+
                 sb = null;
             }
             catch(Exception ex)

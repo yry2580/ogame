@@ -9,7 +9,7 @@ namespace feeling
         public static string ToGalaxy()
         {
             var script = "doc = window.parent.frames['Hauptframe'].document;";
-            script += "doc.querySelectorAll('#menuTable .menubutton_table a')[11].click();";
+            script += "doc.querySelector('#menuTable .menubutton_table a[title=外部银河]').click();";
             return script;
         }
 

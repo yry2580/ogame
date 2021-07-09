@@ -52,6 +52,11 @@ namespace feeling
         {
             var settings = new CefSettings();
             settings.Locale = "zh-CN";
+            /*settings.CefCommandLineArgs.Add("disable-gpu", "1");
+            settings.CefCommandLineArgs.Add("disable-gpu-compositing", "1");
+            settings.CefCommandLineArgs.Add("enable-begin-frame-scheduling", "1");
+            settings.CefCommandLineArgs.Add("disable-gpu-vsync", "1"); //Disable Vsync*/
+
             Cef.Initialize(settings);
             mWebBrowser = new ChromiumWebBrowser(NativeConst.Homepage);
 
