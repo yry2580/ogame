@@ -17,8 +17,7 @@ namespace feeling
                 if (!newFileName.EndsWith(".xlsx") && !newFileName.EndsWith(".xls")) return false;
 
                 Workbook workbook = new Workbook();
-                workbook.LoadFromFile(fileName, ",", 1, 1);
-                // Worksheet sheet = workbook.Worksheets[0];
+                workbook.LoadFromFile(fileName, ",");
                 workbook.SaveToFile(newFileName, FileFormat.Version2016);
                 return true;
             }
