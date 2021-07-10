@@ -14,6 +14,7 @@ namespace feeling
 {
     public delegate void DelegateStatusChange();
     public delegate void DelegateScanGalaxy(string sDesc, string pDesc, string uDesc);
+    public delegate void DelegatePlanet();
 
     class NativeController: Singleton<NativeController>
     {
@@ -23,18 +24,47 @@ namespace feeling
         public string MyAddress = "";
         public DelegateStatusChange StatusChangeEvent;
         public DelegateScanGalaxy ScanGalaxyEvent;
+        public DelegatePlanet PlanetEvent;
+
         public ChromiumWebBrowser MyWebBrowser;
 
         Galaxy mGalaxy = new Galaxy();
+        Planet mPlanet = new Planet();
+        Expedition mExpedition = new Expedition();
         string mScanDesc = "";
         string mScanPage = "";
         string mScanUniverse = "";
 
+        public Planet MyPlanet => mPlanet;
         public static User User = new User();
-
+        
         public void HandleWebBrowserFrameEnd(string url)
         {
             MyAddress = MyWebBrowser.Address;
+
+            if (url.Contains("ogame/frames.php"))
+            {
+                ScanPlanet();
+            }
+        }
+
+        public void ScanPlanet()
+        {
+            Task.Run(async() =>
+            {
+                try
+                {
+                    var source = await GetHauptframe()?.GetSourceAsync();
+                    if (!mPlanet.HasData)
+                    {
+                        mPlanet.Parse(source);
+                        PlanetEvent?.Invoke();
+                    }
+                }
+                catch (Exception)
+                { 
+                }
+            });
         }
 
         public void RunJs(string jsCode)
@@ -52,12 +82,14 @@ namespace feeling
             return MyWebBrowser.GetBrowser().GetFrame("Hauptframe");
         }
 
+        #region galaxy
+
         public void StartScanGalaxy()
         {
             if (IsWorking) return;
             IsWorking = true;
 
-            SwitchStatues(OperStatus.Galaxy);
+            SwitchStatus(OperStatus.Galaxy);
 
             FrameRunJs(NativeScript.ToGalaxy());
             Thread.Sleep(1500);
@@ -165,7 +197,7 @@ namespace feeling
         {
             if (OperStatus.Galaxy != MyOperStatus) return;
             IsWorking = false;
-            SwitchStatues(OperStatus.None);
+            SwitchStatus(OperStatus.None);
             FireScanGalaxy();
         }
 
@@ -180,19 +212,14 @@ namespace feeling
             mGalaxy.Save();
         }
 
-        protected void SwitchStatues(OperStatus operStatus)
-        {
-            if (MyOperStatus == operStatus) return;
-
-            MyOperStatus = operStatus;
-
-            StatusChangeEvent?.Invoke();
-        }
-
         protected void FireScanGalaxy()
         {
             ScanGalaxyEvent?.Invoke(mScanDesc, mScanPage, mScanUniverse);
         }
+
+        #endregion
+
+        #region login
 
         public async Task LoginAsync(string account, string psw, int universe)
         {
@@ -216,6 +243,9 @@ namespace feeling
             {
                 await DoLoginAsync(account, psw, universe);
             }
+
+            await Task.Delay(1000);
+            await GoHome();
         }
 
         protected async Task DoLoginAsync(string account, string psw, int universe)
@@ -248,6 +278,8 @@ namespace feeling
             RunJs(jsSubmit);
 
             User.SetUserData(account, psw, universe);
+
+            mPlanet.Reset();
         }
 
         public async Task LogoutAsync()
@@ -267,7 +299,7 @@ namespace feeling
             var source = await GetHauptframe().GetSourceAsync();
             if (!HtmlUtil.HasLogoutBtn(source))
             {
-                FrameRunJs(NativeScript.ToHome());
+                await GoHome();
                 await Task.Delay(1500);
             }
 
@@ -279,6 +311,163 @@ namespace feeling
 
             FrameRunJs(NativeScript.ToLogout());
             await Task.Delay(500);
+        }
+        #endregion login
+
+        #region Expedition
+        void GoFleetPage(int delay = 1500)
+        {
+            FrameRunJs(NativeScript.ToFleet());
+            Thread.Sleep(delay);
+        }
+
+        internal void StartExpedition(ExMission exMission)
+        {
+            SwitchStatus(OperStatus.Expedition);
+            Task.Run(() =>
+            {
+                DoExpedition(exMission);
+            });
+        }
+
+        protected async void DoExpedition(ExMission exMission)
+        {
+            int index = 0;
+            int _count = 0;
+            bool lastErr = false;
+
+            var errFunc = new Action(() =>
+            {
+                if (lastErr)
+                {
+                    lastErr = false;
+                    index++;
+                }
+                else
+                {
+                    lastErr = true;
+                }
+            });
+
+            try
+            {
+                do
+                {
+                    if (index >= exMission.List.Count)
+                    {
+                        MessageBox.Show($"探险派出结束，请检测是否成功{_count}/{exMission.List.Count}");
+                        break;
+                    }
+
+                    var mission = exMission.GetMission(index);
+
+                    // 切换舰队页面
+                    GoFleetPage();
+
+                    // 切换触发球
+                    int idx = mPlanet.GetPlanetIndex(mission.PlanetName);
+                    if (idx < 0)
+                    {
+                        errFunc();
+                        continue;
+                    }
+                    FrameRunJs(NativeScript.SelectPlanet(idx));
+                    await Task.Delay(1500);
+
+                    // 查看舰队队列
+                    var source = await GetHauptframe().GetSourceAsync();
+                    if (!mExpedition.ParseFleetQueue(source, out FleetQueue fq))
+                    {
+                        errFunc();
+                        continue;
+                    }
+
+                    if (fq.ExCount >= fq.ExMaxCount)
+                    {
+                        MessageBox.Show("探险队伍已满");
+                        break;
+                    }
+
+                    // 派遣探险
+                    bool flag = true;
+                    for (var i = 0; i < mission.FleetList.Count; i++)
+                    {
+                        var fleet = mission.FleetList[i];
+                        var shipId = Ship.GetShipId(fleet.ShipType);
+                        if (mExpedition.ParseShip(source, shipId, out int total))
+                        {
+                            if (total >= fleet.Count)
+                            {
+                                FrameRunJs(NativeScript.SetShip(shipId, fleet.Count));
+                                continue;
+                            }
+                        }
+
+                        flag = false;
+                        break;
+                    }
+
+                    if (!flag)
+                    {
+                        errFunc();
+                        continue;
+                    }
+
+                    // 继续
+                    FrameRunJs(NativeScript.SetShipNext());
+                    await Task.Delay(1000);
+
+                    // 设置目标点
+                    FrameRunJs(NativeScript.SetTarget(mission.X, mission.Y, mission.Z, (int)PlanetType.Star));
+                    await Task.Delay(200);
+                    // 设置目标继续
+                    FrameRunJs(NativeScript.SetTargetNext());
+                    await Task.Delay(1500);
+
+                    // 攻击确认
+                    FrameRunJs(NativeScript.SetAttackConfirm());
+                    await Task.Delay(1500);
+
+                    // 查看结果
+                    source = await GetHauptframe().GetSourceAsync();
+                    if (HtmlUtil.HasFleetSuccess(source, mExpedition.Parser))
+                    {
+                        index++;
+                        _count++;
+                        continue;
+                    }
+
+                    if (HtmlUtil.HasTutorial(source, mExpedition.Parser))
+                    {
+                        FrameRunJs(NativeScript.TutorialConfirm());
+                        await Task.Delay(1000);
+                    }
+
+                    errFunc();
+                } while (true);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"DoExpedition catch {ex.Message}");
+            }
+
+            SwitchStatus(OperStatus.None);
+        }
+        #endregion
+
+        protected void SwitchStatus(OperStatus operStatus)
+        {
+            if (MyOperStatus == operStatus) return;
+
+            MyOperStatus = operStatus;
+
+            StatusChangeEvent?.Invoke();
+        }
+
+        public async Task GoHome(int delay = 500)
+        {
+            FrameRunJs(NativeScript.ToHome());
+            await Task.Delay(delay);
         }
     }
 }

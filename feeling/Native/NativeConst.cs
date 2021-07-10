@@ -16,5 +16,6 @@ namespace feeling
     {
         None = 0,
         Galaxy,
+        Expedition,
     }
 }

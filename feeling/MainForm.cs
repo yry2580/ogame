@@ -30,8 +30,16 @@ namespace feeling
 
             NativeController.Instance.StatusChangeEvent += OnStatusChange;
             NativeController.Instance.ScanGalaxyEvent += OnScanGalaxyEvent;
+            NativeController.Instance.PlanetEvent += OnPlanetEvent;
 
             InitData();
+        }
+
+        private void OnPlanetEvent()
+        {
+            Invoke(new Action(() => {
+                RedrawPlanet();
+            }));
         }
 
         protected void InitData()
@@ -39,7 +47,43 @@ namespace feeling
             w_user_account.Text = NativeController.User.Account;
             w_user_password.Text = NativeController.User.Password;
             w_user_universe.Text = NativeController.User.Universe.ToString();
+
+            InitExpedition();
             RedrawAccount();
+        }
+
+        protected void InitExpedition()
+        {
+            var exShipOptions = Expedition.GetShipOptions();
+
+            tx0_ship0_cb.Items.Clear();
+            tx0_ship1_cb.Items.Clear();
+            tx1_ship0_cb.Items.Clear();
+            tx1_ship1_cb.Items.Clear();
+            tx2_ship0_cb.Items.Clear();
+            tx2_ship1_cb.Items.Clear();
+            tx3_ship0_cb.Items.Clear();
+            tx3_ship1_cb.Items.Clear();
+            exShipOptions.ForEach(e =>
+            {
+                tx0_ship0_cb.Items.Add(e);
+                tx0_ship1_cb.Items.Add(e);
+                tx1_ship0_cb.Items.Add(e);
+                tx1_ship1_cb.Items.Add(e);
+                tx2_ship0_cb.Items.Add(e);
+                tx2_ship1_cb.Items.Add(e);
+                tx3_ship0_cb.Items.Add(e);
+                tx3_ship1_cb.Items.Add(e);
+            });
+
+            tx0_ship0_cb.SelectedIndex = 0;
+            tx0_ship1_cb.SelectedIndex = 0;
+            tx1_ship0_cb.SelectedIndex = 0;
+            tx1_ship1_cb.SelectedIndex = 0;
+            tx2_ship0_cb.SelectedIndex = 0;
+            tx2_ship1_cb.SelectedIndex = 0;
+            tx3_ship0_cb.SelectedIndex = 0;
+            tx3_ship1_cb.SelectedIndex = 0;
         }
 
         protected void InitWebHandler()
@@ -52,6 +96,7 @@ namespace feeling
         {
             var settings = new CefSettings();
             settings.Locale = "zh-CN";
+            
             /*settings.CefCommandLineArgs.Add("disable-gpu", "1");
             settings.CefCommandLineArgs.Add("disable-gpu-compositing", "1");
             settings.CefCommandLineArgs.Add("enable-begin-frame-scheduling", "1");
@@ -95,11 +140,18 @@ namespace feeling
                     case OperStatus.Galaxy:
                         btn_galaxy_start.Enabled = false;
                         btn_galaxy_stop.Enabled = true;
+                        btn_tx_start.Enabled = false;
+                        break;
+                    case OperStatus.Expedition:
+                        btn_galaxy_start.Enabled = false;
+                        btn_galaxy_stop.Enabled = false;
+                        btn_tx_start.Enabled = false;
                         break;
                     case OperStatus.None:
                     default:
                         btn_galaxy_start.Enabled = true;
                         btn_galaxy_stop.Enabled = false;
+                        btn_tx_start.Enabled = true;
                         break;
                 }
 
@@ -110,6 +162,37 @@ namespace feeling
             }
 
         }
+
+        protected void RedrawPlanet()
+        {
+            var lists = NativeController.Instance.MyPlanet.List;
+
+            if (lists.Count <= 0)
+            {
+                NativeController.Instance.ScanPlanet();
+                return;
+            }
+
+            tx0_planet.Items.Clear();
+            tx1_planet.Items.Clear();
+            tx2_planet.Items.Clear();
+            tx3_planet.Items.Clear();
+
+            lists.ForEach(e =>
+            {
+                if (string.IsNullOrWhiteSpace(e)) return;
+                tx0_planet.Items.Add(e);
+                tx1_planet.Items.Add(e);
+                tx2_planet.Items.Add(e);
+                tx3_planet.Items.Add(e);
+
+                tx0_planet.SelectedIndex = 0;
+                tx1_planet.SelectedIndex = 0;
+                tx2_planet.SelectedIndex = 0;
+                tx3_planet.SelectedIndex = 0;
+            });
+        }
+
 
         public void SetUserButton(bool enabled)
         {
@@ -195,7 +278,7 @@ namespace feeling
             Redraw();
         }
 
-        private void w_user_universe_KeyPress(object sender, KeyPressEventArgs e)
+        private void w_count_KeyPress(object sender, KeyPressEventArgs e)
         {
             if (e.KeyChar != '\b')//这是允许输入退格键
             {
@@ -231,6 +314,54 @@ namespace feeling
             var psw = NativeController.User.GetPassword(w_user_account.Text.Trim());
             if (string.IsNullOrEmpty(psw)) return;
             w_user_password.Text = psw;
+        }
+
+        private void btn_tx_start_Click(object sender, EventArgs e)
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                MessageBox.Show("当前正在忙，暂不能操作");
+                return;
+            }
+
+            ExMission exMission = new ExMission();
+            exMission.Add(
+                tx0_ship0_cb.SelectedIndex,
+                tx0_ship0.Text.Trim(),
+                tx0_ship1_cb.SelectedIndex,
+                tx0_ship1.Text.Trim(),
+                tx0_planet.Text.Trim()
+            );
+            exMission.Add(
+                tx1_ship0_cb.SelectedIndex,
+                tx1_ship0.Text.Trim(),
+                tx1_ship1_cb.SelectedIndex,
+                tx1_ship1.Text.Trim(),
+                tx1_planet.Text.Trim()
+            );
+            exMission.Add(
+                tx2_ship0_cb.SelectedIndex,
+                tx2_ship0.Text.Trim(),
+                tx2_ship1_cb.SelectedIndex,
+                tx2_ship1.Text.Trim(),
+                tx2_planet.Text.Trim()
+            );
+            exMission.Add(
+                tx3_ship0_cb.SelectedIndex,
+                tx3_ship0.Text.Trim(),
+                tx3_ship1_cb.SelectedIndex,
+                tx3_ship1.Text.Trim(),
+                tx3_planet.Text.Trim()
+            );
+
+            if (exMission.List.Count <= 0)
+            {
+                MessageBox.Show("探险任务配置无效，请检测后再开始");
+                return;
+            }
+
+            NativeController.Instance.StartExpedition(exMission);
+            Redraw();
         }
     }
 }

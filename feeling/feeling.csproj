@@ -85,11 +85,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Common\Const.cs" />
     <Compile Include="Common\Singleton.cs" />
     <Compile Include="Handler\DownloadHandler.cs" />
     <Compile Include="Handler\JsDialogHandler.cs" />
     <Compile Include="Handler\MenuHandler.cs" />
     <Compile Include="Handler\OpenPageSelf.cs" />
+    <Compile Include="Html\Expedition\ExMission.cs" />
+    <Compile Include="Html\Expedition\Expedition.cs" />
     <Compile Include="Html\Galaxy\Galaxy.cs" />
     <Compile Include="Html\HtmlUtil.cs" />
     <Compile Include="MainForm.cs">
@@ -98,6 +101,11 @@
     <Compile Include="MainForm.Designer.cs">
       <DependentUpon>MainForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Module\Fleet.cs" />
+    <Compile Include="Module\Mission.cs" />
+    <Compile Include="Module\Planet.cs" />
+    <Compile Include="Module\Pos.cs" />
+    <Compile Include="Module\Ship.cs" />
     <Compile Include="Native\NativeConst.cs" />
     <Compile Include="Native\NativeController.cs" />
     <Compile Include="Native\NativeScript.cs" />

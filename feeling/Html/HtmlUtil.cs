@@ -60,5 +60,25 @@ namespace feeling
             var logout = doc.QuerySelector("#header_top a[accesskey=s]");
             return null != logout;
         }
+
+        public static bool HasTutorial(string source, HtmlParser parser = null)
+        {
+            if (string.IsNullOrWhiteSpace(source)) return false;
+            parser = parser??new HtmlParser();
+            var doc = parser.ParseDocument(source);
+            var node = doc.QuerySelector("#tutorial .tutorial_buttons a");
+            return null != node;
+        }
+
+        public static bool HasFleetSuccess(string source, HtmlParser parser = null)
+        {
+            if (string.IsNullOrWhiteSpace(source)) return false;
+            parser = parser??new HtmlParser();
+            var doc = parser.ParseDocument(source);
+            var node = doc.QuerySelector(".success");
+            if (null != node) return false;
+            if (node.TextContent.Trim() == "派遣舰队") return true;
+            return false;
+        }
     }
 }
