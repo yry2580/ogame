@@ -1,6 +1,8 @@
 ﻿using AngleSharp.Html.Parser;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
@@ -10,6 +12,9 @@ namespace feeling
 {
     class Expedition
     {
+        static string missionCfgFile = NativeConst.CurrentDirectory + "ex_mission.cfg";
+
+        public static ExMission MyExMissionCfg;
         public static List<ShipType> ShipOptions = new List<ShipType> {
             ShipType.SC,
             ShipType.LC,
@@ -21,6 +26,35 @@ namespace feeling
         public static List<string> GetShipOptions()
         {
             return (from type in ShipOptions select Ship.GetShipName(type)).ToList();
+        }
+
+        public static void Save(ExMission exMission)
+        {
+            try
+            {
+                MyExMissionCfg = exMission;
+                string text = JsonConvert.SerializeObject(exMission, Formatting.Indented);
+                File.WriteAllText(missionCfgFile, text);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"expedition save catch {ex.Message}");
+            }
+        }
+
+        public static void ReadCfg()
+        {
+            if (!File.Exists(missionCfgFile)) return;
+
+            try
+            {
+                var text = File.ReadAllText(missionCfgFile);
+                MyExMissionCfg = JsonConvert.DeserializeObject<ExMission>(text);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"expedition readCfg catch {ex.Message}");
+            }
         }
 
         public HtmlParser Parser = new HtmlParser();

@@ -7,10 +7,12 @@ using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using CefSharp;
 using CefSharp.WinForms;
+using Newtonsoft.Json;
 
 namespace feeling
 {
@@ -84,6 +86,58 @@ namespace feeling
             tx2_ship1_cb.SelectedIndex = 0;
             tx3_ship0_cb.SelectedIndex = 0;
             tx3_ship1_cb.SelectedIndex = 0;
+
+            RevertCfg();
+        }
+
+        protected bool RevertCfg()
+        {
+            // 读取配置
+            Expedition.ReadCfg();
+
+            var exMissionCfg = Expedition.MyExMissionCfg;
+
+            if (null == exMissionCfg) return false;
+
+            var planetList = NativeController.Instance.MyPlanet.List;
+            var exOptions = Expedition.ShipOptions;
+
+            for (var i = 0; i < 4; i++)
+            {
+                if (i >= exMissionCfg.List.Count)
+                {
+                    (Controls.Find($"tx{i}_ship0", true)[0] as TextBox).Text = "";
+                    (Controls.Find($"tx{i}_ship1", true)[0] as TextBox).Text = "";
+                    continue;
+                }
+
+                var mission = exMissionCfg.GetMission(i);
+                var idx = planetList.FindIndex(e => e == mission.PlanetName);
+                if (idx != -1)
+                {
+                    (Controls.Find($"tx{i}_planet", true)[0] as ComboBox).SelectedIndex = idx;
+                }
+
+                (Controls.Find($"tx{i}_ship0", true)[0] as TextBox).Text = "";
+                (Controls.Find($"tx{i}_ship1", true)[0] as TextBox).Text = "";
+
+                var count = mission.FleetList.Count;
+                var fleet = mission.FleetList[0];
+                idx = exOptions.FindIndex(e => e == fleet.ShipType);
+
+                (Controls.Find($"tx{i}_ship0_cb", true)[0] as ComboBox).SelectedIndex = idx < 0 ? 0 : idx;
+                (Controls.Find($"tx{i}_ship0", true)[0] as TextBox).Text = fleet.Count.ToString();
+
+                if (mission.FleetList.Count > 1)
+                {
+                    fleet = mission.FleetList[1];
+                    idx = exOptions.FindIndex(e => e == fleet.ShipType);
+                    (Controls.Find($"tx{i}_ship1_cb", true)[0] as ComboBox).SelectedIndex = idx < 0 ? 0 : idx;
+                    (Controls.Find($"tx{i}_ship1", true)[0] as TextBox).Text = fleet.Count.ToString();
+                }
+            }
+
+            return true;
         }
 
         protected void InitWebHandler()
@@ -141,17 +195,20 @@ namespace feeling
                         btn_galaxy_start.Enabled = false;
                         btn_galaxy_stop.Enabled = true;
                         btn_tx_start.Enabled = false;
+                        btn_tx_revert.Enabled = false;
                         break;
                     case OperStatus.Expedition:
                         btn_galaxy_start.Enabled = false;
                         btn_galaxy_stop.Enabled = false;
                         btn_tx_start.Enabled = false;
+                        btn_tx_revert.Enabled = false;
                         break;
                     case OperStatus.None:
                     default:
                         btn_galaxy_start.Enabled = true;
                         btn_galaxy_stop.Enabled = false;
                         btn_tx_start.Enabled = true;
+                        btn_tx_revert.Enabled = true;
                         break;
                 }
 
@@ -315,15 +372,9 @@ namespace feeling
             if (string.IsNullOrEmpty(psw)) return;
             w_user_password.Text = psw;
         }
-
-        private void btn_tx_start_Click(object sender, EventArgs e)
+        
+        private ExMission GetExMission()
         {
-            if (OperStatus.None != NativeController.Instance.MyOperStatus)
-            {
-                MessageBox.Show("当前正在忙，暂不能操作");
-                return;
-            }
-
             ExMission exMission = new ExMission();
             exMission.Add(
                 tx0_ship0_cb.SelectedIndex,
@@ -353,6 +404,17 @@ namespace feeling
                 tx3_ship1.Text.Trim(),
                 tx3_planet.Text.Trim()
             );
+            return exMission;
+        }
+        private void btn_tx_start_Click(object sender, EventArgs e)
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                MessageBox.Show("当前正在忙，暂不能操作");
+                return;
+            }
+
+            var exMission = GetExMission();
 
             if (exMission.List.Count <= 0)
             {
@@ -362,6 +424,26 @@ namespace feeling
 
             NativeController.Instance.StartExpedition(exMission);
             Redraw();
+        }
+
+        private void btn_tx_save_Click(object sender, EventArgs e)
+        {
+            var exMission = GetExMission();
+
+            if (exMission.List.Count <= 0)
+            {
+                MessageBox.Show("探险任务配置无效，请检测后再保存");
+            }
+
+            Expedition.Save(exMission);
+        }
+
+        private void btn_tx_revert_Click(object sender, EventArgs e)
+        {
+            if (!RevertCfg())
+            {
+                MessageBox.Show("读取配置失败");
+            }
         }
     }
 }

@@ -9,6 +9,7 @@ using System.Windows.Forms;
 using AngleSharp.Html.Parser;
 using CefSharp;
 using CefSharp.WinForms;
+using Newtonsoft.Json;
 
 namespace feeling
 {
@@ -353,6 +354,9 @@ namespace feeling
             {
                 do
                 {
+
+                    Console.WriteLine($"\n\n\n new index{index}");
+
                     if (index >= exMission.List.Count)
                     {
                         MessageBox.Show($"探险派出结束，请检测是否成功{_count}/{exMission.List.Count}");
@@ -360,6 +364,8 @@ namespace feeling
                     }
 
                     var mission = exMission.GetMission(index);
+
+                    Console.WriteLine($"mission {JsonConvert.SerializeObject(mission)}");
 
                     // 切换舰队页面
                     GoFleetPage();
@@ -384,7 +390,7 @@ namespace feeling
 
                     if (fq.ExCount >= fq.ExMaxCount)
                     {
-                        MessageBox.Show("探险队伍已满");
+                        MessageBox.Show("探险队列已满");
                         break;
                     }
 
@@ -394,11 +400,14 @@ namespace feeling
                     {
                         var fleet = mission.FleetList[i];
                         var shipId = Ship.GetShipId(fleet.ShipType);
+                        var count = fleet.Count;
                         if (mExpedition.ParseShip(source, shipId, out int total))
                         {
-                            if (total >= fleet.Count)
+                            Console.WriteLine($"shipId{shipId} count{count}");
+                            if (total >= count)
                             {
-                                FrameRunJs(NativeScript.SetShip(shipId, fleet.Count));
+                                FrameRunJs(NativeScript.SetShip(shipId, count));
+                                await Task.Delay(100);
                                 continue;
                             }
                         }
@@ -415,7 +424,7 @@ namespace feeling
 
                     // 继续
                     FrameRunJs(NativeScript.SetShipNext());
-                    await Task.Delay(1000);
+                    await Task.Delay(1500);
 
                     // 设置目标点
                     FrameRunJs(NativeScript.SetTarget(mission.X, mission.Y, mission.Z, (int)PlanetType.Star));
@@ -432,6 +441,7 @@ namespace feeling
                     source = await GetHauptframe().GetSourceAsync();
                     if (HtmlUtil.HasFleetSuccess(source, mExpedition.Parser))
                     {
+                        // Console.WriteLine($"HasFleetSuccess");
                         index++;
                         _count++;
                         continue;
@@ -440,7 +450,7 @@ namespace feeling
                     if (HtmlUtil.HasTutorial(source, mExpedition.Parser))
                     {
                         FrameRunJs(NativeScript.TutorialConfirm());
-                        await Task.Delay(1000);
+                        await Task.Delay(1500);
                     }
 
                     errFunc();

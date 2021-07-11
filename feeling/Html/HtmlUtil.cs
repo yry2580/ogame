@@ -76,7 +76,7 @@ namespace feeling
             parser = parser??new HtmlParser();
             var doc = parser.ParseDocument(source);
             var node = doc.QuerySelector(".success");
-            if (null != node) return false;
+            if (null == node) return false;
             if (node.TextContent.Trim() == "派遣舰队") return true;
             return false;
         }

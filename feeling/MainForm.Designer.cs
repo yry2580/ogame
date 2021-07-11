@@ -78,6 +78,8 @@ namespace feeling
             this.label2 = new System.Windows.Forms.Label();
             this.w_galaxy_status = new System.Windows.Forms.Label();
             this.w_galaxy_status_lb = new System.Windows.Forms.Label();
+            this.btn_tx_save = new System.Windows.Forms.Button();
+            this.btn_tx_revert = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.w_split_container)).BeginInit();
             this.w_split_container.Panel2.SuspendLayout();
             this.w_split_container.SuspendLayout();
@@ -116,6 +118,8 @@ namespace feeling
             // 
             // tab_tanxian
             // 
+            this.tab_tanxian.Controls.Add(this.btn_tx_revert);
+            this.tab_tanxian.Controls.Add(this.btn_tx_save);
             this.tab_tanxian.Controls.Add(this.btn_tx_start);
             this.tab_tanxian.Controls.Add(this.tx3_planet);
             this.tab_tanxian.Controls.Add(this.label9);
@@ -161,6 +165,7 @@ namespace feeling
             // 
             // tx3_planet
             // 
+            this.tx3_planet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tx3_planet.FormattingEnabled = true;
             this.tx3_planet.Location = new System.Drawing.Point(521, 91);
             this.tx3_planet.Name = "tx3_planet";
@@ -178,6 +183,7 @@ namespace feeling
             // 
             // tx3_ship1_cb
             // 
+            this.tx3_ship1_cb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tx3_ship1_cb.FormattingEnabled = true;
             this.tx3_ship1_cb.Location = new System.Drawing.Point(290, 91);
             this.tx3_ship1_cb.Name = "tx3_ship1_cb";
@@ -196,6 +202,7 @@ namespace feeling
             // 
             // tx3_ship0_cb
             // 
+            this.tx3_ship0_cb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tx3_ship0_cb.FormattingEnabled = true;
             this.tx3_ship0_cb.Location = new System.Drawing.Point(56, 93);
             this.tx3_ship0_cb.Name = "tx3_ship0_cb";
@@ -214,6 +221,7 @@ namespace feeling
             // 
             // tx2_planet
             // 
+            this.tx2_planet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tx2_planet.FormattingEnabled = true;
             this.tx2_planet.Location = new System.Drawing.Point(521, 65);
             this.tx2_planet.Name = "tx2_planet";
@@ -231,6 +239,7 @@ namespace feeling
             // 
             // tx2_ship1_cb
             // 
+            this.tx2_ship1_cb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tx2_ship1_cb.FormattingEnabled = true;
             this.tx2_ship1_cb.Location = new System.Drawing.Point(290, 65);
             this.tx2_ship1_cb.Name = "tx2_ship1_cb";
@@ -249,6 +258,7 @@ namespace feeling
             // 
             // tx2_ship0_cb
             // 
+            this.tx2_ship0_cb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tx2_ship0_cb.FormattingEnabled = true;
             this.tx2_ship0_cb.Location = new System.Drawing.Point(56, 67);
             this.tx2_ship0_cb.Name = "tx2_ship0_cb";
@@ -267,6 +277,7 @@ namespace feeling
             // 
             // tx1_planet
             // 
+            this.tx1_planet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tx1_planet.FormattingEnabled = true;
             this.tx1_planet.Location = new System.Drawing.Point(521, 39);
             this.tx1_planet.Name = "tx1_planet";
@@ -284,6 +295,7 @@ namespace feeling
             // 
             // tx1_ship1_cb
             // 
+            this.tx1_ship1_cb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tx1_ship1_cb.FormattingEnabled = true;
             this.tx1_ship1_cb.Location = new System.Drawing.Point(290, 39);
             this.tx1_ship1_cb.Name = "tx1_ship1_cb";
@@ -302,6 +314,7 @@ namespace feeling
             // 
             // tx1_ship0_cb
             // 
+            this.tx1_ship0_cb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tx1_ship0_cb.FormattingEnabled = true;
             this.tx1_ship0_cb.Location = new System.Drawing.Point(56, 41);
             this.tx1_ship0_cb.Name = "tx1_ship0_cb";
@@ -320,6 +333,7 @@ namespace feeling
             // 
             // tx0_planet
             // 
+            this.tx0_planet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tx0_planet.FormattingEnabled = true;
             this.tx0_planet.Location = new System.Drawing.Point(521, 13);
             this.tx0_planet.Name = "tx0_planet";
@@ -337,6 +351,7 @@ namespace feeling
             // 
             // tx0_ship1_cb
             // 
+            this.tx0_ship1_cb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tx0_ship1_cb.FormattingEnabled = true;
             this.tx0_ship1_cb.Location = new System.Drawing.Point(290, 15);
             this.tx0_ship1_cb.Name = "tx0_ship1_cb";
@@ -355,6 +370,7 @@ namespace feeling
             // 
             // tx0_ship0_cb
             // 
+            this.tx0_ship0_cb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tx0_ship0_cb.FormattingEnabled = true;
             this.tx0_ship0_cb.Location = new System.Drawing.Point(56, 15);
             this.tx0_ship0_cb.Name = "tx0_ship0_cb";
@@ -577,6 +593,26 @@ namespace feeling
             this.w_galaxy_status_lb.TabIndex = 0;
             this.w_galaxy_status_lb.Text = "当前状态：";
             // 
+            // btn_tx_save
+            // 
+            this.btn_tx_save.Location = new System.Drawing.Point(61, 122);
+            this.btn_tx_save.Name = "btn_tx_save";
+            this.btn_tx_save.Size = new System.Drawing.Size(50, 22);
+            this.btn_tx_save.TabIndex = 43;
+            this.btn_tx_save.Text = "保存";
+            this.btn_tx_save.UseVisualStyleBackColor = true;
+            this.btn_tx_save.Click += new System.EventHandler(this.btn_tx_save_Click);
+            // 
+            // btn_tx_revert
+            // 
+            this.btn_tx_revert.Location = new System.Drawing.Point(117, 122);
+            this.btn_tx_revert.Name = "btn_tx_revert";
+            this.btn_tx_revert.Size = new System.Drawing.Size(50, 22);
+            this.btn_tx_revert.TabIndex = 44;
+            this.btn_tx_revert.Text = "读取";
+            this.btn_tx_revert.UseVisualStyleBackColor = true;
+            this.btn_tx_revert.Click += new System.EventHandler(this.btn_tx_revert_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -652,6 +688,7 @@ namespace feeling
         private System.Windows.Forms.ComboBox tx1_ship0_cb;
         private System.Windows.Forms.TextBox tx1_ship0;
         private System.Windows.Forms.Button btn_tx_start;
+        private System.Windows.Forms.Button btn_tx_save;
+        private System.Windows.Forms.Button btn_tx_revert;
     }
 }
-
