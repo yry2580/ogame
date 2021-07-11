@@ -33,6 +33,11 @@ namespace feeling
             this.w_split_container = new System.Windows.Forms.SplitContainer();
             this.tabControl1 = new System.Windows.Forms.TabControl();
             this.tab_tanxian = new System.Windows.Forms.TabPage();
+            this.tx_content = new System.Windows.Forms.Label();
+            this.label10 = new System.Windows.Forms.Label();
+            this.xbox_auto = new System.Windows.Forms.CheckBox();
+            this.btn_tx_revert = new System.Windows.Forms.Button();
+            this.btn_tx_save = new System.Windows.Forms.Button();
             this.btn_tx_start = new System.Windows.Forms.Button();
             this.tx3_planet = new System.Windows.Forms.ComboBox();
             this.label9 = new System.Windows.Forms.Label();
@@ -78,8 +83,6 @@ namespace feeling
             this.label2 = new System.Windows.Forms.Label();
             this.w_galaxy_status = new System.Windows.Forms.Label();
             this.w_galaxy_status_lb = new System.Windows.Forms.Label();
-            this.btn_tx_save = new System.Windows.Forms.Button();
-            this.btn_tx_revert = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.w_split_container)).BeginInit();
             this.w_split_container.Panel2.SuspendLayout();
             this.w_split_container.SuspendLayout();
@@ -118,6 +121,9 @@ namespace feeling
             // 
             // tab_tanxian
             // 
+            this.tab_tanxian.Controls.Add(this.tx_content);
+            this.tab_tanxian.Controls.Add(this.label10);
+            this.tab_tanxian.Controls.Add(this.xbox_auto);
             this.tab_tanxian.Controls.Add(this.btn_tx_revert);
             this.tab_tanxian.Controls.Add(this.btn_tx_save);
             this.tab_tanxian.Controls.Add(this.btn_tx_start);
@@ -152,6 +158,56 @@ namespace feeling
             this.tab_tanxian.TabIndex = 1;
             this.tab_tanxian.Text = "探险";
             this.tab_tanxian.UseVisualStyleBackColor = true;
+            // 
+            // tx_content
+            // 
+            this.tx_content.AutoSize = true;
+            this.tx_content.ForeColor = System.Drawing.Color.Black;
+            this.tx_content.Location = new System.Drawing.Point(322, 126);
+            this.tx_content.Name = "tx_content";
+            this.tx_content.Size = new System.Drawing.Size(0, 12);
+            this.tx_content.TabIndex = 47;
+            // 
+            // label10
+            // 
+            this.label10.AutoSize = true;
+            this.label10.ForeColor = System.Drawing.Color.Red;
+            this.label10.Location = new System.Drawing.Point(288, 126);
+            this.label10.Name = "label10";
+            this.label10.Size = new System.Drawing.Size(41, 12);
+            this.label10.TabIndex = 46;
+            this.label10.Text = "提示：";
+            // 
+            // xbox_auto
+            // 
+            this.xbox_auto.AutoSize = true;
+            this.xbox_auto.Location = new System.Drawing.Point(173, 126);
+            this.xbox_auto.Name = "xbox_auto";
+            this.xbox_auto.Size = new System.Drawing.Size(114, 16);
+            this.xbox_auto.TabIndex = 45;
+            this.xbox_auto.Text = "自动(间隔2小时)";
+            this.xbox_auto.UseVisualStyleBackColor = true;
+            this.xbox_auto.CheckedChanged += new System.EventHandler(this.xbox_auto_CheckedChanged);
+            // 
+            // btn_tx_revert
+            // 
+            this.btn_tx_revert.Location = new System.Drawing.Point(117, 122);
+            this.btn_tx_revert.Name = "btn_tx_revert";
+            this.btn_tx_revert.Size = new System.Drawing.Size(50, 22);
+            this.btn_tx_revert.TabIndex = 44;
+            this.btn_tx_revert.Text = "读取";
+            this.btn_tx_revert.UseVisualStyleBackColor = true;
+            this.btn_tx_revert.Click += new System.EventHandler(this.btn_tx_revert_Click);
+            // 
+            // btn_tx_save
+            // 
+            this.btn_tx_save.Location = new System.Drawing.Point(61, 122);
+            this.btn_tx_save.Name = "btn_tx_save";
+            this.btn_tx_save.Size = new System.Drawing.Size(50, 22);
+            this.btn_tx_save.TabIndex = 43;
+            this.btn_tx_save.Text = "保存";
+            this.btn_tx_save.UseVisualStyleBackColor = true;
+            this.btn_tx_save.Click += new System.EventHandler(this.btn_tx_save_Click);
             // 
             // btn_tx_start
             // 
@@ -415,9 +471,9 @@ namespace feeling
             // 
             // btn_user_logout
             // 
-            this.btn_user_logout.Location = new System.Drawing.Point(130, 142);
+            this.btn_user_logout.Location = new System.Drawing.Point(146, 142);
             this.btn_user_logout.Name = "btn_user_logout";
-            this.btn_user_logout.Size = new System.Drawing.Size(75, 23);
+            this.btn_user_logout.Size = new System.Drawing.Size(59, 23);
             this.btn_user_logout.TabIndex = 17;
             this.btn_user_logout.Text = "退 出";
             this.btn_user_logout.UseVisualStyleBackColor = true;
@@ -427,7 +483,7 @@ namespace feeling
             // 
             this.btn_user_login.Location = new System.Drawing.Point(8, 142);
             this.btn_user_login.Name = "btn_user_login";
-            this.btn_user_login.Size = new System.Drawing.Size(75, 23);
+            this.btn_user_login.Size = new System.Drawing.Size(56, 23);
             this.btn_user_login.TabIndex = 16;
             this.btn_user_login.Text = "登 录";
             this.btn_user_login.UseVisualStyleBackColor = true;
@@ -593,26 +649,6 @@ namespace feeling
             this.w_galaxy_status_lb.TabIndex = 0;
             this.w_galaxy_status_lb.Text = "当前状态：";
             // 
-            // btn_tx_save
-            // 
-            this.btn_tx_save.Location = new System.Drawing.Point(61, 122);
-            this.btn_tx_save.Name = "btn_tx_save";
-            this.btn_tx_save.Size = new System.Drawing.Size(50, 22);
-            this.btn_tx_save.TabIndex = 43;
-            this.btn_tx_save.Text = "保存";
-            this.btn_tx_save.UseVisualStyleBackColor = true;
-            this.btn_tx_save.Click += new System.EventHandler(this.btn_tx_save_Click);
-            // 
-            // btn_tx_revert
-            // 
-            this.btn_tx_revert.Location = new System.Drawing.Point(117, 122);
-            this.btn_tx_revert.Name = "btn_tx_revert";
-            this.btn_tx_revert.Size = new System.Drawing.Size(50, 22);
-            this.btn_tx_revert.TabIndex = 44;
-            this.btn_tx_revert.Text = "读取";
-            this.btn_tx_revert.UseVisualStyleBackColor = true;
-            this.btn_tx_revert.Click += new System.EventHandler(this.btn_tx_revert_Click);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -690,5 +726,8 @@ namespace feeling
         private System.Windows.Forms.Button btn_tx_start;
         private System.Windows.Forms.Button btn_tx_save;
         private System.Windows.Forms.Button btn_tx_revert;
+        private System.Windows.Forms.CheckBox xbox_auto;
+        private System.Windows.Forms.Label label10;
+        private System.Windows.Forms.Label tx_content;
     }
 }

@@ -12,9 +12,10 @@ namespace feeling
         public static string FileDirectory = CurrentDirectory + "Out/";
     }
 
-    enum OperStatus
+    public enum OperStatus
     {
         None = 0,
+        System = 1,
         Galaxy,
         Expedition,
     }

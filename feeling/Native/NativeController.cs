@@ -16,6 +16,7 @@ namespace feeling
     public delegate void DelegateStatusChange();
     public delegate void DelegateScanGalaxy(string sDesc, string pDesc, string uDesc);
     public delegate void DelegatePlanet();
+    public delegate void DelegateOperTips(OperStatus operStatus, string tips);
 
     class NativeController: Singleton<NativeController>
     {
@@ -26,6 +27,7 @@ namespace feeling
         public DelegateStatusChange StatusChangeEvent;
         public DelegateScanGalaxy ScanGalaxyEvent;
         public DelegatePlanet PlanetEvent;
+        public DelegateOperTips OperTipsEvent;
 
         public ChromiumWebBrowser MyWebBrowser;
 
@@ -38,7 +40,12 @@ namespace feeling
 
         public Planet MyPlanet => mPlanet;
         public static User User = new User();
-        
+
+
+        // auto
+        public bool IsAutoExpedition = false;
+        public DateTime LastExeditionTime = DateTime.Now;
+
         public void HandleWebBrowserFrameEnd(string url)
         {
             MyAddress = MyWebBrowser.Address;
@@ -325,6 +332,8 @@ namespace feeling
         internal void StartExpedition(ExMission exMission)
         {
             SwitchStatus(OperStatus.Expedition);
+
+            OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:G}|开始探险");
             Task.Run(() =>
             {
                 DoExpedition(exMission);
@@ -336,6 +345,7 @@ namespace feeling
             int index = 0;
             int _count = 0;
             bool lastErr = false;
+            string source = "";
 
             var errFunc = new Action(() =>
             {
@@ -350,16 +360,23 @@ namespace feeling
                 }
             });
 
+            await GoHome(2000);
+
             try
             {
                 do
                 {
 
-                    Console.WriteLine($"\n\n\n new index{index}");
+                    Console.WriteLine($"ex-mession index{index}");
+                    OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:G}|探险{index+1}");
 
                     if (index >= exMission.List.Count)
                     {
-                        MessageBox.Show($"探险派出结束，请检测是否成功{_count}/{exMission.List.Count}");
+                        if (!IsAutoExpedition)
+                        {
+                            MessageBox.Show($"探险派出结束，请检测是否成功{_count}/{exMission.List.Count}");
+                        }
+                        OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:G}|探险派出结束{_count}/{exMission.List.Count}");
                         break;
                     }
 
@@ -367,8 +384,19 @@ namespace feeling
 
                     Console.WriteLine($"mission {JsonConvert.SerializeObject(mission)}");
 
+                    source = await GetHauptframe().GetSourceAsync();
+                    if (HtmlUtil.HasTutorial(source, mExpedition.Parser))
+                    {
+                        OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:G}|存在错误");
+                        FrameRunJs(NativeScript.TutorialConfirm());
+                        await Task.Delay(1500);
+                    }
+
                     // 切换舰队页面
                     GoFleetPage();
+
+                    source = await GetHauptframe().GetSourceAsync();
+
 
                     // 切换触发球
                     int idx = mPlanet.GetPlanetIndex(mission.PlanetName);
@@ -381,16 +409,21 @@ namespace feeling
                     await Task.Delay(1500);
 
                     // 查看舰队队列
-                    var source = await GetHauptframe().GetSourceAsync();
+                    source = await GetHauptframe().GetSourceAsync();
                     if (!mExpedition.ParseFleetQueue(source, out FleetQueue fq))
                     {
                         errFunc();
+                        OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:G}|解析探险队列有误");
                         continue;
                     }
 
                     if (fq.ExCount >= fq.ExMaxCount)
                     {
-                        MessageBox.Show("探险队列已满");
+                        if (!IsAutoExpedition)
+                        {
+                            MessageBox.Show("探险队列已满");
+                        }
+                        OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:G}|探险队列已满");
                         break;
                     }
 
@@ -418,6 +451,7 @@ namespace feeling
 
                     if (!flag)
                     {
+                        OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:G}|没有足够舰队数");
                         errFunc();
                         continue;
                     }
@@ -426,13 +460,18 @@ namespace feeling
                     FrameRunJs(NativeScript.SetShipNext());
                     await Task.Delay(1500);
 
+                    source = await GetHauptframe().GetSourceAsync();
+
                     // 设置目标点
                     FrameRunJs(NativeScript.SetTarget(mission.X, mission.Y, mission.Z, (int)PlanetType.Star));
                     await Task.Delay(200);
+
+                    source = await GetHauptframe().GetSourceAsync();
                     // 设置目标继续
                     FrameRunJs(NativeScript.SetTargetNext());
                     await Task.Delay(1500);
 
+                    source = await GetHauptframe().GetSourceAsync();
                     // 攻击确认
                     FrameRunJs(NativeScript.SetAttackConfirm());
                     await Task.Delay(1500);
@@ -449,6 +488,7 @@ namespace feeling
 
                     if (HtmlUtil.HasTutorial(source, mExpedition.Parser))
                     {
+                        OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:G}|派遣错误");
                         FrameRunJs(NativeScript.TutorialConfirm());
                         await Task.Delay(1500);
                     }
@@ -459,6 +499,14 @@ namespace feeling
             catch (Exception ex)
             {
                 Console.WriteLine($"DoExpedition catch {ex.Message}");
+            }
+
+            OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:G}|探险派遣结束{_count}/{exMission.List.Count}");
+
+            // 如果存在派遣成功的
+            if (_count >= 0)
+            {
+                LastExeditionTime = DateTime.Now;
             }
 
             SwitchStatus(OperStatus.None);

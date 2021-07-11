@@ -8,6 +8,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using CefSharp;
@@ -19,6 +20,9 @@ namespace feeling
     public partial class MainForm : Form
     {
         ChromiumWebBrowser mWebBrowser;
+
+        Thread mThread;
+        bool mCanAutoExpedition = false;
 
         public MainForm()
         {
@@ -33,8 +37,42 @@ namespace feeling
             NativeController.Instance.StatusChangeEvent += OnStatusChange;
             NativeController.Instance.ScanGalaxyEvent += OnScanGalaxyEvent;
             NativeController.Instance.PlanetEvent += OnPlanetEvent;
+            NativeController.Instance.OperTipsEvent += OnOperTipsChange;
 
             InitData();
+        }
+
+        private void LookBackThread()
+        {
+            do
+            {
+                Invoke(new Action(() =>
+                {
+                    _LookThread();
+                }));
+                Thread.Sleep(1000 * 60);
+            } while (true);
+        }
+
+        private void _LookThread()
+        {
+            try
+            {
+                if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
+
+                doAutoExpedtion();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"_LookThread {ex.Message}");
+            }
+        }
+
+        private void OnOperTipsChange(OperStatus operStatus, string tips)
+        {
+            Invoke(new Action(() => {
+                RedrawOperTips(operStatus, tips);
+            }));
         }
 
         private void OnPlanetEvent()
@@ -196,12 +234,14 @@ namespace feeling
                         btn_galaxy_stop.Enabled = true;
                         btn_tx_start.Enabled = false;
                         btn_tx_revert.Enabled = false;
+                        xbox_auto.Enabled = false;
                         break;
                     case OperStatus.Expedition:
                         btn_galaxy_start.Enabled = false;
                         btn_galaxy_stop.Enabled = false;
                         btn_tx_start.Enabled = false;
                         btn_tx_revert.Enabled = false;
+                        xbox_auto.Enabled = false;
                         break;
                     case OperStatus.None:
                     default:
@@ -209,6 +249,7 @@ namespace feeling
                         btn_galaxy_stop.Enabled = false;
                         btn_tx_start.Enabled = true;
                         btn_tx_revert.Enabled = true;
+                        xbox_auto.Enabled = true;
                         break;
                 }
 
@@ -250,6 +291,17 @@ namespace feeling
             });
         }
 
+        private void RedrawOperTips(OperStatus operStatus, string tips)
+        {
+            switch (operStatus)
+            {
+                case OperStatus.Expedition:
+                    tx_content.Text = tips.Trim();
+                    break;
+                default:
+                    break;
+            }
+        }
 
         public void SetUserButton(bool enabled)
         {
@@ -291,6 +343,10 @@ namespace feeling
             w_split_container.Panel1.Controls.Add(mWebBrowser);
 
             Redraw();
+
+            mThread = new Thread(LookBackThread);
+            mThread.IsBackground = true;
+            mThread.Start();
         }
 
         private void btn_galaxy_open_Click(object sender, EventArgs e)
@@ -415,15 +471,18 @@ namespace feeling
             }
 
             var exMission = GetExMission();
-
             if (exMission.List.Count <= 0)
             {
                 MessageBox.Show("探险任务配置无效，请检测后再开始");
                 return;
             }
 
-            NativeController.Instance.StartExpedition(exMission);
-            Redraw();
+            if (xbox_auto.Checked)
+            {
+                mCanAutoExpedition = true;
+            }
+            
+            doExpedtion();
         }
 
         private void btn_tx_save_Click(object sender, EventArgs e)
@@ -444,6 +503,48 @@ namespace feeling
             {
                 MessageBox.Show("读取配置失败");
             }
+        }
+
+        private void xbox_auto_CheckedChanged(object sender, EventArgs e)
+        {
+            NativeController.Instance.IsAutoExpedition = xbox_auto.Checked;
+
+            if (xbox_auto.Checked)
+            {
+                var ret = MessageBox.Show("是否立刻开始");
+                if (ret == DialogResult.OK)
+                {
+                    mCanAutoExpedition = true;
+                    doExpedtion();
+                }
+            } else
+            {
+                mCanAutoExpedition = false;
+            }
+        }
+
+        private void doExpedtion()
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
+
+            var exMission = GetExMission();
+            if (exMission.List.Count <= 0) return;
+
+            NativeController.Instance.StartExpedition(exMission);
+            Redraw();
+        }
+
+        private void doAutoExpedtion()
+        {
+            if (!mCanAutoExpedition) return;
+
+            // if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
+            if (!xbox_auto.Checked) return;
+
+            var delta = DateTime.Now - NativeController.Instance.LastExeditionTime;
+            if (delta.TotalMinutes < 60 * 2) return;
+
+            doExpedtion();
         }
     }
 }
