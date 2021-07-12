@@ -85,6 +85,19 @@ namespace feeling
                 return true;
             }
 
+            mat = Regex.Match(tr.TextContent, @"舰队 (?<jd>\d{1,2}) / (?<jdMax>\d{1,2})探险");
+            if (mat.Success)
+            {
+                fleetQueue = new FleetQueue
+                {
+                    Count = int.Parse(mat.Groups["jd"].Value),
+                    MaxCount = int.Parse(mat.Groups["jdMax"].Value),
+                    ExCount = 0,
+                    ExMaxCount = 0,
+                };
+                return true;
+            }
+
             return false;
         }
 

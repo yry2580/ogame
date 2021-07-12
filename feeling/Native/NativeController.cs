@@ -427,6 +427,16 @@ namespace feeling
                         break;
                     }
 
+                    if (fq.Count >= fq.MaxCount)
+                    {
+                        if (!IsAutoExpedition)
+                        {
+                            MessageBox.Show("航道已满");
+                        }
+                        OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:G}|航道已满");
+                        break;
+                    }
+
                     // 派遣探险
                     bool flag = true;
                     for (var i = 0; i < mission.FleetList.Count; i++)
