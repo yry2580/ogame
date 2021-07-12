@@ -6,6 +6,10 @@ namespace feeling
 {
     class NativeScript
     {
+        /// <summary>
+        /// 外部银河
+        /// </summary>
+        /// <returns></returns>
         public static string ToGalaxy()
         {
             var script = "doc = window.parent.frames['Hauptframe'].document;";
@@ -13,6 +17,10 @@ namespace feeling
             return script;
         }
 
+        /// <summary>
+        /// 概况
+        /// </summary>
+        /// <returns></returns>
         public static string ToHome()
         {
             var script = "doc = window.parent.frames['Hauptframe'].document;";
@@ -20,6 +28,10 @@ namespace feeling
             return script;
         }
 
+        /// <summary>
+        /// 退出登录
+        /// </summary>
+        /// <returns></returns>
         public static string ToLogout()
         {
             var script = "doc = window.parent.frames['Hauptframe'].document;";
@@ -27,6 +39,10 @@ namespace feeling
             return script;
         }
 
+        /// <summary>
+        /// 舰队页
+        /// </summary>
+        /// <returns></returns>
         public static string ToFleet()
         {
             var script = "doc = window.parent.frames['Hauptframe'].document;";
@@ -46,6 +62,12 @@ namespace feeling
             return $"(function() {{ return {script}; }})();";
         }
 
+        /// <summary>
+        /// 刷星图
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <returns></returns>
         public static string RefreshGalaxy(int x, int y)
         {
             var script = $"document.querySelectorAll('#galaxy_form table input[type=text]')[0].value = {x};";
@@ -54,6 +76,11 @@ namespace feeling
             return script;
         }
 
+        /// <summary>
+        /// 选择星球
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
         public static string SelectPlanet(int index)
         {
             var script = "doc = window.parent.frames['Hauptframe'].document;";
@@ -62,6 +89,12 @@ namespace feeling
             return script;
         }
 
+        /// <summary>
+        /// 设置船只
+        /// </summary>
+        /// <param name="shipId"></param>
+        /// <param name="count"></param>
+        /// <returns></returns>
         public static string SetShip(string shipId, int count)
         {
             var script = "doc = window.parent.frames['Hauptframe'].document;";
@@ -69,6 +102,10 @@ namespace feeling
             return script;
         }
 
+        /// <summary>
+        /// 设置船只=》继续
+        /// </summary>
+        /// <returns></returns>
         public static string SetShipNext()
         {
             var script = "doc = window.parent.frames['Hauptframe'].document;";
@@ -76,6 +113,14 @@ namespace feeling
             return script;
         }
 
+        /// <summary>
+        /// 设置目标
+        /// </summary>
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        /// <param name="z"></param>
+        /// <param name="pt"></param>
+        /// <returns></returns>
         public static string SetTarget(int x, int y, int z, int pt)
         {
             var script = "doc = window.parent.frames['Hauptframe'].document;";
@@ -86,6 +131,10 @@ namespace feeling
             return script;
         }
 
+        /// <summary>
+        /// 设置目标=》继续
+        /// </summary>
+        /// <returns></returns>
         public static string SetTargetNext()
         {
             var script = "doc = window.parent.frames['Hauptframe'].document;";
@@ -93,6 +142,10 @@ namespace feeling
             return script;
         }
 
+        /// <summary>
+        /// 攻击确认
+        /// </summary>
+        /// <returns></returns>
         public static string SetAttackConfirm()
         {
             var script = "doc = window.parent.frames['Hauptframe'].document;";
@@ -100,6 +153,10 @@ namespace feeling
             return script;
         }
 
+        /// <summary>
+        /// 提示确认
+        /// </summary>
+        /// <returns></returns>
         public static string TutorialConfirm()
         {
             var script = "doc = window.parent.frames['Hauptframe'].document;";
