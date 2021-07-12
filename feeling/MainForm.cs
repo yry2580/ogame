@@ -511,11 +511,15 @@ namespace feeling
 
             if (xbox_auto.Checked)
             {
-                var ret = MessageBox.Show("是否立刻开始");
+                var ret = MessageBox.Show("是否立刻开始", "提示", MessageBoxButtons.OKCancel);
                 if (ret == DialogResult.OK)
                 {
                     mCanAutoExpedition = true;
                     doExpedtion();
+                }
+                else
+                {
+                    mCanAutoExpedition = false;
                 }
             } else
             {

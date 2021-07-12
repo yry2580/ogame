@@ -96,6 +96,7 @@ namespace feeling
             // 
             this.w_split_container.Dock = System.Windows.Forms.DockStyle.Fill;
             this.w_split_container.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
+            this.w_split_container.IsSplitterFixed = true;
             this.w_split_container.Location = new System.Drawing.Point(0, 0);
             this.w_split_container.Name = "w_split_container";
             this.w_split_container.Orientation = System.Windows.Forms.Orientation.Horizontal;
