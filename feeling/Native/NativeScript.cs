@@ -143,6 +143,17 @@ namespace feeling
         }
 
         /// <summary>
+        /// 攻击
+        /// </summary>
+        /// <returns></returns>
+        public static string SetAttack()
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"input[name='mission'][value='1']\").click()";
+            return script;
+        }
+
+        /// <summary>
         /// 攻击确认
         /// </summary>
         /// <returns></returns>

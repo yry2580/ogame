@@ -18,5 +18,6 @@ namespace feeling
         System = 1,
         Galaxy,
         Expedition,
+        Pirate,
     }
 }

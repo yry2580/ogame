@@ -22,7 +22,9 @@ namespace feeling
         ChromiumWebBrowser mWebBrowser;
 
         Thread mThread;
-        bool mCanAutoExpedition = false;
+        bool mAutoExpedition = false;
+        bool mAutoPirate = false;
+        int mPirateInterval = 120; // 分
 
         public MainForm()
         {
@@ -38,8 +40,16 @@ namespace feeling
             NativeController.Instance.ScanGalaxyEvent += OnScanGalaxyEvent;
             NativeController.Instance.PlanetEvent += OnPlanetEvent;
             NativeController.Instance.OperTipsEvent += OnOperTipsChange;
+            NativeController.Instance.NpcChangeEvent += OnNpcChange;
 
             InitData();
+        }
+
+        private void OnNpcChange()
+        {
+            Invoke(new Action(() => {
+                RedrawNpc();
+            }));
         }
 
         private void LookBackThread()
@@ -61,6 +71,7 @@ namespace feeling
                 if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
 
                 doAutoExpedtion();
+                doAutoPirate();
             }
             catch (Exception ex)
             {
@@ -87,6 +98,9 @@ namespace feeling
             w_user_account.Text = NativeController.User.Account;
             w_user_password.Text = NativeController.User.Password;
             w_user_universe.Text = NativeController.User.Universe.ToString();
+
+            // 默认值
+            lb_hd_interval.Text = mPirateInterval.ToString();
 
             InitExpedition();
             RedrawAccount();
@@ -126,6 +140,59 @@ namespace feeling
             tx3_ship1_cb.SelectedIndex = 0;
 
             RevertCfg();
+        }
+
+        private void RedrawNpc()
+        {
+            var npcList = PirateUtil.NpcList;
+            if (npcList.Count <= 0) return;
+
+            for (int i = 0; i < 5; i++)
+            {
+                PirateControl control = Controls.Find($"w_pirate{i}", true)[0] as PirateControl;
+                if (null == control) continue;
+
+                var list = npcList.Where(e => e.StartsWith($"[{i+1}")).ToList();
+                control.SetAllOptions(list);
+            }
+        }
+
+        protected bool PirateCfg()
+        {
+            // 读取配置
+            PirateUtil.ReadCfg();
+
+            var pMissionCfg = PirateUtil.MyPirateMission;
+
+            if (null == pMissionCfg) return false;
+
+            var planetList = NativeController.Instance.MyPlanet.List;
+            var npcList = PirateUtil.NpcList;
+
+            var list = pMissionCfg.List;
+
+            for (int i = 0; i < 5; i++)
+            {
+                PirateControl control = Controls.Find($"w_pirate{i}", true)[0] as PirateControl;
+                if (null == control) continue;
+
+                var pirate = i < list.Count ? list[i] : new Pirate();
+
+                var _list = npcList.Where(e => e.StartsWith($"[{i + 1}")).ToList();
+                control.SetAllOptions(_list);
+                control.SetPlanets(planetList);
+
+                control.MyCount = pirate.Count;
+                control.MyMode = pirate.Mode;
+                control.MyPlanet = pirate.PlanetName;
+                control.MyOptions = pirate.Options;
+            }
+
+            var interval = pMissionCfg.Interval;
+            mPirateInterval = interval < 120 ? 120 : interval;
+            lb_hd_interval.Text = mPirateInterval.ToString();
+
+            return true;
         }
 
         protected bool RevertCfg()
@@ -232,24 +299,27 @@ namespace feeling
                     case OperStatus.Galaxy:
                         btn_galaxy_start.Enabled = false;
                         btn_galaxy_stop.Enabled = true;
-                        btn_tx_start.Enabled = false;
-                        btn_tx_revert.Enabled = false;
-                        xbox_auto.Enabled = false;
+                        SetExpeditionButton(false);
+                        SetPirateButton(false);
                         break;
                     case OperStatus.Expedition:
                         btn_galaxy_start.Enabled = false;
                         btn_galaxy_stop.Enabled = false;
-                        btn_tx_start.Enabled = false;
-                        btn_tx_revert.Enabled = false;
-                        xbox_auto.Enabled = false;
+                        SetExpeditionButton(false, true);
+                        SetPirateButton(false);
+                        break;
+                    case OperStatus.Pirate:
+                        btn_galaxy_start.Enabled = false;
+                        btn_galaxy_stop.Enabled = false;
+                        SetExpeditionButton(false);
+                        SetPirateButton(false, true);
                         break;
                     case OperStatus.None:
                     default:
                         btn_galaxy_start.Enabled = true;
                         btn_galaxy_stop.Enabled = false;
-                        btn_tx_start.Enabled = true;
-                        btn_tx_revert.Enabled = true;
-                        xbox_auto.Enabled = true;
+                        SetExpeditionButton(true);
+                        SetPirateButton(true);
                         break;
                 }
 
@@ -289,6 +359,12 @@ namespace feeling
                 tx2_planet.SelectedIndex = 0;
                 tx3_planet.SelectedIndex = 0;
             });
+
+            w_pirate0.SetPlanets(lists);
+            w_pirate1.SetPlanets(lists);
+            w_pirate2.SetPlanets(lists);
+            w_pirate3.SetPlanets(lists);
+            w_pirate4.SetPlanets(lists);
         }
 
         private void RedrawOperTips(OperStatus operStatus, string tips)
@@ -297,6 +373,9 @@ namespace feeling
             {
                 case OperStatus.Expedition:
                     tx_content.Text = tips.Trim();
+                    break;
+                case OperStatus.Pirate:
+                    w_hd_tips.Text = tips.Trim();
                     break;
                 default:
                     break;
@@ -308,6 +387,27 @@ namespace feeling
             w_user_account.Enabled = enabled;
             btn_user_login.Enabled = enabled;
             btn_user_logout.Enabled = enabled;
+        }
+
+        public void SetPirateButton(bool enabled, bool canStop = false)
+        {
+            btn_hd_start.Enabled = enabled;
+            btn_hd_save.Enabled = enabled;
+            btn_hd_revert.Enabled = enabled;
+            btn_hd_refresh.Enabled = enabled;
+            cbox_hd_auto.Enabled = enabled;
+            w_hd_inverval.Enabled = enabled;
+            btn_hd_interval.Enabled = enabled;
+            btn_hd_stop.Enabled = !enabled && canStop;
+        }
+
+        public void SetExpeditionButton(bool enabled, bool canStop = false)
+        {
+            btn_tx_start.Enabled = enabled;
+            btn_tx_save.Enabled = enabled;
+            btn_tx_revert.Enabled = enabled;
+            cbox_tx_auto.Enabled = enabled;
+            btn_tx_stop.Enabled = !enabled && canStop;
         }
 
         protected void RedrawAccount()
@@ -476,11 +576,6 @@ namespace feeling
                 MessageBox.Show("探险任务配置无效，请检测后再开始");
                 return;
             }
-
-            if (xbox_auto.Checked)
-            {
-                mCanAutoExpedition = true;
-            }
             
             doExpedtion();
         }
@@ -507,24 +602,8 @@ namespace feeling
 
         private void xbox_auto_CheckedChanged(object sender, EventArgs e)
         {
-            NativeController.Instance.IsAutoExpedition = xbox_auto.Checked;
-
-            if (xbox_auto.Checked)
-            {
-                var ret = MessageBox.Show("是否立刻开始", "提示", MessageBoxButtons.OKCancel);
-                if (ret == DialogResult.OK)
-                {
-                    mCanAutoExpedition = true;
-                    doExpedtion();
-                }
-                else
-                {
-                    mCanAutoExpedition = false;
-                }
-            } else
-            {
-                mCanAutoExpedition = false;
-            }
+            NativeController.Instance.IsAutoExpedition = cbox_tx_auto.Checked;
+            mAutoExpedition = cbox_tx_auto.Checked;
         }
 
         private void doExpedtion()
@@ -540,15 +619,136 @@ namespace feeling
 
         private void doAutoExpedtion()
         {
-            if (!mCanAutoExpedition) return;
-
-            // if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
-            if (!xbox_auto.Checked) return;
+            if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
+            if (!mAutoExpedition) return;
+            if (!cbox_tx_auto.Checked) return;
 
             var delta = DateTime.Now - NativeController.Instance.LastExeditionTime;
             if (delta.TotalMinutes < 60 * 2) return;
 
             doExpedtion();
+        }
+
+        private PirateMission GetPirateMission()
+        {
+            PirateMission pMission = new PirateMission();
+
+            for(int i = 0; i < 5; i++)
+            {
+                PirateControl control = Controls.Find($"w_pirate{i}", true)[0] as PirateControl;
+                if (null == control) continue;
+
+                pMission.Add(new Pirate
+                {
+                    Index = i,
+                    Count = control.MyCount,
+                    Mode = control.MyMode,
+                    Options = control.MyOptions,
+                    PlanetName = control.MyPlanet,
+                    AllOptions = control.AllOptions
+                });
+            }
+
+            return pMission;
+        }
+
+        private void btn_hd_start_Click(object sender, EventArgs e)
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                MessageBox.Show("当前正在忙，暂不能操作");
+                return;
+            }
+
+            var pMission = GetPirateMission();
+            if (pMission.MissionCount <= 0)
+            {
+                MessageBox.Show("海盗任务配置无效，请检测后再开始");
+                return;
+            }
+
+            doPirate();
+        }
+
+        private void doPirate()
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
+
+            var pMission = GetPirateMission();
+            if (pMission.MissionCount <= 0) return;
+
+            NativeController.Instance.StartPirate(pMission);
+            Redraw();
+        }
+
+        private void btn_hd_save_Click(object sender, EventArgs e)
+        {
+            var pMission = GetPirateMission();
+            pMission.Interval = mPirateInterval;
+
+            PirateUtil.Save(pMission);
+        }
+
+        private void btn_hd_revert_Click(object sender, EventArgs e)
+        {
+            if (!PirateCfg())
+            {
+                MessageBox.Show("读取配置还原失败");
+            }
+        }
+
+        private void btn_hd_refresh_Click(object sender, EventArgs e)
+        {
+            NativeController.Instance.RefreshNpc();
+            Redraw();
+        }
+
+        private void doAutoPirate()
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
+            if (!mAutoPirate) return;
+            if (!cbox_hd_auto.Checked) return;
+
+            var delta = DateTime.Now - NativeController.Instance.LastPirateTime;
+            if (delta.TotalMinutes < mPirateInterval) return;
+
+            doPirate();
+        }
+
+        private void cbox_hd_auto_CheckedChanged(object sender, EventArgs e)
+        {
+            NativeController.Instance.IsAutoPirate = cbox_hd_auto.Checked;
+            mAutoPirate = cbox_hd_auto.Checked;
+        }
+
+        private void btn_hd_interval_Click(object sender, EventArgs e)
+        {
+            var txt = w_hd_inverval.Text.Trim();
+            if (txt.Length <= 0)
+            {
+                MessageBox.Show("请输入数值");
+                return;
+            }
+
+            var interval = int.Parse(txt);
+            if (interval < 60)
+            {
+                MessageBox.Show("间隔不能小于60分钟");
+                return;
+            }
+
+            mPirateInterval = interval;
+            lb_hd_interval.Text = mPirateInterval.ToString();
+        }
+
+        private void btn_hd_stop_Click(object sender, EventArgs e)
+        {
+            NativeController.Instance.StopPirate();
+        }
+
+        private void btn_tx_stop_Click(object sender, EventArgs e)
+        {
+            NativeController.Instance.StopExpedition();
         }
     }
 }

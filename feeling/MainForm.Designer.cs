@@ -31,11 +31,11 @@ namespace feeling
         {
             System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(MainForm));
             this.w_split_container = new System.Windows.Forms.SplitContainer();
-            this.tabControl1 = new System.Windows.Forms.TabControl();
+            this.w_tab = new System.Windows.Forms.TabControl();
             this.tab_tanxian = new System.Windows.Forms.TabPage();
             this.tx_content = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
-            this.xbox_auto = new System.Windows.Forms.CheckBox();
+            this.cbox_tx_auto = new System.Windows.Forms.CheckBox();
             this.btn_tx_revert = new System.Windows.Forms.Button();
             this.btn_tx_save = new System.Windows.Forms.Button();
             this.btn_tx_start = new System.Windows.Forms.Button();
@@ -63,6 +63,30 @@ namespace feeling
             this.tx0_ship1 = new System.Windows.Forms.TextBox();
             this.tx0_ship0_cb = new System.Windows.Forms.ComboBox();
             this.tx0_ship0 = new System.Windows.Forms.TextBox();
+            this.tab_haidao = new System.Windows.Forms.TabPage();
+            this.w_hd_tips = new System.Windows.Forms.Label();
+            this.lb_hd_interval = new System.Windows.Forms.Label();
+            this.label13 = new System.Windows.Forms.Label();
+            this.btn_hd_interval = new System.Windows.Forms.Button();
+            this.w_hd_inverval = new System.Windows.Forms.TextBox();
+            this.label12 = new System.Windows.Forms.Label();
+            this.label11 = new System.Windows.Forms.Label();
+            this.btn_hd_refresh = new System.Windows.Forms.Button();
+            this.cbox_hd_auto = new System.Windows.Forms.CheckBox();
+            this.btn_hd_revert = new System.Windows.Forms.Button();
+            this.btn_hd_save = new System.Windows.Forms.Button();
+            this.btn_hd_start = new System.Windows.Forms.Button();
+            this.w_galaxy = new System.Windows.Forms.TabPage();
+            this.btn_galaxy_open = new System.Windows.Forms.Button();
+            this.w_galaxy_status_lb = new System.Windows.Forms.Label();
+            this.btn_galaxy_save = new System.Windows.Forms.Button();
+            this.w_galaxy_status = new System.Windows.Forms.Label();
+            this.btn_galaxy_stop = new System.Windows.Forms.Button();
+            this.label2 = new System.Windows.Forms.Label();
+            this.btn_galaxy_start = new System.Windows.Forms.Button();
+            this.w_galaxy_page = new System.Windows.Forms.Label();
+            this.w_galaxy_universe = new System.Windows.Forms.Label();
+            this.label4 = new System.Windows.Forms.Label();
             this.w_user_box = new System.Windows.Forms.GroupBox();
             this.w_user_account = new System.Windows.Forms.ComboBox();
             this.btn_user_logout = new System.Windows.Forms.Button();
@@ -72,24 +96,21 @@ namespace feeling
             this.label5 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.w_galaxy_box = new System.Windows.Forms.GroupBox();
-            this.btn_galaxy_open = new System.Windows.Forms.Button();
-            this.btn_galaxy_save = new System.Windows.Forms.Button();
-            this.btn_galaxy_stop = new System.Windows.Forms.Button();
-            this.btn_galaxy_start = new System.Windows.Forms.Button();
-            this.w_galaxy_universe = new System.Windows.Forms.Label();
-            this.label4 = new System.Windows.Forms.Label();
-            this.w_galaxy_page = new System.Windows.Forms.Label();
-            this.label2 = new System.Windows.Forms.Label();
-            this.w_galaxy_status = new System.Windows.Forms.Label();
-            this.w_galaxy_status_lb = new System.Windows.Forms.Label();
+            this.w_pirate4 = new feeling.PirateControl();
+            this.w_pirate3 = new feeling.PirateControl();
+            this.w_pirate2 = new feeling.PirateControl();
+            this.w_pirate1 = new feeling.PirateControl();
+            this.w_pirate0 = new feeling.PirateControl();
+            this.btn_tx_stop = new System.Windows.Forms.Button();
+            this.btn_hd_stop = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.w_split_container)).BeginInit();
             this.w_split_container.Panel2.SuspendLayout();
             this.w_split_container.SuspendLayout();
-            this.tabControl1.SuspendLayout();
+            this.w_tab.SuspendLayout();
             this.tab_tanxian.SuspendLayout();
+            this.tab_haidao.SuspendLayout();
+            this.w_galaxy.SuspendLayout();
             this.w_user_box.SuspendLayout();
-            this.w_galaxy_box.SuspendLayout();
             this.SuspendLayout();
             // 
             // w_split_container
@@ -103,28 +124,30 @@ namespace feeling
             // 
             // w_split_container.Panel2
             // 
-            this.w_split_container.Panel2.Controls.Add(this.tabControl1);
+            this.w_split_container.Panel2.Controls.Add(this.w_tab);
             this.w_split_container.Panel2.Controls.Add(this.w_user_box);
-            this.w_split_container.Panel2.Controls.Add(this.w_galaxy_box);
-            this.w_split_container.Size = new System.Drawing.Size(1153, 861);
+            this.w_split_container.Size = new System.Drawing.Size(1213, 861);
             this.w_split_container.SplitterDistance = 666;
             this.w_split_container.TabIndex = 0;
             // 
-            // tabControl1
+            // w_tab
             // 
-            this.tabControl1.Controls.Add(this.tab_tanxian);
-            this.tabControl1.Location = new System.Drawing.Point(453, 3);
-            this.tabControl1.Multiline = true;
-            this.tabControl1.Name = "tabControl1";
-            this.tabControl1.SelectedIndex = 0;
-            this.tabControl1.Size = new System.Drawing.Size(697, 176);
-            this.tabControl1.TabIndex = 2;
+            this.w_tab.Controls.Add(this.tab_tanxian);
+            this.w_tab.Controls.Add(this.tab_haidao);
+            this.w_tab.Controls.Add(this.w_galaxy);
+            this.w_tab.Location = new System.Drawing.Point(209, 7);
+            this.w_tab.Multiline = true;
+            this.w_tab.Name = "w_tab";
+            this.w_tab.SelectedIndex = 0;
+            this.w_tab.Size = new System.Drawing.Size(1004, 176);
+            this.w_tab.TabIndex = 2;
             // 
             // tab_tanxian
             // 
+            this.tab_tanxian.Controls.Add(this.btn_tx_stop);
             this.tab_tanxian.Controls.Add(this.tx_content);
             this.tab_tanxian.Controls.Add(this.label10);
-            this.tab_tanxian.Controls.Add(this.xbox_auto);
+            this.tab_tanxian.Controls.Add(this.cbox_tx_auto);
             this.tab_tanxian.Controls.Add(this.btn_tx_revert);
             this.tab_tanxian.Controls.Add(this.btn_tx_save);
             this.tab_tanxian.Controls.Add(this.btn_tx_start);
@@ -155,7 +178,7 @@ namespace feeling
             this.tab_tanxian.Location = new System.Drawing.Point(4, 22);
             this.tab_tanxian.Name = "tab_tanxian";
             this.tab_tanxian.Padding = new System.Windows.Forms.Padding(3);
-            this.tab_tanxian.Size = new System.Drawing.Size(689, 150);
+            this.tab_tanxian.Size = new System.Drawing.Size(996, 150);
             this.tab_tanxian.TabIndex = 1;
             this.tab_tanxian.Text = "探险";
             this.tab_tanxian.UseVisualStyleBackColor = true;
@@ -173,26 +196,26 @@ namespace feeling
             // 
             this.label10.AutoSize = true;
             this.label10.ForeColor = System.Drawing.Color.Red;
-            this.label10.Location = new System.Drawing.Point(288, 126);
+            this.label10.Location = new System.Drawing.Point(342, 126);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(41, 12);
             this.label10.TabIndex = 46;
             this.label10.Text = "提示：";
             // 
-            // xbox_auto
+            // cbox_tx_auto
             // 
-            this.xbox_auto.AutoSize = true;
-            this.xbox_auto.Location = new System.Drawing.Point(173, 126);
-            this.xbox_auto.Name = "xbox_auto";
-            this.xbox_auto.Size = new System.Drawing.Size(114, 16);
-            this.xbox_auto.TabIndex = 45;
-            this.xbox_auto.Text = "自动(间隔2小时)";
-            this.xbox_auto.UseVisualStyleBackColor = true;
-            this.xbox_auto.CheckedChanged += new System.EventHandler(this.xbox_auto_CheckedChanged);
+            this.cbox_tx_auto.AutoSize = true;
+            this.cbox_tx_auto.Location = new System.Drawing.Point(227, 126);
+            this.cbox_tx_auto.Name = "cbox_tx_auto";
+            this.cbox_tx_auto.Size = new System.Drawing.Size(114, 16);
+            this.cbox_tx_auto.TabIndex = 45;
+            this.cbox_tx_auto.Text = "自动(间隔2小时)";
+            this.cbox_tx_auto.UseVisualStyleBackColor = true;
+            this.cbox_tx_auto.CheckedChanged += new System.EventHandler(this.xbox_auto_CheckedChanged);
             // 
             // btn_tx_revert
             // 
-            this.btn_tx_revert.Location = new System.Drawing.Point(117, 122);
+            this.btn_tx_revert.Location = new System.Drawing.Point(3, 122);
             this.btn_tx_revert.Name = "btn_tx_revert";
             this.btn_tx_revert.Size = new System.Drawing.Size(50, 22);
             this.btn_tx_revert.TabIndex = 44;
@@ -202,7 +225,7 @@ namespace feeling
             // 
             // btn_tx_save
             // 
-            this.btn_tx_save.Location = new System.Drawing.Point(61, 122);
+            this.btn_tx_save.Location = new System.Drawing.Point(59, 122);
             this.btn_tx_save.Name = "btn_tx_save";
             this.btn_tx_save.Size = new System.Drawing.Size(50, 22);
             this.btn_tx_save.TabIndex = 43;
@@ -212,7 +235,7 @@ namespace feeling
             // 
             // btn_tx_start
             // 
-            this.btn_tx_start.Location = new System.Drawing.Point(5, 122);
+            this.btn_tx_start.Location = new System.Drawing.Point(115, 122);
             this.btn_tx_start.Name = "btn_tx_start";
             this.btn_tx_start.Size = new System.Drawing.Size(50, 22);
             this.btn_tx_start.TabIndex = 10;
@@ -444,6 +467,262 @@ namespace feeling
             this.tx0_ship0.WordWrap = false;
             this.tx0_ship0.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.w_count_KeyPress);
             // 
+            // tab_haidao
+            // 
+            this.tab_haidao.Controls.Add(this.btn_hd_stop);
+            this.tab_haidao.Controls.Add(this.w_hd_tips);
+            this.tab_haidao.Controls.Add(this.lb_hd_interval);
+            this.tab_haidao.Controls.Add(this.label13);
+            this.tab_haidao.Controls.Add(this.btn_hd_interval);
+            this.tab_haidao.Controls.Add(this.w_hd_inverval);
+            this.tab_haidao.Controls.Add(this.label12);
+            this.tab_haidao.Controls.Add(this.label11);
+            this.tab_haidao.Controls.Add(this.btn_hd_refresh);
+            this.tab_haidao.Controls.Add(this.cbox_hd_auto);
+            this.tab_haidao.Controls.Add(this.btn_hd_revert);
+            this.tab_haidao.Controls.Add(this.btn_hd_save);
+            this.tab_haidao.Controls.Add(this.btn_hd_start);
+            this.tab_haidao.Controls.Add(this.w_pirate4);
+            this.tab_haidao.Controls.Add(this.w_pirate3);
+            this.tab_haidao.Controls.Add(this.w_pirate2);
+            this.tab_haidao.Controls.Add(this.w_pirate1);
+            this.tab_haidao.Controls.Add(this.w_pirate0);
+            this.tab_haidao.Location = new System.Drawing.Point(4, 22);
+            this.tab_haidao.Name = "tab_haidao";
+            this.tab_haidao.Padding = new System.Windows.Forms.Padding(3);
+            this.tab_haidao.Size = new System.Drawing.Size(996, 150);
+            this.tab_haidao.TabIndex = 2;
+            this.tab_haidao.Text = "海盗";
+            this.tab_haidao.UseVisualStyleBackColor = true;
+            // 
+            // w_hd_tips
+            // 
+            this.w_hd_tips.Location = new System.Drawing.Point(42, 120);
+            this.w_hd_tips.Name = "w_hd_tips";
+            this.w_hd_tips.Size = new System.Drawing.Size(185, 27);
+            this.w_hd_tips.TabIndex = 54;
+            this.w_hd_tips.Text = "提示内容";
+            // 
+            // lb_hd_interval
+            // 
+            this.lb_hd_interval.AutoSize = true;
+            this.lb_hd_interval.Location = new System.Drawing.Point(153, 66);
+            this.lb_hd_interval.Name = "lb_hd_interval";
+            this.lb_hd_interval.Size = new System.Drawing.Size(23, 12);
+            this.lb_hd_interval.TabIndex = 53;
+            this.lb_hd_interval.Text = "120";
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(75, 65);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(77, 12);
+            this.label13.TabIndex = 52;
+            this.label13.Text = "间隔（分）：";
+            // 
+            // btn_hd_interval
+            // 
+            this.btn_hd_interval.Location = new System.Drawing.Point(155, 89);
+            this.btn_hd_interval.Name = "btn_hd_interval";
+            this.btn_hd_interval.Size = new System.Drawing.Size(60, 22);
+            this.btn_hd_interval.TabIndex = 51;
+            this.btn_hd_interval.Text = "设置";
+            this.btn_hd_interval.UseVisualStyleBackColor = true;
+            this.btn_hd_interval.Click += new System.EventHandler(this.btn_hd_interval_Click);
+            // 
+            // w_hd_inverval
+            // 
+            this.w_hd_inverval.Location = new System.Drawing.Point(77, 90);
+            this.w_hd_inverval.Name = "w_hd_inverval";
+            this.w_hd_inverval.Size = new System.Drawing.Size(72, 21);
+            this.w_hd_inverval.TabIndex = 50;
+            this.w_hd_inverval.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.w_count_KeyPress);
+            // 
+            // label12
+            // 
+            this.label12.AutoSize = true;
+            this.label12.Location = new System.Drawing.Point(6, 93);
+            this.label12.Name = "label12";
+            this.label12.Size = new System.Drawing.Size(65, 12);
+            this.label12.TabIndex = 49;
+            this.label12.Text = "设置间隔：";
+            // 
+            // label11
+            // 
+            this.label11.AutoSize = true;
+            this.label11.ForeColor = System.Drawing.Color.Red;
+            this.label11.Location = new System.Drawing.Point(6, 120);
+            this.label11.Name = "label11";
+            this.label11.Size = new System.Drawing.Size(41, 12);
+            this.label11.TabIndex = 48;
+            this.label11.Text = "提示：";
+            // 
+            // btn_hd_refresh
+            // 
+            this.btn_hd_refresh.Location = new System.Drawing.Point(6, 6);
+            this.btn_hd_refresh.Name = "btn_hd_refresh";
+            this.btn_hd_refresh.Size = new System.Drawing.Size(60, 22);
+            this.btn_hd_refresh.TabIndex = 47;
+            this.btn_hd_refresh.Text = "刷NPC";
+            this.btn_hd_refresh.UseVisualStyleBackColor = true;
+            this.btn_hd_refresh.Click += new System.EventHandler(this.btn_hd_refresh_Click);
+            // 
+            // cbox_hd_auto
+            // 
+            this.cbox_hd_auto.AutoSize = true;
+            this.cbox_hd_auto.Location = new System.Drawing.Point(8, 65);
+            this.cbox_hd_auto.Name = "cbox_hd_auto";
+            this.cbox_hd_auto.Size = new System.Drawing.Size(48, 16);
+            this.cbox_hd_auto.TabIndex = 46;
+            this.cbox_hd_auto.Text = "自动";
+            this.cbox_hd_auto.UseVisualStyleBackColor = true;
+            this.cbox_hd_auto.CheckedChanged += new System.EventHandler(this.cbox_hd_auto_CheckedChanged);
+            // 
+            // btn_hd_revert
+            // 
+            this.btn_hd_revert.Location = new System.Drawing.Point(82, 6);
+            this.btn_hd_revert.Name = "btn_hd_revert";
+            this.btn_hd_revert.Size = new System.Drawing.Size(60, 22);
+            this.btn_hd_revert.TabIndex = 12;
+            this.btn_hd_revert.Text = "读配置";
+            this.btn_hd_revert.UseVisualStyleBackColor = true;
+            this.btn_hd_revert.Click += new System.EventHandler(this.btn_hd_revert_Click);
+            // 
+            // btn_hd_save
+            // 
+            this.btn_hd_save.Location = new System.Drawing.Point(155, 6);
+            this.btn_hd_save.Name = "btn_hd_save";
+            this.btn_hd_save.Size = new System.Drawing.Size(60, 22);
+            this.btn_hd_save.TabIndex = 11;
+            this.btn_hd_save.Text = "保存";
+            this.btn_hd_save.UseVisualStyleBackColor = true;
+            this.btn_hd_save.Click += new System.EventHandler(this.btn_hd_save_Click);
+            // 
+            // btn_hd_start
+            // 
+            this.btn_hd_start.Location = new System.Drawing.Point(6, 34);
+            this.btn_hd_start.Name = "btn_hd_start";
+            this.btn_hd_start.Size = new System.Drawing.Size(60, 22);
+            this.btn_hd_start.TabIndex = 10;
+            this.btn_hd_start.Text = "开始";
+            this.btn_hd_start.UseVisualStyleBackColor = true;
+            this.btn_hd_start.Click += new System.EventHandler(this.btn_hd_start_Click);
+            // 
+            // w_galaxy
+            // 
+            this.w_galaxy.Controls.Add(this.btn_galaxy_open);
+            this.w_galaxy.Controls.Add(this.w_galaxy_status_lb);
+            this.w_galaxy.Controls.Add(this.btn_galaxy_save);
+            this.w_galaxy.Controls.Add(this.w_galaxy_status);
+            this.w_galaxy.Controls.Add(this.btn_galaxy_stop);
+            this.w_galaxy.Controls.Add(this.label2);
+            this.w_galaxy.Controls.Add(this.btn_galaxy_start);
+            this.w_galaxy.Controls.Add(this.w_galaxy_page);
+            this.w_galaxy.Controls.Add(this.w_galaxy_universe);
+            this.w_galaxy.Controls.Add(this.label4);
+            this.w_galaxy.Location = new System.Drawing.Point(4, 22);
+            this.w_galaxy.Name = "w_galaxy";
+            this.w_galaxy.Padding = new System.Windows.Forms.Padding(3);
+            this.w_galaxy.Size = new System.Drawing.Size(996, 150);
+            this.w_galaxy.TabIndex = 3;
+            this.w_galaxy.Text = "星图";
+            this.w_galaxy.UseVisualStyleBackColor = true;
+            // 
+            // btn_galaxy_open
+            // 
+            this.btn_galaxy_open.Location = new System.Drawing.Point(247, 122);
+            this.btn_galaxy_open.Name = "btn_galaxy_open";
+            this.btn_galaxy_open.Size = new System.Drawing.Size(75, 22);
+            this.btn_galaxy_open.TabIndex = 9;
+            this.btn_galaxy_open.Text = "打开";
+            this.btn_galaxy_open.UseVisualStyleBackColor = true;
+            this.btn_galaxy_open.Click += new System.EventHandler(this.btn_galaxy_open_Click);
+            // 
+            // w_galaxy_status_lb
+            // 
+            this.w_galaxy_status_lb.AutoSize = true;
+            this.w_galaxy_status_lb.Location = new System.Drawing.Point(6, 11);
+            this.w_galaxy_status_lb.Name = "w_galaxy_status_lb";
+            this.w_galaxy_status_lb.Size = new System.Drawing.Size(65, 12);
+            this.w_galaxy_status_lb.TabIndex = 0;
+            this.w_galaxy_status_lb.Text = "当前状态：";
+            // 
+            // btn_galaxy_save
+            // 
+            this.btn_galaxy_save.Location = new System.Drawing.Point(168, 120);
+            this.btn_galaxy_save.Name = "btn_galaxy_save";
+            this.btn_galaxy_save.Size = new System.Drawing.Size(69, 22);
+            this.btn_galaxy_save.TabIndex = 8;
+            this.btn_galaxy_save.Text = "保存";
+            this.btn_galaxy_save.UseVisualStyleBackColor = true;
+            this.btn_galaxy_save.Click += new System.EventHandler(this.btn_galaxy_save_Click);
+            // 
+            // w_galaxy_status
+            // 
+            this.w_galaxy_status.AutoSize = true;
+            this.w_galaxy_status.Location = new System.Drawing.Point(77, 11);
+            this.w_galaxy_status.Name = "w_galaxy_status";
+            this.w_galaxy_status.Size = new System.Drawing.Size(17, 12);
+            this.w_galaxy_status.TabIndex = 1;
+            this.w_galaxy_status.Text = "无";
+            // 
+            // btn_galaxy_stop
+            // 
+            this.btn_galaxy_stop.Location = new System.Drawing.Point(87, 120);
+            this.btn_galaxy_stop.Name = "btn_galaxy_stop";
+            this.btn_galaxy_stop.Size = new System.Drawing.Size(75, 22);
+            this.btn_galaxy_stop.TabIndex = 7;
+            this.btn_galaxy_stop.Text = "停止";
+            this.btn_galaxy_stop.UseVisualStyleBackColor = true;
+            this.btn_galaxy_stop.Click += new System.EventHandler(this.btn_galaxy_stop_Click);
+            // 
+            // label2
+            // 
+            this.label2.AutoSize = true;
+            this.label2.Location = new System.Drawing.Point(6, 35);
+            this.label2.Name = "label2";
+            this.label2.Size = new System.Drawing.Size(65, 12);
+            this.label2.TabIndex = 2;
+            this.label2.Text = "当前页面：";
+            // 
+            // btn_galaxy_start
+            // 
+            this.btn_galaxy_start.Location = new System.Drawing.Point(8, 120);
+            this.btn_galaxy_start.Name = "btn_galaxy_start";
+            this.btn_galaxy_start.Size = new System.Drawing.Size(69, 22);
+            this.btn_galaxy_start.TabIndex = 6;
+            this.btn_galaxy_start.Text = "开始";
+            this.btn_galaxy_start.UseVisualStyleBackColor = true;
+            this.btn_galaxy_start.Click += new System.EventHandler(this.btn_galaxy_start_Click);
+            // 
+            // w_galaxy_page
+            // 
+            this.w_galaxy_page.AutoSize = true;
+            this.w_galaxy_page.Location = new System.Drawing.Point(77, 35);
+            this.w_galaxy_page.Name = "w_galaxy_page";
+            this.w_galaxy_page.Size = new System.Drawing.Size(17, 12);
+            this.w_galaxy_page.TabIndex = 3;
+            this.w_galaxy_page.Text = "无";
+            // 
+            // w_galaxy_universe
+            // 
+            this.w_galaxy_universe.AutoSize = true;
+            this.w_galaxy_universe.Location = new System.Drawing.Point(77, 63);
+            this.w_galaxy_universe.Name = "w_galaxy_universe";
+            this.w_galaxy_universe.Size = new System.Drawing.Size(17, 12);
+            this.w_galaxy_universe.TabIndex = 5;
+            this.w_galaxy_universe.Text = "无";
+            // 
+            // label4
+            // 
+            this.label4.AutoSize = true;
+            this.label4.Location = new System.Drawing.Point(6, 63);
+            this.label4.Name = "label4";
+            this.label4.Size = new System.Drawing.Size(65, 12);
+            this.label4.TabIndex = 4;
+            this.label4.Text = "当前宇宙：";
+            // 
             // w_user_box
             // 
             this.w_user_box.Controls.Add(this.w_user_account);
@@ -456,7 +735,7 @@ namespace feeling
             this.w_user_box.Controls.Add(this.label1);
             this.w_user_box.Location = new System.Drawing.Point(9, 7);
             this.w_user_box.Name = "w_user_box";
-            this.w_user_box.Size = new System.Drawing.Size(211, 172);
+            this.w_user_box.Size = new System.Drawing.Size(194, 172);
             this.w_user_box.TabIndex = 1;
             this.w_user_box.TabStop = false;
             this.w_user_box.Text = "用户";
@@ -466,13 +745,13 @@ namespace feeling
             this.w_user_account.FormattingEnabled = true;
             this.w_user_account.Location = new System.Drawing.Point(53, 25);
             this.w_user_account.Name = "w_user_account";
-            this.w_user_account.Size = new System.Drawing.Size(152, 20);
+            this.w_user_account.Size = new System.Drawing.Size(135, 20);
             this.w_user_account.TabIndex = 18;
             this.w_user_account.SelectedIndexChanged += new System.EventHandler(this.w_user_account_SelectedIndexChanged);
             // 
             // btn_user_logout
             // 
-            this.btn_user_logout.Location = new System.Drawing.Point(146, 142);
+            this.btn_user_logout.Location = new System.Drawing.Point(129, 142);
             this.btn_user_logout.Name = "btn_user_logout";
             this.btn_user_logout.Size = new System.Drawing.Size(59, 23);
             this.btn_user_logout.TabIndex = 17;
@@ -505,7 +784,7 @@ namespace feeling
             this.w_user_password.Location = new System.Drawing.Point(53, 54);
             this.w_user_password.MaxLength = 20;
             this.w_user_password.Name = "w_user_password";
-            this.w_user_password.Size = new System.Drawing.Size(152, 21);
+            this.w_user_password.Size = new System.Drawing.Size(135, 21);
             this.w_user_password.TabIndex = 14;
             this.w_user_password.UseSystemPasswordChar = true;
             this.w_user_password.WordWrap = false;
@@ -537,124 +816,96 @@ namespace feeling
             this.label1.TabIndex = 10;
             this.label1.Text = "账 号:";
             // 
-            // w_galaxy_box
+            // w_pirate4
             // 
-            this.w_galaxy_box.Controls.Add(this.btn_galaxy_open);
-            this.w_galaxy_box.Controls.Add(this.btn_galaxy_save);
-            this.w_galaxy_box.Controls.Add(this.btn_galaxy_stop);
-            this.w_galaxy_box.Controls.Add(this.btn_galaxy_start);
-            this.w_galaxy_box.Controls.Add(this.w_galaxy_universe);
-            this.w_galaxy_box.Controls.Add(this.label4);
-            this.w_galaxy_box.Controls.Add(this.w_galaxy_page);
-            this.w_galaxy_box.Controls.Add(this.label2);
-            this.w_galaxy_box.Controls.Add(this.w_galaxy_status);
-            this.w_galaxy_box.Controls.Add(this.w_galaxy_status_lb);
-            this.w_galaxy_box.Location = new System.Drawing.Point(226, 7);
-            this.w_galaxy_box.Name = "w_galaxy_box";
-            this.w_galaxy_box.Size = new System.Drawing.Size(221, 172);
-            this.w_galaxy_box.TabIndex = 0;
-            this.w_galaxy_box.TabStop = false;
-            this.w_galaxy_box.Text = "星图";
+            this.w_pirate4.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.w_pirate4.Location = new System.Drawing.Point(846, 0);
+            this.w_pirate4.MyCount = 0;
+            this.w_pirate4.MyMode = 0;
+            this.w_pirate4.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate4.MyOptions")));
+            this.w_pirate4.MyPlanet = "";
+            this.w_pirate4.MyTitle = "银河系5";
+            this.w_pirate4.Name = "w_pirate4";
+            this.w_pirate4.Size = new System.Drawing.Size(150, 150);
+            this.w_pirate4.TabIndex = 4;
             // 
-            // btn_galaxy_open
+            // w_pirate3
             // 
-            this.btn_galaxy_open.Location = new System.Drawing.Point(167, 143);
-            this.btn_galaxy_open.Name = "btn_galaxy_open";
-            this.btn_galaxy_open.Size = new System.Drawing.Size(50, 22);
-            this.btn_galaxy_open.TabIndex = 9;
-            this.btn_galaxy_open.Text = "打开";
-            this.btn_galaxy_open.UseVisualStyleBackColor = true;
-            this.btn_galaxy_open.Click += new System.EventHandler(this.btn_galaxy_open_Click);
+            this.w_pirate3.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.w_pirate3.Location = new System.Drawing.Point(693, 0);
+            this.w_pirate3.MyCount = 0;
+            this.w_pirate3.MyMode = 0;
+            this.w_pirate3.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate3.MyOptions")));
+            this.w_pirate3.MyPlanet = "";
+            this.w_pirate3.MyTitle = "银河系4";
+            this.w_pirate3.Name = "w_pirate3";
+            this.w_pirate3.Size = new System.Drawing.Size(150, 150);
+            this.w_pirate3.TabIndex = 3;
             // 
-            // btn_galaxy_save
+            // w_pirate2
             // 
-            this.btn_galaxy_save.Location = new System.Drawing.Point(113, 143);
-            this.btn_galaxy_save.Name = "btn_galaxy_save";
-            this.btn_galaxy_save.Size = new System.Drawing.Size(50, 22);
-            this.btn_galaxy_save.TabIndex = 8;
-            this.btn_galaxy_save.Text = "保存";
-            this.btn_galaxy_save.UseVisualStyleBackColor = true;
-            this.btn_galaxy_save.Click += new System.EventHandler(this.btn_galaxy_save_Click);
+            this.w_pirate2.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.w_pirate2.Location = new System.Drawing.Point(539, 0);
+            this.w_pirate2.MyCount = 0;
+            this.w_pirate2.MyMode = 0;
+            this.w_pirate2.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate2.MyOptions")));
+            this.w_pirate2.MyPlanet = "";
+            this.w_pirate2.MyTitle = "银河系3";
+            this.w_pirate2.Name = "w_pirate2";
+            this.w_pirate2.Size = new System.Drawing.Size(150, 150);
+            this.w_pirate2.TabIndex = 2;
             // 
-            // btn_galaxy_stop
+            // w_pirate1
             // 
-            this.btn_galaxy_stop.Location = new System.Drawing.Point(59, 143);
-            this.btn_galaxy_stop.Name = "btn_galaxy_stop";
-            this.btn_galaxy_stop.Size = new System.Drawing.Size(50, 22);
-            this.btn_galaxy_stop.TabIndex = 7;
-            this.btn_galaxy_stop.Text = "停止";
-            this.btn_galaxy_stop.UseVisualStyleBackColor = true;
-            this.btn_galaxy_stop.Click += new System.EventHandler(this.btn_galaxy_stop_Click);
+            this.w_pirate1.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.w_pirate1.Location = new System.Drawing.Point(386, 0);
+            this.w_pirate1.MyCount = 0;
+            this.w_pirate1.MyMode = 0;
+            this.w_pirate1.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate1.MyOptions")));
+            this.w_pirate1.MyPlanet = "";
+            this.w_pirate1.MyTitle = "银河系2";
+            this.w_pirate1.Name = "w_pirate1";
+            this.w_pirate1.Size = new System.Drawing.Size(150, 150);
+            this.w_pirate1.TabIndex = 1;
             // 
-            // btn_galaxy_start
+            // w_pirate0
             // 
-            this.btn_galaxy_start.Location = new System.Drawing.Point(4, 143);
-            this.btn_galaxy_start.Name = "btn_galaxy_start";
-            this.btn_galaxy_start.Size = new System.Drawing.Size(50, 22);
-            this.btn_galaxy_start.TabIndex = 6;
-            this.btn_galaxy_start.Text = "开始";
-            this.btn_galaxy_start.UseVisualStyleBackColor = true;
-            this.btn_galaxy_start.Click += new System.EventHandler(this.btn_galaxy_start_Click);
+            this.w_pirate0.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.w_pirate0.Location = new System.Drawing.Point(233, 0);
+            this.w_pirate0.MyCount = 0;
+            this.w_pirate0.MyMode = 0;
+            this.w_pirate0.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate0.MyOptions")));
+            this.w_pirate0.MyPlanet = "";
+            this.w_pirate0.MyTitle = "银河系1";
+            this.w_pirate0.Name = "w_pirate0";
+            this.w_pirate0.Size = new System.Drawing.Size(150, 150);
+            this.w_pirate0.TabIndex = 0;
             // 
-            // w_galaxy_universe
+            // btn_tx_stop
             // 
-            this.w_galaxy_universe.AutoSize = true;
-            this.w_galaxy_universe.Location = new System.Drawing.Point(77, 88);
-            this.w_galaxy_universe.Name = "w_galaxy_universe";
-            this.w_galaxy_universe.Size = new System.Drawing.Size(17, 12);
-            this.w_galaxy_universe.TabIndex = 5;
-            this.w_galaxy_universe.Text = "无";
+            this.btn_tx_stop.Location = new System.Drawing.Point(171, 122);
+            this.btn_tx_stop.Name = "btn_tx_stop";
+            this.btn_tx_stop.Size = new System.Drawing.Size(50, 22);
+            this.btn_tx_stop.TabIndex = 48;
+            this.btn_tx_stop.Text = "停止";
+            this.btn_tx_stop.UseVisualStyleBackColor = true;
+            this.btn_tx_stop.Click += new System.EventHandler(this.btn_tx_stop_Click);
             // 
-            // label4
+            // btn_hd_stop
             // 
-            this.label4.AutoSize = true;
-            this.label4.Location = new System.Drawing.Point(4, 88);
-            this.label4.Name = "label4";
-            this.label4.Size = new System.Drawing.Size(65, 12);
-            this.label4.TabIndex = 4;
-            this.label4.Text = "当前宇宙：";
-            // 
-            // w_galaxy_page
-            // 
-            this.w_galaxy_page.AutoSize = true;
-            this.w_galaxy_page.Location = new System.Drawing.Point(77, 57);
-            this.w_galaxy_page.Name = "w_galaxy_page";
-            this.w_galaxy_page.Size = new System.Drawing.Size(17, 12);
-            this.w_galaxy_page.TabIndex = 3;
-            this.w_galaxy_page.Text = "无";
-            // 
-            // label2
-            // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(6, 57);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(65, 12);
-            this.label2.TabIndex = 2;
-            this.label2.Text = "当前页面：";
-            // 
-            // w_galaxy_status
-            // 
-            this.w_galaxy_status.AutoSize = true;
-            this.w_galaxy_status.Location = new System.Drawing.Point(77, 28);
-            this.w_galaxy_status.Name = "w_galaxy_status";
-            this.w_galaxy_status.Size = new System.Drawing.Size(17, 12);
-            this.w_galaxy_status.TabIndex = 1;
-            this.w_galaxy_status.Text = "无";
-            // 
-            // w_galaxy_status_lb
-            // 
-            this.w_galaxy_status_lb.AutoSize = true;
-            this.w_galaxy_status_lb.Location = new System.Drawing.Point(6, 28);
-            this.w_galaxy_status_lb.Name = "w_galaxy_status_lb";
-            this.w_galaxy_status_lb.Size = new System.Drawing.Size(65, 12);
-            this.w_galaxy_status_lb.TabIndex = 0;
-            this.w_galaxy_status_lb.Text = "当前状态：";
+            this.btn_hd_stop.Location = new System.Drawing.Point(82, 34);
+            this.btn_hd_stop.Name = "btn_hd_stop";
+            this.btn_hd_stop.Size = new System.Drawing.Size(60, 22);
+            this.btn_hd_stop.TabIndex = 55;
+            this.btn_hd_stop.Text = "停止";
+            this.btn_hd_stop.UseVisualStyleBackColor = true;
+            this.btn_hd_stop.Click += new System.EventHandler(this.btn_hd_stop_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1153, 861);
+            this.ClientSize = new System.Drawing.Size(1213, 861);
             this.Controls.Add(this.w_split_container);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";
@@ -664,13 +915,15 @@ namespace feeling
             this.w_split_container.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.w_split_container)).EndInit();
             this.w_split_container.ResumeLayout(false);
-            this.tabControl1.ResumeLayout(false);
+            this.w_tab.ResumeLayout(false);
             this.tab_tanxian.ResumeLayout(false);
             this.tab_tanxian.PerformLayout();
+            this.tab_haidao.ResumeLayout(false);
+            this.tab_haidao.PerformLayout();
+            this.w_galaxy.ResumeLayout(false);
+            this.w_galaxy.PerformLayout();
             this.w_user_box.ResumeLayout(false);
             this.w_user_box.PerformLayout();
-            this.w_galaxy_box.ResumeLayout(false);
-            this.w_galaxy_box.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -678,7 +931,6 @@ namespace feeling
         #endregion
 
         private System.Windows.Forms.SplitContainer w_split_container;
-        private System.Windows.Forms.GroupBox w_galaxy_box;
         private System.Windows.Forms.Label w_galaxy_status_lb;
         private System.Windows.Forms.Label w_galaxy_status;
         private System.Windows.Forms.Label w_galaxy_universe;
@@ -696,7 +948,7 @@ namespace feeling
         private System.Windows.Forms.Button btn_user_logout;
         private System.Windows.Forms.Button btn_user_login;
         private System.Windows.Forms.ComboBox w_user_account;
-        private System.Windows.Forms.TabControl tabControl1;
+        private System.Windows.Forms.TabControl w_tab;
         private System.Windows.Forms.TabPage tab_tanxian;
         private System.Windows.Forms.TextBox w_user_password;
         private System.Windows.Forms.Label label5;
@@ -727,8 +979,29 @@ namespace feeling
         private System.Windows.Forms.Button btn_tx_start;
         private System.Windows.Forms.Button btn_tx_save;
         private System.Windows.Forms.Button btn_tx_revert;
-        private System.Windows.Forms.CheckBox xbox_auto;
+        private System.Windows.Forms.CheckBox cbox_tx_auto;
         private System.Windows.Forms.Label label10;
         private System.Windows.Forms.Label tx_content;
+        private System.Windows.Forms.TabPage tab_haidao;
+        private PirateControl w_pirate0;
+        private PirateControl w_pirate3;
+        private PirateControl w_pirate2;
+        private PirateControl w_pirate1;
+        private PirateControl w_pirate4;
+        private System.Windows.Forms.Button btn_hd_revert;
+        private System.Windows.Forms.Button btn_hd_save;
+        private System.Windows.Forms.Button btn_hd_start;
+        private System.Windows.Forms.CheckBox cbox_hd_auto;
+        private System.Windows.Forms.Button btn_hd_refresh;
+        private System.Windows.Forms.TabPage w_galaxy;
+        private System.Windows.Forms.Label label11;
+        private System.Windows.Forms.Label label12;
+        private System.Windows.Forms.TextBox w_hd_inverval;
+        private System.Windows.Forms.Button btn_hd_interval;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Label lb_hd_interval;
+        private System.Windows.Forms.Label w_hd_tips;
+        private System.Windows.Forms.Button btn_tx_stop;
+        private System.Windows.Forms.Button btn_hd_stop;
     }
 }
