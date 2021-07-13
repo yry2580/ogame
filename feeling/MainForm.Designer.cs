@@ -33,6 +33,7 @@ namespace feeling
             this.w_split_container = new System.Windows.Forms.SplitContainer();
             this.w_tab = new System.Windows.Forms.TabControl();
             this.tab_tanxian = new System.Windows.Forms.TabPage();
+            this.btn_tx_stop = new System.Windows.Forms.Button();
             this.tx_content = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
             this.cbox_tx_auto = new System.Windows.Forms.CheckBox();
@@ -64,6 +65,7 @@ namespace feeling
             this.tx0_ship0_cb = new System.Windows.Forms.ComboBox();
             this.tx0_ship0 = new System.Windows.Forms.TextBox();
             this.tab_haidao = new System.Windows.Forms.TabPage();
+            this.btn_hd_stop = new System.Windows.Forms.Button();
             this.w_hd_tips = new System.Windows.Forms.Label();
             this.lb_hd_interval = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
@@ -76,6 +78,11 @@ namespace feeling
             this.btn_hd_revert = new System.Windows.Forms.Button();
             this.btn_hd_save = new System.Windows.Forms.Button();
             this.btn_hd_start = new System.Windows.Forms.Button();
+            this.w_pirate4 = new feeling.PirateControl();
+            this.w_pirate3 = new feeling.PirateControl();
+            this.w_pirate2 = new feeling.PirateControl();
+            this.w_pirate1 = new feeling.PirateControl();
+            this.w_pirate0 = new feeling.PirateControl();
             this.w_galaxy = new System.Windows.Forms.TabPage();
             this.btn_galaxy_open = new System.Windows.Forms.Button();
             this.w_galaxy_status_lb = new System.Windows.Forms.Label();
@@ -96,13 +103,11 @@ namespace feeling
             this.label5 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.w_pirate4 = new feeling.PirateControl();
-            this.w_pirate3 = new feeling.PirateControl();
-            this.w_pirate2 = new feeling.PirateControl();
-            this.w_pirate1 = new feeling.PirateControl();
-            this.w_pirate0 = new feeling.PirateControl();
-            this.btn_tx_stop = new System.Windows.Forms.Button();
-            this.btn_hd_stop = new System.Windows.Forms.Button();
+            this.w_info = new System.Windows.Forms.TabPage();
+            this.lb_tx_info = new System.Windows.Forms.Label();
+            this.label15 = new System.Windows.Forms.Label();
+            this.lb_hd_info = new System.Windows.Forms.Label();
+            this.label16 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.w_split_container)).BeginInit();
             this.w_split_container.Panel2.SuspendLayout();
             this.w_split_container.SuspendLayout();
@@ -111,6 +116,7 @@ namespace feeling
             this.tab_haidao.SuspendLayout();
             this.w_galaxy.SuspendLayout();
             this.w_user_box.SuspendLayout();
+            this.w_info.SuspendLayout();
             this.SuspendLayout();
             // 
             // w_split_container
@@ -135,6 +141,7 @@ namespace feeling
             this.w_tab.Controls.Add(this.tab_tanxian);
             this.w_tab.Controls.Add(this.tab_haidao);
             this.w_tab.Controls.Add(this.w_galaxy);
+            this.w_tab.Controls.Add(this.w_info);
             this.w_tab.Location = new System.Drawing.Point(209, 7);
             this.w_tab.Multiline = true;
             this.w_tab.Name = "w_tab";
@@ -182,6 +189,16 @@ namespace feeling
             this.tab_tanxian.TabIndex = 1;
             this.tab_tanxian.Text = "探险";
             this.tab_tanxian.UseVisualStyleBackColor = true;
+            // 
+            // btn_tx_stop
+            // 
+            this.btn_tx_stop.Location = new System.Drawing.Point(171, 122);
+            this.btn_tx_stop.Name = "btn_tx_stop";
+            this.btn_tx_stop.Size = new System.Drawing.Size(50, 22);
+            this.btn_tx_stop.TabIndex = 48;
+            this.btn_tx_stop.Text = "停止";
+            this.btn_tx_stop.UseVisualStyleBackColor = true;
+            this.btn_tx_stop.Click += new System.EventHandler(this.btn_tx_stop_Click);
             // 
             // tx_content
             // 
@@ -495,6 +512,16 @@ namespace feeling
             this.tab_haidao.Text = "海盗";
             this.tab_haidao.UseVisualStyleBackColor = true;
             // 
+            // btn_hd_stop
+            // 
+            this.btn_hd_stop.Location = new System.Drawing.Point(82, 34);
+            this.btn_hd_stop.Name = "btn_hd_stop";
+            this.btn_hd_stop.Size = new System.Drawing.Size(60, 22);
+            this.btn_hd_stop.TabIndex = 55;
+            this.btn_hd_stop.Text = "停止";
+            this.btn_hd_stop.UseVisualStyleBackColor = true;
+            this.btn_hd_stop.Click += new System.EventHandler(this.btn_hd_stop_Click);
+            // 
             // w_hd_tips
             // 
             this.w_hd_tips.Location = new System.Drawing.Point(42, 120);
@@ -608,6 +635,71 @@ namespace feeling
             this.btn_hd_start.Text = "开始";
             this.btn_hd_start.UseVisualStyleBackColor = true;
             this.btn_hd_start.Click += new System.EventHandler(this.btn_hd_start_Click);
+            // 
+            // w_pirate4
+            // 
+            this.w_pirate4.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.w_pirate4.Location = new System.Drawing.Point(846, 0);
+            this.w_pirate4.MyCount = 0;
+            this.w_pirate4.MyMode = 0;
+            this.w_pirate4.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate4.MyOptions")));
+            this.w_pirate4.MyPlanet = "";
+            this.w_pirate4.MyTitle = "银河系5";
+            this.w_pirate4.Name = "w_pirate4";
+            this.w_pirate4.Size = new System.Drawing.Size(150, 150);
+            this.w_pirate4.TabIndex = 4;
+            // 
+            // w_pirate3
+            // 
+            this.w_pirate3.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.w_pirate3.Location = new System.Drawing.Point(693, 0);
+            this.w_pirate3.MyCount = 0;
+            this.w_pirate3.MyMode = 0;
+            this.w_pirate3.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate3.MyOptions")));
+            this.w_pirate3.MyPlanet = "";
+            this.w_pirate3.MyTitle = "银河系4";
+            this.w_pirate3.Name = "w_pirate3";
+            this.w_pirate3.Size = new System.Drawing.Size(150, 150);
+            this.w_pirate3.TabIndex = 3;
+            // 
+            // w_pirate2
+            // 
+            this.w_pirate2.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.w_pirate2.Location = new System.Drawing.Point(539, 0);
+            this.w_pirate2.MyCount = 0;
+            this.w_pirate2.MyMode = 0;
+            this.w_pirate2.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate2.MyOptions")));
+            this.w_pirate2.MyPlanet = "";
+            this.w_pirate2.MyTitle = "银河系3";
+            this.w_pirate2.Name = "w_pirate2";
+            this.w_pirate2.Size = new System.Drawing.Size(150, 150);
+            this.w_pirate2.TabIndex = 2;
+            // 
+            // w_pirate1
+            // 
+            this.w_pirate1.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.w_pirate1.Location = new System.Drawing.Point(386, 0);
+            this.w_pirate1.MyCount = 0;
+            this.w_pirate1.MyMode = 0;
+            this.w_pirate1.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate1.MyOptions")));
+            this.w_pirate1.MyPlanet = "";
+            this.w_pirate1.MyTitle = "银河系2";
+            this.w_pirate1.Name = "w_pirate1";
+            this.w_pirate1.Size = new System.Drawing.Size(150, 150);
+            this.w_pirate1.TabIndex = 1;
+            // 
+            // w_pirate0
+            // 
+            this.w_pirate0.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.w_pirate0.Location = new System.Drawing.Point(233, 0);
+            this.w_pirate0.MyCount = 0;
+            this.w_pirate0.MyMode = 0;
+            this.w_pirate0.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate0.MyOptions")));
+            this.w_pirate0.MyPlanet = "";
+            this.w_pirate0.MyTitle = "银河系1";
+            this.w_pirate0.Name = "w_pirate0";
+            this.w_pirate0.Size = new System.Drawing.Size(150, 150);
+            this.w_pirate0.TabIndex = 0;
             // 
             // w_galaxy
             // 
@@ -816,90 +908,57 @@ namespace feeling
             this.label1.TabIndex = 10;
             this.label1.Text = "账 号:";
             // 
-            // w_pirate4
+            // w_info
             // 
-            this.w_pirate4.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.w_pirate4.Location = new System.Drawing.Point(846, 0);
-            this.w_pirate4.MyCount = 0;
-            this.w_pirate4.MyMode = 0;
-            this.w_pirate4.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate4.MyOptions")));
-            this.w_pirate4.MyPlanet = "";
-            this.w_pirate4.MyTitle = "银河系5";
-            this.w_pirate4.Name = "w_pirate4";
-            this.w_pirate4.Size = new System.Drawing.Size(150, 150);
-            this.w_pirate4.TabIndex = 4;
+            this.w_info.Controls.Add(this.lb_hd_info);
+            this.w_info.Controls.Add(this.label16);
+            this.w_info.Controls.Add(this.lb_tx_info);
+            this.w_info.Controls.Add(this.label15);
+            this.w_info.Location = new System.Drawing.Point(4, 22);
+            this.w_info.Name = "w_info";
+            this.w_info.Padding = new System.Windows.Forms.Padding(3);
+            this.w_info.Size = new System.Drawing.Size(996, 150);
+            this.w_info.TabIndex = 4;
+            this.w_info.Text = "信息";
+            this.w_info.UseVisualStyleBackColor = true;
             // 
-            // w_pirate3
+            // lb_tx_info
             // 
-            this.w_pirate3.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.w_pirate3.Location = new System.Drawing.Point(693, 0);
-            this.w_pirate3.MyCount = 0;
-            this.w_pirate3.MyMode = 0;
-            this.w_pirate3.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate3.MyOptions")));
-            this.w_pirate3.MyPlanet = "";
-            this.w_pirate3.MyTitle = "银河系4";
-            this.w_pirate3.Name = "w_pirate3";
-            this.w_pirate3.Size = new System.Drawing.Size(150, 150);
-            this.w_pirate3.TabIndex = 3;
+            this.lb_tx_info.AutoSize = true;
+            this.lb_tx_info.Location = new System.Drawing.Point(77, 11);
+            this.lb_tx_info.Name = "lb_tx_info";
+            this.lb_tx_info.Size = new System.Drawing.Size(17, 12);
+            this.lb_tx_info.TabIndex = 56;
+            this.lb_tx_info.Text = "无";
             // 
-            // w_pirate2
+            // label15
             // 
-            this.w_pirate2.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.w_pirate2.Location = new System.Drawing.Point(539, 0);
-            this.w_pirate2.MyCount = 0;
-            this.w_pirate2.MyMode = 0;
-            this.w_pirate2.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate2.MyOptions")));
-            this.w_pirate2.MyPlanet = "";
-            this.w_pirate2.MyTitle = "银河系3";
-            this.w_pirate2.Name = "w_pirate2";
-            this.w_pirate2.Size = new System.Drawing.Size(150, 150);
-            this.w_pirate2.TabIndex = 2;
+            this.label15.AutoSize = true;
+            this.label15.ForeColor = System.Drawing.Color.Red;
+            this.label15.Location = new System.Drawing.Point(6, 11);
+            this.label15.Name = "label15";
+            this.label15.Size = new System.Drawing.Size(65, 12);
+            this.label15.TabIndex = 55;
+            this.label15.Text = "自动探险：";
             // 
-            // w_pirate1
+            // lb_hd_info
             // 
-            this.w_pirate1.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.w_pirate1.Location = new System.Drawing.Point(386, 0);
-            this.w_pirate1.MyCount = 0;
-            this.w_pirate1.MyMode = 0;
-            this.w_pirate1.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate1.MyOptions")));
-            this.w_pirate1.MyPlanet = "";
-            this.w_pirate1.MyTitle = "银河系2";
-            this.w_pirate1.Name = "w_pirate1";
-            this.w_pirate1.Size = new System.Drawing.Size(150, 150);
-            this.w_pirate1.TabIndex = 1;
+            this.lb_hd_info.AutoSize = true;
+            this.lb_hd_info.Location = new System.Drawing.Point(77, 32);
+            this.lb_hd_info.Name = "lb_hd_info";
+            this.lb_hd_info.Size = new System.Drawing.Size(17, 12);
+            this.lb_hd_info.TabIndex = 58;
+            this.lb_hd_info.Text = "无";
             // 
-            // w_pirate0
+            // label16
             // 
-            this.w_pirate0.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.w_pirate0.Location = new System.Drawing.Point(233, 0);
-            this.w_pirate0.MyCount = 0;
-            this.w_pirate0.MyMode = 0;
-            this.w_pirate0.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate0.MyOptions")));
-            this.w_pirate0.MyPlanet = "";
-            this.w_pirate0.MyTitle = "银河系1";
-            this.w_pirate0.Name = "w_pirate0";
-            this.w_pirate0.Size = new System.Drawing.Size(150, 150);
-            this.w_pirate0.TabIndex = 0;
-            // 
-            // btn_tx_stop
-            // 
-            this.btn_tx_stop.Location = new System.Drawing.Point(171, 122);
-            this.btn_tx_stop.Name = "btn_tx_stop";
-            this.btn_tx_stop.Size = new System.Drawing.Size(50, 22);
-            this.btn_tx_stop.TabIndex = 48;
-            this.btn_tx_stop.Text = "停止";
-            this.btn_tx_stop.UseVisualStyleBackColor = true;
-            this.btn_tx_stop.Click += new System.EventHandler(this.btn_tx_stop_Click);
-            // 
-            // btn_hd_stop
-            // 
-            this.btn_hd_stop.Location = new System.Drawing.Point(82, 34);
-            this.btn_hd_stop.Name = "btn_hd_stop";
-            this.btn_hd_stop.Size = new System.Drawing.Size(60, 22);
-            this.btn_hd_stop.TabIndex = 55;
-            this.btn_hd_stop.Text = "停止";
-            this.btn_hd_stop.UseVisualStyleBackColor = true;
-            this.btn_hd_stop.Click += new System.EventHandler(this.btn_hd_stop_Click);
+            this.label16.AutoSize = true;
+            this.label16.ForeColor = System.Drawing.Color.Red;
+            this.label16.Location = new System.Drawing.Point(6, 32);
+            this.label16.Name = "label16";
+            this.label16.Size = new System.Drawing.Size(65, 12);
+            this.label16.TabIndex = 57;
+            this.label16.Text = "自动海盗：";
             // 
             // MainForm
             // 
@@ -924,6 +983,8 @@ namespace feeling
             this.w_galaxy.PerformLayout();
             this.w_user_box.ResumeLayout(false);
             this.w_user_box.PerformLayout();
+            this.w_info.ResumeLayout(false);
+            this.w_info.PerformLayout();
             this.ResumeLayout(false);
 
         }
@@ -1003,5 +1064,10 @@ namespace feeling
         private System.Windows.Forms.Label w_hd_tips;
         private System.Windows.Forms.Button btn_tx_stop;
         private System.Windows.Forms.Button btn_hd_stop;
+        private System.Windows.Forms.TabPage w_info;
+        private System.Windows.Forms.Label lb_tx_info;
+        private System.Windows.Forms.Label label15;
+        private System.Windows.Forms.Label lb_hd_info;
+        private System.Windows.Forms.Label label16;
     }
 }

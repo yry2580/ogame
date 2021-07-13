@@ -447,7 +447,6 @@ namespace feeling
 
                     source = await GetHauptframe().GetSourceAsync();
 
-
                     // 切换触发球
                     int idx = mPlanet.GetPlanetIndex(mission.PlanetName);
                     if (idx < 0)

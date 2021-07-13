@@ -263,7 +263,6 @@ namespace feeling
 
             Cef.Initialize(settings);
             mWebBrowser = new ChromiumWebBrowser(NativeConst.Homepage);
-
             mWebBrowser.Dock = DockStyle.Fill;
             mWebBrowser.FrameLoadStart += Web_OnFrameStart;
             mWebBrowser.FrameLoadEnd += Web_OnFrameEnd;
@@ -611,20 +610,38 @@ namespace feeling
             if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
 
             var exMission = GetExMission();
-            if (exMission.List.Count <= 0) return;
-
+            
             NativeController.Instance.StartExpedition(exMission);
             Redraw();
         }
 
         private void doAutoExpedtion()
         {
-            if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
-            if (!mAutoExpedition) return;
-            if (!cbox_tx_auto.Checked) return;
+            if (OperStatus.Expedition == NativeController.Instance.MyOperStatus)
+            {
+                lb_tx_info.Text = $"{DateTime.Now:G}|正在探险状态";
+                return;
+            }
+
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                lb_tx_info.Text = $"{DateTime.Now:G}|其他操作正忙";
+                return;
+            }
+
+            if (!cbox_tx_auto.Checked || !mAutoExpedition)
+            {
+                lb_tx_info.Text = $"{DateTime.Now:G}|没有设置自动探险";
+                return;
+            }
 
             var delta = DateTime.Now - NativeController.Instance.LastExeditionTime;
-            if (delta.TotalMinutes < 60 * 2) return;
+            if (delta.TotalMinutes < 120)
+            {
+                var val = 120 - delta.TotalMinutes;
+                lb_tx_info.Text = $"{DateTime.Now:G}|大概还差{Math.Ceiling(val)}分钟可自动探险";
+                return;
+            }
 
             doExpedtion();
         }
@@ -675,8 +692,6 @@ namespace feeling
             if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
 
             var pMission = GetPirateMission();
-            if (pMission.MissionCount <= 0) return;
-
             NativeController.Instance.StartPirate(pMission);
             Redraw();
         }
@@ -705,12 +720,31 @@ namespace feeling
 
         private void doAutoPirate()
         {
-            if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
-            if (!mAutoPirate) return;
-            if (!cbox_hd_auto.Checked) return;
+            if (OperStatus.Pirate == NativeController.Instance.MyOperStatus)
+            {
+                lb_hd_info.Text = $"{DateTime.Now:G}|正在海盗状态";
+                return;
+            }
+            
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                lb_hd_info.Text = $"{DateTime.Now:G}|其他操作正忙";
+                return;
+            }
+
+            if (!cbox_hd_auto.Checked || !mAutoPirate)
+            {
+                lb_hd_info.Text = $"{DateTime.Now:G}|没有设置自动海盗";
+                return;
+            }
 
             var delta = DateTime.Now - NativeController.Instance.LastPirateTime;
-            if (delta.TotalMinutes < mPirateInterval) return;
+            if (delta.TotalMinutes < mPirateInterval)
+            {
+                var val = mPirateInterval - delta.TotalMinutes;
+                lb_hd_info.Text = $"{DateTime.Now:G}|大概还差{Math.Ceiling(val)}分钟可自动海盗";
+                return;
+            }
 
             doPirate();
         }
