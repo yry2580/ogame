@@ -6,8 +6,6 @@ using System.Linq;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
-using AngleSharp;
-using AngleSharp.Html.Parser;
 
 namespace feeling
 {
@@ -28,7 +26,7 @@ namespace feeling
         public int Count => mGalaxyDict.Count;
         IDictionary<string, string> mGalaxyDict = new ConcurrentDictionary<string, string>();
 
-        HtmlParser mHtmlParser = new HtmlParser();
+        OgameParser mHtmlParser = new OgameParser();
 
         public bool AddPage(string source)
         {
@@ -94,43 +92,9 @@ namespace feeling
 
         protected bool ParsePage(string source)
         {
-            if (string.IsNullOrWhiteSpace(source)) return false;
-
-            var doc = mHtmlParser.ParseDocument(source);
-            var galaxypage = doc?.QuerySelector("#galaxypage");
-            var list = galaxypage?.QuerySelectorAll("tbody tr");
-            if (null == list) return false;
-
-            var pagexy = list[0];
-            var xy = pagexy?.TextContent.Replace("太阳系", "").Split(':');
-            if (null == xy) return false;
-            int x = int.Parse(xy[0]);
-            int y = int.Parse(xy[1]);
-
-            string key = $"{x}:{y:d3}";
-
-            for (int z = 1; z < 16; z++)
+            if (!HtmlUtil.ParseGalaxyPage(source, ref mGalaxyDict, mHtmlParser))
             {
-                int idx = z + 1;
-                if (idx >= list.Length) break;
-
-                var e = list[idx];
-                var childs = e.Children;
-
-                var name = HtmlUtil.ParseText(childs[5].TextContent, "(");
-                if (string.IsNullOrWhiteSpace(name)) continue;
-
-                var rno = HtmlUtil.ParseText(childs[0].TextContent);
-                var union = HtmlUtil.ParseText(childs[6].TextContent);
-                var rank = "";
-                var mat = Regex.Match(childs[5].InnerHtml, $@"玩家 (?<name>\S*) 排名 (?<rank>\d*)");
-                if (mat.Success)
-                {
-                    name = mat.Groups["name"].Value;
-                    rank = mat.Groups["rank"].Value;
-                }
-
-                mGalaxyDict[key] = $"{x}:{y}:{rno},{name},{union},{rank}";
+                return false;
             }
 
             return true;

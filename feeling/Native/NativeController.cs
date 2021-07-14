@@ -6,7 +6,6 @@ using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
-using AngleSharp.Html.Parser;
 using CefSharp;
 using CefSharp.WinForms;
 using Newtonsoft.Json;
@@ -45,7 +44,7 @@ namespace feeling
         public Planet MyPlanet => mPlanet;
         public static User User = new User();
 
-        HtmlParser mHtmlParser = new HtmlParser();
+        OgameParser mHtmlParser = new OgameParser();
 
         // auto
         public bool IsAutoExpedition = false;
@@ -427,6 +426,16 @@ namespace feeling
                 }
             });
 
+            if (exMission.List.Count <= 0)
+            {
+                OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MMdd-hhmm}|没有探险任务");
+                
+                LastExeditionTime = DateTime.Now;
+                IsExpeditionWorking = false;
+                SwitchStatus(OperStatus.None);
+                return;
+            }
+
             Reload();
             await GoHome(1500);
 
@@ -484,7 +493,7 @@ namespace feeling
 
                     // 查看舰队队列
                     source = await GetHauptframe().GetSourceAsync();
-                    if (!mExpedition.ParseFleetQueue(source, out FleetQueue fq))
+                    if (!HtmlUtil.ParseFleetQueue(source, out FleetQueue fq))
                     {
                         _nextFunc(false);
                         OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MMdd-hhmm}|解析探险队列有误");
@@ -519,7 +528,7 @@ namespace feeling
                         var fleet = mission.FleetList[i];
                         var shipId = Ship.GetShipId(fleet.ShipType);
                         var count = fleet.Count;
-                        if (mExpedition.ParseShip(source, shipId, out int total))
+                        if (HtmlUtil.ParseShip(source, shipId, out int total))
                         {
                             Console.WriteLine($"shipId{shipId} count{count}");
                             if (total >= count)
@@ -668,6 +677,15 @@ namespace feeling
                 }
             });
 
+            if (pMission.MissionCount <= 0)
+            {
+                OperTipsEvent.Invoke(OperStatus.Pirate, $"{DateTime.Now:MMdd-hhmm}|没有海盗任务");
+                LastPirateTime = DateTime.Now;
+                IsPirateWorking = false;
+                SwitchStatus(OperStatus.None);
+                return;
+            }
+
             Reload();
             await GoHome(1500);
 
@@ -724,7 +742,7 @@ namespace feeling
 
                     // 查看舰队队列
                     source = await GetHauptframe().GetSourceAsync();
-                    if (!mExpedition.ParseFleetQueue(source, out FleetQueue fq))
+                    if (!HtmlUtil.ParseFleetQueue(source, out FleetQueue fq))
                     {
                         _nextFunc(false);
                         Console.WriteLine($"{DateTime.Now:G}|解析航道队列有误");
@@ -744,7 +762,7 @@ namespace feeling
                         break;
                     }
 
-                    if (PirateUtil.HasAttack(source, mission.TargetPos))
+                    if (HtmlUtil.HasAttack(source, mission.TargetPos))
                     {
                         Console.WriteLine($"{DateTime.Now:G}|已经存在攻击任务");
                         OperTipsEvent.Invoke(OperStatus.Pirate, $"{DateTime.Now:MMdd-hhmm}|已存在攻击目标任务");
@@ -759,7 +777,7 @@ namespace feeling
                         var fleet = mission.FleetList[i];
                         var shipId = Ship.GetShipId(fleet.ShipType);
                         var count = fleet.Count;
-                        if (mExpedition.ParseShip(source, shipId, out int total))
+                        if (HtmlUtil.ParseShip(source, shipId, out int total))
                         {
                             Console.WriteLine($"shipId{shipId} count{count}");
                             if (total >= count)

@@ -33,6 +33,7 @@ namespace feeling
             this.w_split_container = new System.Windows.Forms.SplitContainer();
             this.w_tab = new System.Windows.Forms.TabControl();
             this.tab_tanxian = new System.Windows.Forms.TabPage();
+            this.btn_tx_planet = new System.Windows.Forms.Button();
             this.btn_tx_stop = new System.Windows.Forms.Button();
             this.tx_content = new System.Windows.Forms.Label();
             this.label10 = new System.Windows.Forms.Label();
@@ -65,6 +66,8 @@ namespace feeling
             this.tx0_ship0_cb = new System.Windows.Forms.ComboBox();
             this.tx0_ship0 = new System.Windows.Forms.TextBox();
             this.tab_haidao = new System.Windows.Forms.TabPage();
+            this.rbtn_cfg1 = new System.Windows.Forms.RadioButton();
+            this.rbtn_cfg0 = new System.Windows.Forms.RadioButton();
             this.btn_hd_stop = new System.Windows.Forms.Button();
             this.w_hd_tips = new System.Windows.Forms.Label();
             this.lb_hd_interval = new System.Windows.Forms.Label();
@@ -108,7 +111,6 @@ namespace feeling
             this.label5 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.btn_tx_planet = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.w_split_container)).BeginInit();
             this.w_split_container.Panel2.SuspendLayout();
             this.w_split_container.SuspendLayout();
@@ -192,6 +194,16 @@ namespace feeling
             this.tab_tanxian.Text = "探险";
             this.tab_tanxian.UseVisualStyleBackColor = true;
             // 
+            // btn_tx_planet
+            // 
+            this.btn_tx_planet.Location = new System.Drawing.Point(3, 122);
+            this.btn_tx_planet.Name = "btn_tx_planet";
+            this.btn_tx_planet.Size = new System.Drawing.Size(50, 22);
+            this.btn_tx_planet.TabIndex = 49;
+            this.btn_tx_planet.Text = "刷球";
+            this.btn_tx_planet.UseVisualStyleBackColor = true;
+            this.btn_tx_planet.Click += new System.EventHandler(this.btn_tx_planet_Click);
+            // 
             // btn_tx_stop
             // 
             this.btn_tx_stop.Location = new System.Drawing.Point(232, 122);
@@ -206,7 +218,7 @@ namespace feeling
             // 
             this.tx_content.AutoSize = true;
             this.tx_content.ForeColor = System.Drawing.Color.Black;
-            this.tx_content.Location = new System.Drawing.Point(322, 126);
+            this.tx_content.Location = new System.Drawing.Point(444, 127);
             this.tx_content.Name = "tx_content";
             this.tx_content.Size = new System.Drawing.Size(0, 12);
             this.tx_content.TabIndex = 47;
@@ -488,6 +500,8 @@ namespace feeling
             // 
             // tab_haidao
             // 
+            this.tab_haidao.Controls.Add(this.rbtn_cfg1);
+            this.tab_haidao.Controls.Add(this.rbtn_cfg0);
             this.tab_haidao.Controls.Add(this.btn_hd_stop);
             this.tab_haidao.Controls.Add(this.w_hd_tips);
             this.tab_haidao.Controls.Add(this.lb_hd_interval);
@@ -514,9 +528,31 @@ namespace feeling
             this.tab_haidao.Text = "海盗";
             this.tab_haidao.UseVisualStyleBackColor = true;
             // 
+            // rbtn_cfg1
+            // 
+            this.rbtn_cfg1.AutoSize = true;
+            this.rbtn_cfg1.Location = new System.Drawing.Point(177, 7);
+            this.rbtn_cfg1.Name = "rbtn_cfg1";
+            this.rbtn_cfg1.Size = new System.Drawing.Size(53, 16);
+            this.rbtn_cfg1.TabIndex = 57;
+            this.rbtn_cfg1.Text = "配置2";
+            this.rbtn_cfg1.UseVisualStyleBackColor = true;
+            // 
+            // rbtn_cfg0
+            // 
+            this.rbtn_cfg0.AutoSize = true;
+            this.rbtn_cfg0.Checked = true;
+            this.rbtn_cfg0.Location = new System.Drawing.Point(127, 7);
+            this.rbtn_cfg0.Name = "rbtn_cfg0";
+            this.rbtn_cfg0.Size = new System.Drawing.Size(53, 16);
+            this.rbtn_cfg0.TabIndex = 56;
+            this.rbtn_cfg0.TabStop = true;
+            this.rbtn_cfg0.Text = "配置1";
+            this.rbtn_cfg0.UseVisualStyleBackColor = true;
+            // 
             // btn_hd_stop
             // 
-            this.btn_hd_stop.Location = new System.Drawing.Point(82, 34);
+            this.btn_hd_stop.Location = new System.Drawing.Point(66, 35);
             this.btn_hd_stop.Name = "btn_hd_stop";
             this.btn_hd_stop.Size = new System.Drawing.Size(60, 22);
             this.btn_hd_stop.TabIndex = 55;
@@ -535,7 +571,7 @@ namespace feeling
             // lb_hd_interval
             // 
             this.lb_hd_interval.AutoSize = true;
-            this.lb_hd_interval.Location = new System.Drawing.Point(153, 66);
+            this.lb_hd_interval.Location = new System.Drawing.Point(155, 78);
             this.lb_hd_interval.Name = "lb_hd_interval";
             this.lb_hd_interval.Size = new System.Drawing.Size(23, 12);
             this.lb_hd_interval.TabIndex = 53;
@@ -544,7 +580,7 @@ namespace feeling
             // label13
             // 
             this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(75, 65);
+            this.label13.Location = new System.Drawing.Point(72, 78);
             this.label13.Name = "label13";
             this.label13.Size = new System.Drawing.Size(77, 12);
             this.label13.TabIndex = 52;
@@ -552,7 +588,7 @@ namespace feeling
             // 
             // btn_hd_interval
             // 
-            this.btn_hd_interval.Location = new System.Drawing.Point(155, 89);
+            this.btn_hd_interval.Location = new System.Drawing.Point(155, 95);
             this.btn_hd_interval.Name = "btn_hd_interval";
             this.btn_hd_interval.Size = new System.Drawing.Size(60, 22);
             this.btn_hd_interval.TabIndex = 51;
@@ -562,7 +598,7 @@ namespace feeling
             // 
             // w_hd_inverval
             // 
-            this.w_hd_inverval.Location = new System.Drawing.Point(77, 90);
+            this.w_hd_inverval.Location = new System.Drawing.Point(77, 96);
             this.w_hd_inverval.Name = "w_hd_inverval";
             this.w_hd_inverval.Size = new System.Drawing.Size(72, 21);
             this.w_hd_inverval.TabIndex = 50;
@@ -571,7 +607,7 @@ namespace feeling
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(6, 93);
+            this.label12.Location = new System.Drawing.Point(6, 99);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(65, 12);
             this.label12.TabIndex = 49;
@@ -589,7 +625,7 @@ namespace feeling
             // 
             // btn_hd_refresh
             // 
-            this.btn_hd_refresh.Location = new System.Drawing.Point(6, 6);
+            this.btn_hd_refresh.Location = new System.Drawing.Point(0, 4);
             this.btn_hd_refresh.Name = "btn_hd_refresh";
             this.btn_hd_refresh.Size = new System.Drawing.Size(60, 22);
             this.btn_hd_refresh.TabIndex = 47;
@@ -600,7 +636,7 @@ namespace feeling
             // cbox_hd_auto
             // 
             this.cbox_hd_auto.AutoSize = true;
-            this.cbox_hd_auto.Location = new System.Drawing.Point(8, 65);
+            this.cbox_hd_auto.Location = new System.Drawing.Point(8, 77);
             this.cbox_hd_auto.Name = "cbox_hd_auto";
             this.cbox_hd_auto.Size = new System.Drawing.Size(48, 16);
             this.cbox_hd_auto.TabIndex = 46;
@@ -610,7 +646,7 @@ namespace feeling
             // 
             // btn_hd_revert
             // 
-            this.btn_hd_revert.Location = new System.Drawing.Point(82, 6);
+            this.btn_hd_revert.Location = new System.Drawing.Point(66, 4);
             this.btn_hd_revert.Name = "btn_hd_revert";
             this.btn_hd_revert.Size = new System.Drawing.Size(60, 22);
             this.btn_hd_revert.TabIndex = 12;
@@ -620,7 +656,7 @@ namespace feeling
             // 
             // btn_hd_save
             // 
-            this.btn_hd_save.Location = new System.Drawing.Point(155, 6);
+            this.btn_hd_save.Location = new System.Drawing.Point(132, 35);
             this.btn_hd_save.Name = "btn_hd_save";
             this.btn_hd_save.Size = new System.Drawing.Size(60, 22);
             this.btn_hd_save.TabIndex = 11;
@@ -630,7 +666,7 @@ namespace feeling
             // 
             // btn_hd_start
             // 
-            this.btn_hd_start.Location = new System.Drawing.Point(6, 34);
+            this.btn_hd_start.Location = new System.Drawing.Point(0, 35);
             this.btn_hd_start.Name = "btn_hd_start";
             this.btn_hd_start.Size = new System.Drawing.Size(60, 22);
             this.btn_hd_start.TabIndex = 10;
@@ -725,7 +761,7 @@ namespace feeling
             // 
             // btn_galaxy_open
             // 
-            this.btn_galaxy_open.Location = new System.Drawing.Point(247, 122);
+            this.btn_galaxy_open.Location = new System.Drawing.Point(243, 120);
             this.btn_galaxy_open.Name = "btn_galaxy_open";
             this.btn_galaxy_open.Size = new System.Drawing.Size(75, 22);
             this.btn_galaxy_open.TabIndex = 9;
@@ -962,16 +998,6 @@ namespace feeling
             this.label1.TabIndex = 10;
             this.label1.Text = "账 号:";
             // 
-            // btn_tx_planet
-            // 
-            this.btn_tx_planet.Location = new System.Drawing.Point(3, 122);
-            this.btn_tx_planet.Name = "btn_tx_planet";
-            this.btn_tx_planet.Size = new System.Drawing.Size(50, 22);
-            this.btn_tx_planet.TabIndex = 49;
-            this.btn_tx_planet.Text = "刷球";
-            this.btn_tx_planet.UseVisualStyleBackColor = true;
-            this.btn_tx_planet.Click += new System.EventHandler(this.btn_tx_planet_Click);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -1082,5 +1108,7 @@ namespace feeling
         private System.Windows.Forms.Label lb_hd_info;
         private System.Windows.Forms.Label label16;
         private System.Windows.Forms.Button btn_tx_planet;
+        private System.Windows.Forms.RadioButton rbtn_cfg1;
+        private System.Windows.Forms.RadioButton rbtn_cfg0;
     }
 }

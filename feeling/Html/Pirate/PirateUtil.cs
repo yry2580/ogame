@@ -1,5 +1,4 @@
-﻿using AngleSharp.Html.Parser;
-using Newtonsoft.Json;
+﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -11,22 +10,27 @@ namespace feeling
 {
     class PirateUtil
     {
-        static string mCfgFile = NativeConst.CurrentDirectory + "pirate_mission.cfg";
-
+        // static string mCfgFile = NativeConst.CurrentDirectory + "pirate_mission.cfg";
         public static PirateMission MyPirateMission;
 
-        static HtmlParser mParser = new HtmlParser();
+        static OgameParser mParser = new OgameParser();
 
         public static List<string> NpcList = new List<string>();
         public static bool HasNpcData => NpcList.Count > 0;
 
-        public static void Save(PirateMission pMission)
+        protected static string GetFilePath(int idx = 0)
+        {
+            string flag = idx <= 0 ? "" : idx.ToString();
+            return $"{NativeConst.CurrentDirectory}pirate_mission{flag}.cfg";
+        }
+
+        public static void Save(PirateMission pMission, int idx = 0)
         {
             try
             {
                 MyPirateMission = pMission;
                 string text = JsonConvert.SerializeObject(pMission, Formatting.Indented);
-                File.WriteAllText(mCfgFile, text);
+                File.WriteAllText(GetFilePath(idx), text);
             }
             catch (Exception ex)
             {
@@ -34,57 +38,36 @@ namespace feeling
             }
         }
 
-        public static void ReadCfg()
+        public static bool ReadCfg(int idx = 0)
         {
-            if (!File.Exists(mCfgFile)) return;
+            var filePath = GetFilePath(idx);
+            if (!File.Exists(filePath)) return false;
 
             try
             {
-                var text = File.ReadAllText(mCfgFile);
+                var text = File.ReadAllText(filePath);
                 MyPirateMission = JsonConvert.DeserializeObject<PirateMission>(text);
+                return true;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"PirateUtil readCfg catch {ex.Message}");
+                return false;
             }
         }
 
         public static void ParseNpc(string source)
         {
             Console.WriteLine($"ParseNpc");
+            if (!HtmlUtil.ParseNpc(source, out List<string> result, mParser)) return;
+            if (null == result) return;
 
-            if (string.IsNullOrEmpty(source)) return;
-
-            if (source.IndexOf("id=\"galaxy_form\"") < 0)
-            {
-                return;
-            }
-
-            var doc = mParser.ParseDocument(source);
-            var list = doc?.QuerySelectorAll("#galaxy_form table select[name='npczuobiao'] option");
-            if (null == list) return;
-
-            NpcList = list.Where(e => e.TextContent.Contains("海盗")).Select(e => e.TextContent.Trim()).ToList();
+            NpcList = result;
         }
 
         public static void ResetNpc()
         {
             NpcList.Clear();
-        }
-
-        public static bool HasAttack(string source, Pos pos)
-        {
-            if (string.IsNullOrWhiteSpace(source)) return false;
-            var parser = new HtmlParser();
-            var doc = parser.ParseDocument(source);
-            var node = doc?.QuerySelector("#fleetdelaybox");
-            if (null == node) return false;
-
-            var thQuery = doc.QuerySelectorAll("center center table tr th");
-            var target = $"[{pos.X}:{pos.Y}:{pos.Z}]";
-            var ret = thQuery.Where(e => e.TextContent.Contains(target));
-            if (null == ret) return false;
-            return ret.Count() > 0;
         }
     }
 }

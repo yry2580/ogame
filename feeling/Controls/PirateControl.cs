@@ -90,7 +90,7 @@ namespace feeling
             }
             set
             {
-                var idx = mPlanets.FindIndex(e => e == value);
+                var idx = Planet.FindPlanet(value, mPlanets);
                 if (idx != -1)
                 {
                     u_combo_box.SelectedIndex = idx;

@@ -101,6 +101,7 @@ namespace feeling
 
             // 默认值
             lb_hd_interval.Text = mPirateInterval.ToString();
+            rbtn_cfg0.Checked = true;
 
             InitExpedition();
             RedrawAccount();
@@ -159,8 +160,10 @@ namespace feeling
 
         protected bool PirateCfg()
         {
+            var idx = rbtn_cfg1.Checked ? 1 : 0;
+
             // 读取配置
-            PirateUtil.ReadCfg();
+            if (!PirateUtil.ReadCfg(idx)) return false;
 
             var pMissionCfg = PirateUtil.MyPirateMission;
 
@@ -359,16 +362,16 @@ namespace feeling
                 tx3_planet.Items.Add(e);
             });
 
-            var idx = lists.FindIndex(e => e == txt0);
+            var idx = Planet.FindPlanet(txt0, lists);
             tx0_planet.SelectedIndex = idx != -1 ? idx : 0;
             
-            idx = lists.FindIndex(e => e == txt1);
+            idx = Planet.FindPlanet(txt1, lists);
             tx1_planet.SelectedIndex = idx != -1 ? idx : 0;
             
-            idx = lists.FindIndex(e => e == txt2);
+            idx = Planet.FindPlanet(txt2, lists);
             tx2_planet.SelectedIndex = idx != -1 ? idx : 0;
 
-            idx = lists.FindIndex(e => e == txt3);
+            idx = Planet.FindPlanet(txt3, lists);
             tx3_planet.SelectedIndex = idx != -1 ? idx : 0;
 
             w_pirate0.SetPlanets(lists);
@@ -410,6 +413,8 @@ namespace feeling
             w_hd_inverval.Enabled = enabled;
             btn_hd_interval.Enabled = enabled;
             btn_hd_stop.Enabled = !enabled && canStop;
+            rbtn_cfg0.Enabled = enabled;
+            rbtn_cfg1.Enabled = enabled;
         }
 
         public void SetExpeditionButton(bool enabled, bool canStop = false)
@@ -711,14 +716,22 @@ namespace feeling
 
         private void btn_hd_save_Click(object sender, EventArgs e)
         {
-            var pMission = GetPirateMission();
-            pMission.Interval = mPirateInterval;
-
-            PirateUtil.Save(pMission);
+            var idx = rbtn_cfg1.Checked ? 1 : 0;
+            var ret = MessageBox.Show($"确定保存配置{idx + 1}吗", "提示", MessageBoxButtons.YesNo);
+            if (ret == DialogResult.Yes)
+            {
+                var pMission = GetPirateMission();
+                pMission.Interval = mPirateInterval;
+                PirateUtil.Save(pMission, idx);
+            }
         }
 
         private void btn_hd_revert_Click(object sender, EventArgs e)
         {
+            var idx = rbtn_cfg1.Checked ? 1 : 0;
+            var ret = MessageBox.Show($"确定读取配置{idx + 1}吗", "提示", MessageBoxButtons.YesNo);
+            if (DialogResult.Yes != ret) return;
+
             if (!PirateCfg())
             {
                 MessageBox.Show("读取配置还原失败");
