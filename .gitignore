@@ -6,4 +6,5 @@
 /*/bin/x64/
 /*/bin/feeling/
 /*/obj/
-/ogame/bin/Release.7z
+*.zip
+*.7z
