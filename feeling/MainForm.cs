@@ -340,6 +340,11 @@ namespace feeling
                 return;
             }
 
+            var txt0 = tx0_planet.Text;
+            var txt1 = tx1_planet.Text;
+            var txt2 = tx2_planet.Text;
+            var txt3 = tx3_planet.Text;
+
             tx0_planet.Items.Clear();
             tx1_planet.Items.Clear();
             tx2_planet.Items.Clear();
@@ -352,12 +357,19 @@ namespace feeling
                 tx1_planet.Items.Add(e);
                 tx2_planet.Items.Add(e);
                 tx3_planet.Items.Add(e);
-
-                tx0_planet.SelectedIndex = 0;
-                tx1_planet.SelectedIndex = 0;
-                tx2_planet.SelectedIndex = 0;
-                tx3_planet.SelectedIndex = 0;
             });
+
+            var idx = lists.FindIndex(e => e == txt0);
+            tx0_planet.SelectedIndex = idx != -1 ? idx : 0;
+            
+            idx = lists.FindIndex(e => e == txt1);
+            tx1_planet.SelectedIndex = idx != -1 ? idx : 0;
+            
+            idx = lists.FindIndex(e => e == txt2);
+            tx2_planet.SelectedIndex = idx != -1 ? idx : 0;
+
+            idx = lists.FindIndex(e => e == txt3);
+            tx3_planet.SelectedIndex = idx != -1 ? idx : 0;
 
             w_pirate0.SetPlanets(lists);
             w_pirate1.SetPlanets(lists);
@@ -405,6 +417,7 @@ namespace feeling
             btn_tx_start.Enabled = enabled;
             btn_tx_save.Enabled = enabled;
             btn_tx_revert.Enabled = enabled;
+            btn_tx_planet.Enabled = enabled;
             cbox_tx_auto.Enabled = enabled;
             btn_tx_stop.Enabled = !enabled && canStop;
         }
@@ -783,6 +796,12 @@ namespace feeling
         private void btn_tx_stop_Click(object sender, EventArgs e)
         {
             NativeController.Instance.StopExpedition();
+        }
+
+        private void btn_tx_planet_Click(object sender, EventArgs e)
+        {
+            NativeController.Instance.RefreshPlanet();
+            Redraw();
         }
     }
 }

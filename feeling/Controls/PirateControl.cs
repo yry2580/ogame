@@ -90,7 +90,6 @@ namespace feeling
             }
             set
             {
-                Console.WriteLine("MyPlanet", value);
                 var idx = mPlanets.FindIndex(e => e == value);
                 if (idx != -1)
                 {

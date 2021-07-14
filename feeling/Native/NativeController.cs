@@ -374,6 +374,31 @@ namespace feeling
             });
         }
 
+        /// <summary>
+        /// 刷新NPC
+        /// </summary>
+        internal void RefreshPlanet()
+        {
+            SwitchStatus(OperStatus.Expedition);
+            Task.Run(async () =>
+            {
+                try
+                {
+                    mPlanet.Reset();
+                    Reload();
+                    await GoHome(1500);
+                    var source = await GetHauptframe().GetSourceAsync();
+                    await Task.Delay(500);
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"RefreshPlanet catch {ex.Message}");
+                }
+
+                SwitchStatus(OperStatus.None);
+            });
+        }
+
         internal void StopExpedition()
         {
             if (!IsExpeditionWorking) return;
@@ -586,12 +611,14 @@ namespace feeling
             {
                 try
                 {
+                    mPlanet.Reset();
                     PirateUtil.ResetNpc();
                     Reload();
                     await GoHome(1500);
+                    var source = await GetHauptframe()?.GetSourceAsync();
                     FrameRunJs(NativeScript.ToGalaxy());
                     await Task.Delay(1500);
-                    var source = await GetHauptframe().GetSourceAsync();
+                    source = await GetHauptframe().GetSourceAsync();
                     await Task.Delay(500);
                 }
                 catch(Exception ex)
