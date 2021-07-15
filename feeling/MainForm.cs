@@ -14,6 +14,7 @@ using System.Windows.Forms;
 using CefSharp;
 using CefSharp.WinForms;
 using Newtonsoft.Json;
+using OgameService;
 
 namespace feeling
 {
@@ -25,6 +26,9 @@ namespace feeling
         bool mAutoExpedition = false;
         bool mAutoPirate = false;
         int mPirateInterval = 120; // 分
+
+        OgClient mClient;
+        string mLastContent = "";
 
         public MainForm()
         {
@@ -72,6 +76,7 @@ namespace feeling
 
                 doAutoExpedtion();
                 doAutoPirate();
+                SendHello();
             }
             catch (Exception ex)
             {
@@ -287,6 +292,13 @@ namespace feeling
                 w_galaxy_status.Text = sDesc;
                 w_galaxy_page.Text = pDesc;
                 w_galaxy_universe.Text = uDesc;
+
+                if (sDesc.Length > 0)
+                {
+                    mLastContent = sDesc;
+                }
+
+                SendHello();
             }));
         }
 
@@ -298,6 +310,12 @@ namespace feeling
 
                 switch (operStatus)
                 {
+                    case OperStatus.System:
+                        btn_galaxy_start.Enabled = false;
+                        btn_galaxy_stop.Enabled = false;
+                        SetExpeditionButton(false);
+                        SetPirateButton(false);
+                        break;
                     case OperStatus.Galaxy:
                         btn_galaxy_start.Enabled = false;
                         btn_galaxy_stop.Enabled = true;
@@ -331,6 +349,7 @@ namespace feeling
                 Console.WriteLine($"Redraw catch {ex.Message}");
             }
 
+            SendHello();
         }
 
         protected void RedrawPlanet()
@@ -394,6 +413,12 @@ namespace feeling
                 default:
                     break;
             }
+
+            if (tips.Trim().Length > 0)
+            {
+                mLastContent = tips;
+            }
+            SendHello();
         }
 
         public void SetUserButton(bool enabled)
@@ -464,6 +489,28 @@ namespace feeling
             mThread = new Thread(LookBackThread);
             mThread.IsBackground = true;
             mThread.Start();
+
+            mClient = new OgClient();
+            mClient.Connected += OnServerConnected;
+            mClient.DataReceived += OnServerReceived;
+        }
+
+        private void OnServerReceived(OgameData data)
+        {
+        }
+
+        private void SendHello()
+        {
+            var operStatus = (int)NativeController.Instance.MyOperStatus;
+            var status = (StatusEnum)operStatus;
+            mClient?.SendData(status, mLastContent, lb_hd_info.Text.Trim());
+        }
+
+        private void OnServerConnected()
+        {
+            var operStatus = (int)NativeController.Instance.MyOperStatus;
+            var status = (StatusEnum)operStatus;
+            mClient?.SendAuth(status, mLastContent, lb_hd_info.Text.Trim());
         }
 
         private void btn_galaxy_open_Click(object sender, EventArgs e)
@@ -521,22 +568,32 @@ namespace feeling
 
         private async void btn_user_login_Click(object sender, EventArgs e)
         {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
+
             var account = w_user_account.Text.Trim();
             var psw = w_user_password.Text.Trim();
             var str = w_user_universe.Text.Trim();
             int universe = str.Length <= 0 ? 0 : int.Parse(str);
 
+            NativeController.Instance.SwitchStatus(OperStatus.System);
+
             SetUserButton(false);
             await NativeController.Instance.LoginAsync(account, psw, universe);
             SetUserButton(true);
             RedrawAccount();
+
+            NativeController.Instance.SwitchStatus(OperStatus.None);
         }
 
         private async void btn_user_logout_Click(object sender, EventArgs e)
         {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
+
+            NativeController.Instance.SwitchStatus(OperStatus.System);
             SetUserButton(false);
             await NativeController.Instance.LogoutAsync();
             SetUserButton(true);
+            NativeController.Instance.SwitchStatus(OperStatus.None);
         }
 
         private void w_user_account_SelectedIndexChanged(object sender, EventArgs e)

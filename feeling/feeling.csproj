@@ -160,6 +160,12 @@
   <ItemGroup>
     <Content Include="favicon.ico" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\OgameService\OgameService\OgameService.csproj">
+      <Project>{f41a3506-72f5-49d4-b4f1-55504c9e3ff2}</Project>
+      <Name>OgameService</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
     <PropertyGroup>
