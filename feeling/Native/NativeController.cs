@@ -264,6 +264,7 @@ namespace feeling
 
         public async Task LoginAsync(string account, string psw, int universe)
         {
+            var source = "";
             if (account.Length <= 0 || psw.Length <= 0 || universe <= 0 || universe > 24)
             {
                 MessageBox.Show("请输入正确的账号、密码或宇宙");
@@ -273,7 +274,7 @@ namespace feeling
 
             if (HtmlUtil.IsGameUrl(MyAddress))
             {
-                var source = await GetHauptframe().GetSourceAsync();
+                source = await GetHauptframe().GetSourceAsync();
                 if (HtmlUtil.IsInGame(source))
                 {
                     MessageBox.Show("已经是登录状态");
@@ -288,7 +289,17 @@ namespace feeling
             }
 
             await Task.Delay(1000);
-            await GoHome();
+            await GoHome(1000);
+
+            if (HtmlUtil.IsGameUrl(MyAddress))
+            {
+                source = await GetHauptframe()?.GetSourceAsync();
+                if (HtmlUtil.HasTutorial(source))
+                {
+                    FrameRunJs(NativeScript.TutorialConfirm());
+                    await Task.Delay(1500);
+                }
+            }
 
             OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}登录操作结束");
         }
@@ -338,7 +349,7 @@ namespace feeling
                 return;
             }
 
-            if (OperStatus.None != MyOperStatus)
+            if (OperStatus.System != MyOperStatus)
             {
                 MessageBox.Show("当前正在忙，不建议退出");
                 OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}当前正在忙，不建议退出");
@@ -398,8 +409,12 @@ namespace feeling
                     mPlanet.Reset();
                     Reload();
                     await GoHome(1500);
-                    var source = await GetHauptframe().GetSourceAsync();
-                    await Task.Delay(500);
+
+                    if (HtmlUtil.IsGameUrl(MyAddress))
+                    {
+                        var source = await GetHauptframe().GetSourceAsync();
+                        await Task.Delay(500);
+                    }
                 }
                 catch (Exception ex)
                 {
@@ -452,6 +467,33 @@ namespace feeling
             }
 
             Reload();
+            if (HtmlUtil.IsGameUrl(MyAddress))
+            {
+                source = await GetHauptframe().GetSourceAsync();
+                if (HtmlUtil.HasTutorial(source))
+                {
+                    FrameRunJs(NativeScript.TutorialConfirm());
+                    await Task.Delay(1500);
+                    source = await GetHauptframe().GetSourceAsync();
+                    if (!HtmlUtil.IsInGame(source))
+                    {
+                        OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|探险结束，没有登录");
+                        LastExeditionTime = DateTime.Now;
+                        IsExpeditionWorking = false;
+                        SwitchStatus(OperStatus.None);
+                        return;
+                    }
+                }
+            }
+            else
+            {
+                OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|探险结束，没有登录");
+                LastExeditionTime = DateTime.Now;
+                IsExpeditionWorking = false;
+                SwitchStatus(OperStatus.None);
+                return;
+            }
+
             await GoHome(1500);
 
             try
@@ -642,11 +684,15 @@ namespace feeling
                     PirateUtil.ResetNpc();
                     Reload();
                     await GoHome(1500);
-                    var source = await GetHauptframe()?.GetSourceAsync();
-                    FrameRunJs(NativeScript.ToGalaxy());
-                    await Task.Delay(1500);
-                    source = await GetHauptframe().GetSourceAsync();
-                    await Task.Delay(500);
+
+                    if (HtmlUtil.IsGameUrl(MyAddress))
+                    {
+                        var source = await GetHauptframe()?.GetSourceAsync();
+                        FrameRunJs(NativeScript.ToGalaxy());
+                        await Task.Delay(1500);
+                        source = await GetHauptframe().GetSourceAsync();
+                        await Task.Delay(500);
+                    }
                 }
                 catch(Exception ex)
                 {
@@ -708,6 +754,33 @@ namespace feeling
             }
 
             Reload();
+
+            if (HtmlUtil.IsGameUrl(MyAddress))
+            {
+                source = await GetHauptframe().GetSourceAsync();
+                if (HtmlUtil.HasTutorial(source))
+                {
+                    FrameRunJs(NativeScript.TutorialConfirm());
+                    await Task.Delay(1500);
+                    source = await GetHauptframe().GetSourceAsync();
+                    if (!HtmlUtil.IsInGame(source))
+                    {
+                        OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|海盗结束，没有登录");
+                        LastExeditionTime = DateTime.Now;
+                        IsExpeditionWorking = false;
+                        SwitchStatus(OperStatus.None);
+                        return;
+                    }
+                }
+            }  else
+            {
+                OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|海盗结束，没有登录");
+                LastExeditionTime = DateTime.Now;
+                IsExpeditionWorking = false;
+                SwitchStatus(OperStatus.None);
+                return;
+            }
+
             await GoHome(1500);
 
             try

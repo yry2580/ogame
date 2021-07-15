@@ -161,7 +161,7 @@
     <Content Include="favicon.ico" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\OgameService\OgameService\OgameService.csproj">
+    <ProjectReference Include="..\ogameService\OgameService.csproj">
       <Project>{f41a3506-72f5-49d4-b4f1-55504c9e3ff2}</Project>
       <Name>OgameService</Name>
     </ProjectReference>
