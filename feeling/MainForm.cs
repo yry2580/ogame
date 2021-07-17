@@ -14,7 +14,9 @@ using System.Windows.Forms;
 using CefSharp;
 using CefSharp.WinForms;
 using Newtonsoft.Json;
+#if !NET45
 using OgameService;
+#endif
 
 namespace feeling
 {
@@ -26,8 +28,9 @@ namespace feeling
         bool mAutoExpedition = false;
         bool mAutoPirate = false;
         int mPirateInterval = 120; // 分
-
+#if !NET45
         OgClient mClient;
+#endif
         string mLastContent = "";
 
         public MainForm()
@@ -489,28 +492,35 @@ namespace feeling
             mThread = new Thread(LookBackThread);
             mThread.IsBackground = true;
             mThread.Start();
-
+#if !NET45
             mClient = new OgClient();
             mClient.Connected += OnServerConnected;
             mClient.DataReceived += OnServerReceived;
+#endif
         }
 
+#if !NET45
         private void OnServerReceived(OgameData data)
         {
         }
+#endif
 
         private void SendHello()
         {
+#if !NET45
             var operStatus = (int)NativeController.Instance.MyOperStatus;
             var status = (StatusEnum)operStatus;
             mClient?.SendData(status, mLastContent, lb_hd_info.Text.Trim());
+#endif
         }
 
         private void OnServerConnected()
         {
+#if !NET45
             var operStatus = (int)NativeController.Instance.MyOperStatus;
             var status = (StatusEnum)operStatus;
             mClient?.SendAuth(status, mLastContent, lb_hd_info.Text.Trim());
+#endif
         }
 
         private void btn_galaxy_open_Click(object sender, EventArgs e)

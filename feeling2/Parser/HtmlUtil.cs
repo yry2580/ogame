@@ -193,7 +193,7 @@ namespace feeling
 #else 
             var node = parser?.QuerySelector("//*[@id='fleetdelaybox']");
             if (null == node) return false;
-            var el = parser.QuerySelector($"//l//input[@name='{shipId}'");
+            var el = parser.QuerySelector($"//*[@class='l']//input[@name='{shipId}']");
             if (null == el) return false;
             var alt = el.GetAttributeValue("alt", "");
 #endif

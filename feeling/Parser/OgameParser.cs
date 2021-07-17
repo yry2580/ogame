@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-#if NET46
+#if !NET45
 using AngleSharp.Dom;
 using AngleSharp.Html.Dom;
 using AngleSharp.Html.Parser;
@@ -14,7 +14,7 @@ namespace feeling
 {
     class OgameParser
     {
-#if NET46
+#if !NET45
         HtmlParser mParser = new HtmlParser();
         IHtmlDocument mDoc;
 #else
@@ -23,7 +23,7 @@ namespace feeling
 #endif
         public void LoadHtml(string html)
         {
-#if NET46
+#if !NET45
             mDoc = mParser?.ParseDocument(html);
 #else
             hParser?.LoadHtml(html);
@@ -31,7 +31,7 @@ namespace feeling
 #endif
         }
 
-#if NET46
+#if !NET45
         public IElement QuerySelector(string selectors)
         {
             if (null == mDoc) return null;

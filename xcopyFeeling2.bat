@@ -13,5 +13,4 @@ xcopy ".\feeling\Util" ".\feeling2\Util" /y /e
 xcopy ".\feeling\Parser" ".\feeling2\Parser" /y /e
 xcopy ".\feeling\MainForm.cs" ".\feeling2" /y
 xcopy ".\feeling\MainForm.Designer.cs" ".\feeling2" /y
-xcopy ".\feeling\MainForm.resx" ".\feeling2" /y
 pause
