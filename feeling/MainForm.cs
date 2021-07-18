@@ -79,7 +79,7 @@ namespace feeling
 
                 doAutoExpedtion();
                 doAutoPirate();
-                SendHello();
+                SendData();
             }
             catch (Exception ex)
             {
@@ -301,7 +301,7 @@ namespace feeling
                     mLastContent = sDesc;
                 }
 
-                SendHello();
+                SendData();
             }));
         }
 
@@ -352,7 +352,7 @@ namespace feeling
                 Console.WriteLine($"Redraw catch {ex.Message}");
             }
 
-            SendHello();
+            SendData();
         }
 
         protected void RedrawPlanet()
@@ -421,7 +421,7 @@ namespace feeling
             {
                 mLastContent = tips;
             }
-            SendHello();
+            SendData();
         }
 
         public void SetUserButton(bool enabled)
@@ -502,10 +502,48 @@ namespace feeling
 #if !NET45
         private void OnServerReceived(OgameData data)
         {
+            Invoke(new Action(() => {
+                DoServerReceived(data);
+            }));
         }
-#endif
 
-        private void SendHello()
+        private async void DoServerReceived(OgameData data)
+        {
+            try
+            {
+                var operStatus = NativeController.Instance.MyOperStatus;
+                var lastContent = mLastContent;
+                var hdContent = lb_hd_info.Text.Trim();
+                if (OperStatus.None != operStatus)
+                {
+                    mClient.SendData((StatusEnum)((int)operStatus), lastContent, hdContent);
+                    return;
+                }
+                switch (data.Cmd)
+                {
+                    case CmdEnum.Login:
+                        NativeController.Instance.CanNotify = false;
+                        await TryLogin();
+                        mClient.SendData((StatusEnum)((int)operStatus), lastContent, hdContent);
+                        break;
+                    case CmdEnum.Pirate:
+                        NativeController.Instance.CanNotify = false;
+                        doPirate();
+                        mClient.SendData((StatusEnum)((int)operStatus), lastContent, hdContent);
+                        break;
+                    default:
+                        mClient.SendData((StatusEnum)((int)operStatus), lastContent, hdContent);
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Error($"feeling OnServerReceived catch {ex.Message}");
+            }
+        }
+
+#endif
+        private void SendData()
         {
 #if !NET45
             var operStatus = (int)NativeController.Instance.MyOperStatus;
@@ -577,6 +615,12 @@ namespace feeling
         }
 
         private async void btn_user_login_Click(object sender, EventArgs e)
+        {
+            NativeController.Instance.CanNotify = true;
+            await TryLogin();
+        }
+
+        private async Task TryLogin()
         {
             if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
 
@@ -768,6 +812,8 @@ namespace feeling
                 MessageBox.Show("海盗任务配置无效，请检测后再开始");
                 return;
             }
+
+            NativeController.Instance.CanNotify = true;
 
             doPirate();
         }

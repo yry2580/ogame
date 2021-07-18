@@ -58,6 +58,7 @@
   <ItemGroup>
     <Compile Include="Client\OgClient.cs" />
     <Compile Include="Client\OgClientCfg.cs" />
+    <Compile Include="Common\EventConst.cs" />
     <Compile Include="Data\OgameData.cs" />
     <Compile Include="Data\OgameEnum.cs" />
     <Compile Include="Server\OgCell.cs" />
@@ -73,7 +74,6 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="Common\" />
     <Folder Include="Native\" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -9,6 +9,8 @@ namespace OgameService
 {
     class OgCell
     {
+        private DateTime LastHello = DateTime.Now;
+
         public DateTime LastOperTime = DateTime.Now;
         public string SessionKey = "";
         public string Id = "";
@@ -42,6 +44,29 @@ namespace OgameService
 
             MyLastData = data;
             MyLastData.SessionKey = SessionKey;
+        }
+
+        public void SetHello(OgameData data)
+        {
+            LastHello = DateTime.Now;
+        }
+
+        public bool IsOvertime()
+        {
+            return (DateTime.Now - LastHello).TotalSeconds > (60 * 5);
+        }
+
+        internal void Close()
+        {
+            try
+            {
+                LastHello = DateTime.Now;
+                MySession?.Close();
+            }
+            catch(Exception ex)
+            {
+                LogUtil.Error($"OgCell({SessionKey}) Close catch {ex.Message}");
+            }
         }
     }
 }

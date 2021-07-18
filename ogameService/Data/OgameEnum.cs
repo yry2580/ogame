@@ -18,7 +18,9 @@ namespace OgameService
         None,
         Auth,
         Hello,
+        Data,
         Login,
+        Pirate,
     }
 
     public enum StatusEnum

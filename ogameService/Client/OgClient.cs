@@ -11,15 +11,13 @@ using System.Timers;
 
 namespace OgameService
 {
-    public delegate void OgEventHandler();
-    public delegate void OgEventHandler<T>(T data);
-
     public class OgClient
     {
         string mClientFile = AppDomain.CurrentDomain.BaseDirectory + "OgClient.cfg";
 
         public event OgEventHandler Connected;
         public event OgEventHandler<OgameData> DataReceived;
+        public event OgEventHandler HeartbeatHandler;
 
         TcpSocketClient mClient;
         Timer mTimer;
@@ -95,21 +93,30 @@ namespace OgameService
         void LoopTimerCheck(object sender, ElapsedEventArgs e)
         {
             LogUtil.Info($"LoopTimerUpdate");
-
-            if (null != mClient)
+            try
             {
-                if (TcpSocketConnectionState.Connected == mClient.State)
+                if (null != mClient)
                 {
-                    return;
+                    HeartbeatHandler?.Invoke();
+
+                    if (TcpSocketConnectionState.Connecting == mClient.State)
+                    {
+                        return;
+                    }
+
+                    if (TcpSocketConnectionState.Connected == mClient.State)
+                    {
+                        SendHello();
+                        return;
+                    }
                 }
 
-                if (TcpSocketConnectionState.Connecting == mClient.State)
-                {
-                    return;
-                }
+                ConnectServer();
             }
-
-            ConnectServer();
+            catch(Exception ex)
+            {
+                LogUtil.Error($"LoopTimerUpdate catch {ex.Message}");
+            }
         }
 
         public void ConnectServer()
@@ -129,8 +136,8 @@ namespace OgameService
                     mClient = null;
                 }
 #if DEBUG
-                // IPEndPoint ip = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 17201);
-                IPEndPoint ip = new IPEndPoint(IPAddress.Parse("112.74.170.178"), 17201);
+                IPEndPoint ip = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 17201);
+                // IPEndPoint ip = new IPEndPoint(IPAddress.Parse("112.74.170.178"), 17201);
 #else
                 IPEndPoint ip = new IPEndPoint(IPAddress.Parse("112.74.170.178"), 17201);
 #endif
@@ -173,7 +180,7 @@ namespace OgameService
         protected void OnServerConnected(object sender, TcpServerConnectedEventArgs e)
         {
             LogUtil.Warn("OnServerConnected");
-            Connected.Invoke();
+            Connected?.Invoke();
         }
 
         protected void OnServerDisconnected(object sender, TcpServerDisconnectedEventArgs e)
@@ -190,11 +197,11 @@ namespace OgameService
                 if (data == null) return;
 
                 LogUtil.Info($"Received {data.Cmd}");
-                DataReceived.Invoke(data);
+                DataReceived?.Invoke(data);
             }
-            catch (Exception)
+            catch (Exception ex)
             {
-
+                LogUtil.Error($"OnServerDataReceived catch {ex.Message}");
             }
         }
 
@@ -234,7 +241,12 @@ namespace OgameService
         {
             if (MyId.Length <= 0) return;
             
-            Post(CmdEnum.Hello, status, content, pirateAutoMsg);
+            Post(CmdEnum.Data, status, content, pirateAutoMsg);
+        }
+
+        public void SendHello()
+        {
+            Post(CmdEnum.Hello, StatusEnum.None, "", "");
         }
 
         #endregion

@@ -60,10 +60,8 @@ namespace OgameService
             {
                 var sessionKey = e.Session.SessionKey;
                 LogUtil.Info($"Disconnected {sessionKey}");
-                mCellList.RemoveAll(i => i.SessionKey == sessionKey);
-                mSessions.Remove(e.Session);
-
-                LogUtil.Info($"移除 {sessionKey}");
+                
+                RemoveCell(sessionKey);
             }
             catch (Exception ex)
             {
@@ -87,6 +85,9 @@ namespace OgameService
                 {
                     case CmdEnum.Auth:
                         DoAuth(sessionKey, e.Session, data);
+                        break;
+                    case CmdEnum.Hello:
+                        DoHello(sessionKey, data);
                         break;
                     default:
                         DoRecv(sessionKey, data);
@@ -142,6 +143,59 @@ namespace OgameService
             cell.SetData(data);
         }
 
+        protected void DoHello(string sessionKey, OgameData data)
+        {
+            LogUtil.Info($"DoHello {sessionKey}");
+
+            var cell = mCellList.Find(c => c.SessionKey == sessionKey && c.Id == data.Id);
+
+            if (null == cell)
+            {
+                LogUtil.Error($"DoRecv 没有取到cell");
+                return;
+            }
+
+            LogUtil.Info($"DoHello SetHello");
+            cell.SetHello(data);
+        }
+
+        protected void DoCheckHello()
+        {
+            Task.Run(async() =>
+            {
+                await Task.Delay(1000 * 60);
+
+                List<OgCell> list = new List<OgCell>();
+                mCellList.ForEach(c =>
+                {
+                    if (c.IsOvertime()) {
+                        LogUtil.Info($"超时 {c.SessionKey}");
+                        list.Add(c);
+                    }
+                });
+
+                if (list.Count > 0)
+                {
+                    list.ForEach(c => c.Close());
+                }
+            });
+        }
+
+        protected void RemoveCell(string sessionKey)
+        {
+            try
+            {
+                LogUtil.Info($"RemoveCell 111 {sessionKey}");
+                mCellList.RemoveAll(i => i.SessionKey == sessionKey);
+                mSessions.RemoveAll(e => e.SessionKey == sessionKey);
+                LogUtil.Info($"RemoveCell 222 {sessionKey}");
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Error($"RemoveCell catch {sessionKey} - {ex.Message}");
+            }
+        }
+
         #region API
         public List<OgameData> GetData(string id)
         {
@@ -162,6 +216,44 @@ namespace OgameService
             });
 
             return result;
+        }
+
+        public bool OperLogin(string id, string key)
+        {
+            LogUtil.Info($"OperLogin {id}");
+            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+            var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+            if (null == result)
+            {
+                LogUtil.Warn($"OperLogin 没取到对应cell");
+                return false;
+            }
+
+            OgameData data = new OgameData();
+            data.Cmd = CmdEnum.Login;
+
+            mServer.SendTo(result.SessionKey, OgameData.ToBytes(data));
+            return true;
+        }
+
+        public bool OperPirate(string id, string key)
+        {
+            LogUtil.Info($"OperPirate {id}");
+            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+            var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+            if (null == result)
+            {
+                LogUtil.Warn($"OperPirate 没取到对应cell");
+                return false;
+            }
+
+            OgameData data = new OgameData();
+            data.Cmd = CmdEnum.Pirate;
+
+            mServer.SendTo(result.SessionKey, OgameData.ToBytes(data));
+            return true;
         }
 
         #endregion
