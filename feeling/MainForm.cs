@@ -27,6 +27,7 @@ namespace feeling
         Thread mThread;
         bool mAutoExpedition = false;
         bool mAutoPirate = false;
+        bool mAutoPirateLogin = false;
         int mPirateInterval = 120; // 分
 #if !NET45
         OgClient mClient;
@@ -200,6 +201,7 @@ namespace feeling
             }
 
             var interval = pMissionCfg.Interval;
+            mAutoPirateLogin = pMissionCfg.AutoLogin;
             mPirateInterval = interval < 120 ? 120 : interval;
             lb_hd_interval.Text = mPirateInterval.ToString();
 
@@ -835,6 +837,7 @@ namespace feeling
             {
                 var pMission = GetPirateMission();
                 pMission.Interval = mPirateInterval;
+                pMission.AutoLogin = mAutoPirateLogin;
                 PirateUtil.Save(pMission, idx);
             }
         }
@@ -857,7 +860,7 @@ namespace feeling
             Redraw();
         }
 
-        private void doAutoPirate()
+        private async void doAutoPirate()
         {
             if (OperStatus.Pirate == NativeController.Instance.MyOperStatus)
             {
@@ -883,6 +886,12 @@ namespace feeling
                 var val = mPirateInterval - delta.TotalMinutes;
                 lb_hd_info.Text = $"{DateTime.Now:G}|大概还差{Math.Ceiling(val)}分钟可自动海盗";
                 return;
+            }
+
+            if (mAutoPirateLogin)
+            {
+                NativeController.Instance.CanNotify = false;
+                await TryLogin();
             }
 
             doPirate();

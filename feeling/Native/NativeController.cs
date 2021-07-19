@@ -291,6 +291,8 @@ namespace feeling
                 return;
             }
 
+            OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}开始登录");
+
             MyWebBrowser.Load(NativeConst.Homepage);
             Thread.Sleep(2000);
             source = await MyWebBrowser.GetSourceAsync();
@@ -310,7 +312,7 @@ namespace feeling
                         return;
                     }
                 }
-                catch(Exception ex)
+                catch(Exception)
                 {
                 }
 
@@ -320,17 +322,25 @@ namespace feeling
                 await DoLoginAsync(account, psw, universe);
             }
 
-            await Task.Delay(1000);
-            await GoHome(1000);
-
-            if (HtmlUtil.IsGameUrl(MyAddress))
+            OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}登录输入完成");
+            try
             {
-                source = await GetHauptframe()?.GetSourceAsync();
-                if (HtmlUtil.HasTutorial(source))
+
+                await Task.Delay(1000);
+                await GoHome(1000);
+
+                if (HtmlUtil.IsGameUrl(MyAddress))
                 {
-                    FrameRunJs(NativeScript.TutorialConfirm());
-                    await Task.Delay(1500);
+                    source = await GetHauptframe()?.GetSourceAsync();
+                    if (HtmlUtil.HasTutorial(source))
+                    {
+                        FrameRunJs(NativeScript.TutorialConfirm());
+                        await Task.Delay(1500);
+                    }
                 }
+            }
+            catch(Exception)
+            {
             }
 
             OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}登录操作结束");
