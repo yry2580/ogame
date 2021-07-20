@@ -11,8 +11,8 @@ namespace OgameService
     public class OgServer
     {
         TcpSocketServer mServer;
-        List<TcpSocketSession> mSessions = new List<TcpSocketSession>();
-        List<OgCell> mCellList = new List<OgCell>();
+        volatile List<TcpSocketSession> mSessions = new List<TcpSocketSession>();
+        volatile List<OgCell> mCellList = new List<OgCell>();
 
         public OgServer()
         {
@@ -186,8 +186,23 @@ namespace OgameService
             try
             {
                 LogUtil.Info($"RemoveCell 111 {sessionKey}");
-                mCellList.RemoveAll(i => i.SessionKey == sessionKey);
-                mSessions.RemoveAll(e => e.SessionKey == sessionKey);
+                LogUtil.Info($"RemoveCell mCellList 111{mCellList.Count}");
+                var cell = mCellList.Find(i => i.SessionKey == sessionKey);
+                if (null != cell)
+                {
+                    mCellList.Remove(cell);
+                    cell = null;
+                }
+
+                LogUtil.Info($"RemoveCell mCellList 222 {mCellList.Count}");
+                var session = mSessions.Find(e => e.SessionKey == sessionKey);
+                if (null != session)
+                {
+                    mSessions.Remove(session);
+                    session?.Close();
+                    session = null;
+                }
+
                 LogUtil.Info($"RemoveCell 222 {sessionKey}");
             }
             catch (Exception ex)
@@ -212,7 +227,7 @@ namespace OgameService
 
             result.ForEach(d =>
             {
-                LogUtil.Info($"GetData {d.SessionKey}|{d.Id}|{d.Status}|{d.Content}|{d.PirateAutoMsg}");
+                LogUtil.Info($"GetData {d.Id}|{d.SessionKey}|{d.Status}|{d.Content}|{d.PirateAutoMsg}");
             });
 
             return result;

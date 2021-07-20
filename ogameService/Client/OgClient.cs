@@ -92,7 +92,6 @@ namespace OgameService
 
         void LoopTimerCheck(object sender, ElapsedEventArgs e)
         {
-            LogUtil.Info($"LoopTimerUpdate");
             try
             {
                 if (null != mClient)
@@ -132,6 +131,7 @@ namespace OgameService
 
                 if (null != mClient)
                 {
+                    mClient.Close();
                     mClient.Shutdown();
                     mClient = null;
                 }
@@ -221,13 +221,18 @@ namespace OgameService
 
         protected void Post(CmdEnum cmd, StatusEnum status, string content = "", string pirateAutoMsg = "")
         {
+            Task.Run(() => DoPost(cmd, status, content, pirateAutoMsg));
+        }
+
+        protected void DoPost(CmdEnum cmd, StatusEnum status, string content = "", string pirateAutoMsg = "")
+        {
             try
             {
                 mClient?.Send(MakeGameData(cmd, status, content, pirateAutoMsg));
             }
             catch (Exception ex)
             {
-                LogUtil.Error($"Post catch {ex.Message}");
+                LogUtil.Error($"DoPost catch {ex.Message}");
             }
         }
 

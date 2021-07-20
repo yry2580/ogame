@@ -350,5 +350,31 @@ namespace feeling
 #endif
             return ret.Count() > 0;
         }
+
+        public static bool IsWechatCodePage(string source)
+        {
+            if (string.IsNullOrWhiteSpace(source)) return false;
+            var parser = new OgameParser();
+            parser.LoadHtml(source);
+#if !NET45
+            var node = parser.QuerySelector("form[action='weixincode.php']");
+#else
+            var node = parser.QuerySelector("//form[@action='weixincode.php']");
+#endif
+            return null != node;
+        }
+
+        public static bool HasPrecode(string source)
+        {
+            if (string.IsNullOrWhiteSpace(source)) return false;
+            var parser = new OgameParser();
+            parser.LoadHtml(source);
+#if !NET45
+            var node = parser.QuerySelector("#overviewdata a[href='overview.php?precode=true']");
+#else
+            var node = parser.QuerySelector("//*[@id='overviewdata']//a[@href='overview.php?precode=true']");
+#endif
+            return null != node;
+        }
     }
 }

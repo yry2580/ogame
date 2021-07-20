@@ -60,6 +60,7 @@ namespace OgameService
         {
             try
             {
+                LogUtil.Error($"OgCell({SessionKey}) Close");
                 LastHello = DateTime.Now;
                 MySession?.Close();
             }

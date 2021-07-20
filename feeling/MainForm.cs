@@ -938,5 +938,47 @@ namespace feeling
             NativeController.Instance.RefreshPlanet();
             Redraw();
         }
+
+        private void MainForm_Activated(object sender, EventArgs e)
+        {
+            HotKey.RegisterHotKey(Handle, 107, HotKey.KeyModifiers.Alt, Keys.D8);
+        }
+
+        private void MainForm_Leave(object sender, EventArgs e)
+        {
+            HotKey.UnregisterHotKey(Handle, 107);
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            const int WM_HOTKEY = 0x0312;
+            switch (m.Msg)
+            {
+                case WM_HOTKEY:
+                    switch (m.WParam.ToInt32())
+                    {
+                        case 107: // 按下的是Alt+8
+                            BossKey();
+                            break;
+                    }
+                    break;
+            }
+            base.WndProc(ref m);
+        }
+
+        //老板键：显示|隐藏 窗体
+        private void BossKey()
+        {
+            if (WindowState == FormWindowState.Normal)
+            {
+                WindowState = FormWindowState.Minimized;
+                Hide();//隐藏窗体
+            }
+            else
+            {
+                Visible = true;
+                WindowState = FormWindowState.Normal;
+            }
+        }
     }
 }
