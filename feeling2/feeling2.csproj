@@ -86,6 +86,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Common\Const.cs" />
+    <Compile Include="Common\HotKey.cs" />
     <Compile Include="Common\Singleton.cs" />
     <Compile Include="Handler\DownloadHandler.cs" />
     <Compile Include="Handler\JsDialogHandler.cs" />

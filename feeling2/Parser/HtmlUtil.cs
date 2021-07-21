@@ -44,14 +44,14 @@ namespace feeling
 
             var parser = new OgameParser();
             parser.LoadHtml(source);
-#if NET46
+#if !NET45
             var logout = parser.QuerySelector("#header_top a[accesskey=s]");
 #else
             var logout = parser.QuerySelector("//*[@id='header_top']//a[@accesskey='s']");
 #endif
             if (null != logout) return true;
 
-#if NET46
+#if !NET45
             var home = parser.QuerySelector("#menuTable .menubutton_table a[target=Hauptframe]");
 #else
             var home = parser.QuerySelector("//*[@id='menuTable'//*[@class='menubutton_table']//a[@target='Hauptframe']");
@@ -71,7 +71,7 @@ namespace feeling
             parser = parser??new OgameParser();
             parser.LoadHtml(source);
 
-#if NET46
+#if !NET45
             var list = parser?.QuerySelectorAll("#header_top option");
             if (null == list || list.Length <= 0) return false;
             result = list.Where(e => e.TextContent.Contains("[") && e.TextContent.Contains("]")).Select(e => e.TextContent.Trim()).ToList();
@@ -89,7 +89,7 @@ namespace feeling
 
             var parser = new OgameParser();
             parser.LoadHtml(source);
-#if NET46
+#if !NET45
             var logout = parser.QuerySelector("#header_top a[accesskey=s]");
 #else
             var logout = parser.QuerySelectorAll("//*[@id='header_top]//a[@accesskey='s']");
@@ -102,7 +102,7 @@ namespace feeling
             if (string.IsNullOrWhiteSpace(source)) return false;
             parser = parser??new OgameParser();
             parser.LoadHtml(source);
-#if NET46
+#if !NET45
             var node = parser.QuerySelector("#tutorial .tutorial_buttons a");
 #else
             var node = parser.QuerySelector("//*[@id='tutorial']//*[@class='tutorial_buttons']//a");
@@ -115,7 +115,7 @@ namespace feeling
             if (string.IsNullOrWhiteSpace(source)) return false;
             parser = parser??new OgameParser();
             parser.LoadHtml(source);
-#if NET46
+#if !NET45
             var node = parser.QuerySelector(".success");
             if (null == node) return false;
             if (node.TextContent.Trim() == "派遣舰队") return true;
@@ -134,7 +134,7 @@ namespace feeling
             if (string.IsNullOrWhiteSpace(source)) return false;
             var parser = new OgameParser();
             parser.LoadHtml(source);
-#if NET46
+#if !NET45
             var node = parser?.QuerySelector("#fleetdelaybox");
             if (null == node) return false;
             var trList = parser.QuerySelectorAll("center table tr").ToList();
@@ -184,7 +184,7 @@ namespace feeling
             if (string.IsNullOrWhiteSpace(source)) return false;
             var parser = new OgameParser();
             parser.LoadHtml(source);
-#if NET46
+#if !NET45
             var node = parser?.QuerySelector("#fleetdelaybox");
             if (null == node) return false;
             var el = parser.QuerySelector($".l input[name={shipId}]");
@@ -209,7 +209,7 @@ namespace feeling
             if (string.IsNullOrWhiteSpace(source)) return false;
             var parser = new OgameParser();
             parser.LoadHtml(source);
-#if NET46
+#if !NET45
             var node = parser.QuerySelector(".success");
             if (null == node) return false;
             if (node.TextContent.Trim() == "派遣舰队") return true;
@@ -224,7 +224,7 @@ namespace feeling
 
         public static bool ParseGalaxyPage(string source, ref IDictionary<string, string> dict, OgameParser parser = null)
         {
-#if NET46
+#if !NET45
             if (string.IsNullOrWhiteSpace(source)) return false;
             parser = parser??new OgameParser();
             parser.LoadHtml(source);
@@ -312,7 +312,7 @@ namespace feeling
             if (source.IndexOf("id=\"galaxy_form\"") < 0) return false;
             parser = parser??new OgameParser();
             parser.LoadHtml(source);
-#if NET46
+#if !NET45
             var list = parser.QuerySelectorAll("#galaxy_form table select[name='npczuobiao'] option");
             if (null == list) return false;
 
@@ -331,7 +331,7 @@ namespace feeling
             if (string.IsNullOrWhiteSpace(source)) return false;
             var parser = new OgameParser();
             parser.LoadHtml(source);
-#if NET46
+#if !NET45
             var node = parser?.QuerySelector("#fleetdelaybox");
             if (null == node) return false;
             var thQuery = parser.QuerySelectorAll("center center table tr th");
@@ -349,6 +349,32 @@ namespace feeling
             if (null == ret) return false;
 #endif
             return ret.Count() > 0;
+        }
+
+        public static bool IsWechatCodePage(string source)
+        {
+            if (string.IsNullOrWhiteSpace(source)) return false;
+            var parser = new OgameParser();
+            parser.LoadHtml(source);
+#if !NET45
+            var node = parser.QuerySelector("form[action='weixincode.php']");
+#else
+            var node = parser.QuerySelector("//form[@action='weixincode.php']");
+#endif
+            return null != node;
+        }
+
+        public static bool HasPrecode(string source)
+        {
+            if (string.IsNullOrWhiteSpace(source)) return false;
+            var parser = new OgameParser();
+            parser.LoadHtml(source);
+#if !NET45
+            var node = parser.QuerySelector("#overviewdata a[href='overview.php?precode=true']");
+#else
+            var node = parser.QuerySelector("//*[@id='overviewdata']//a[@href='overview.php?precode=true']");
+#endif
+            return null != node;
         }
     }
 }

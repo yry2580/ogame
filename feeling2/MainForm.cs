@@ -14,7 +14,7 @@ using System.Windows.Forms;
 using CefSharp;
 using CefSharp.WinForms;
 using Newtonsoft.Json;
-#if NET46
+#if !NET45
 using OgameService;
 #endif
 
@@ -27,9 +27,9 @@ namespace feeling
         Thread mThread;
         bool mAutoExpedition = false;
         bool mAutoPirate = false;
+        bool mAutoPirateLogin = false;
         int mPirateInterval = 120; // 分
-
-#if NET46
+#if !NET45
         OgClient mClient;
 #endif
         string mLastContent = "";
@@ -80,7 +80,7 @@ namespace feeling
 
                 doAutoExpedtion();
                 doAutoPirate();
-                SendHello();
+                SendData();
             }
             catch (Exception ex)
             {
@@ -201,6 +201,7 @@ namespace feeling
             }
 
             var interval = pMissionCfg.Interval;
+            mAutoPirateLogin = pMissionCfg.AutoLogin;
             mPirateInterval = interval < 120 ? 120 : interval;
             lb_hd_interval.Text = mPirateInterval.ToString();
 
@@ -302,7 +303,7 @@ namespace feeling
                     mLastContent = sDesc;
                 }
 
-                SendHello();
+                SendData();
             }));
         }
 
@@ -353,7 +354,7 @@ namespace feeling
                 Console.WriteLine($"Redraw catch {ex.Message}");
             }
 
-            SendHello();
+            SendData();
         }
 
         protected void RedrawPlanet()
@@ -422,7 +423,7 @@ namespace feeling
             {
                 mLastContent = tips;
             }
-            SendHello();
+            SendData();
         }
 
         public void SetUserButton(bool enabled)
@@ -493,40 +494,74 @@ namespace feeling
             mThread = new Thread(LookBackThread);
             mThread.IsBackground = true;
             mThread.Start();
-
-#if NET46
+#if !NET45
             mClient = new OgClient();
             mClient.Connected += OnServerConnected;
             mClient.DataReceived += OnServerReceived;
 #endif
         }
-#if NET46
+
+#if !NET45
         private void OnServerReceived(OgameData data)
         {
+            Invoke(new Action(() => {
+                DoServerReceived(data);
+            }));
         }
 
-        private void SendHello()
+        private async void DoServerReceived(OgameData data)
         {
+            try
+            {
+                var operStatus = NativeController.Instance.MyOperStatus;
+                var lastContent = mLastContent;
+                var hdContent = lb_hd_info.Text.Trim();
+                if (OperStatus.None != operStatus)
+                {
+                    mClient.SendData((StatusEnum)((int)operStatus), lastContent, hdContent);
+                    return;
+                }
+                switch (data.Cmd)
+                {
+                    case CmdEnum.Login:
+                        NativeController.Instance.CanNotify = false;
+                        await TryLogin();
+                        mClient.SendData((StatusEnum)((int)operStatus), lastContent, hdContent);
+                        break;
+                    case CmdEnum.Pirate:
+                        NativeController.Instance.CanNotify = false;
+                        doPirate();
+                        mClient.SendData((StatusEnum)((int)operStatus), lastContent, hdContent);
+                        break;
+                    default:
+                        mClient.SendData((StatusEnum)((int)operStatus), lastContent, hdContent);
+                        break;
+                }
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Error($"feeling OnServerReceived catch {ex.Message}");
+            }
+        }
+
+#endif
+        private void SendData()
+        {
+#if !NET45
             var operStatus = (int)NativeController.Instance.MyOperStatus;
             var status = (StatusEnum)operStatus;
             mClient?.SendData(status, mLastContent, lb_hd_info.Text.Trim());
+#endif
         }
 
         private void OnServerConnected()
         {
+#if !NET45
             var operStatus = (int)NativeController.Instance.MyOperStatus;
             var status = (StatusEnum)operStatus;
             mClient?.SendAuth(status, mLastContent, lb_hd_info.Text.Trim());
-        }
-#else
-        private void SendHello()
-        {
-        }
-
-        private void OnServerConnected()
-        {
-        }
 #endif
+        }
 
         private void btn_galaxy_open_Click(object sender, EventArgs e)
         {
@@ -582,6 +617,12 @@ namespace feeling
         }
 
         private async void btn_user_login_Click(object sender, EventArgs e)
+        {
+            NativeController.Instance.CanNotify = true;
+            await TryLogin();
+        }
+
+        private async Task TryLogin()
         {
             if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
 
@@ -774,6 +815,8 @@ namespace feeling
                 return;
             }
 
+            NativeController.Instance.CanNotify = true;
+
             doPirate();
         }
 
@@ -794,6 +837,7 @@ namespace feeling
             {
                 var pMission = GetPirateMission();
                 pMission.Interval = mPirateInterval;
+                pMission.AutoLogin = mAutoPirateLogin;
                 PirateUtil.Save(pMission, idx);
             }
         }
@@ -816,7 +860,7 @@ namespace feeling
             Redraw();
         }
 
-        private void doAutoPirate()
+        private async void doAutoPirate()
         {
             if (OperStatus.Pirate == NativeController.Instance.MyOperStatus)
             {
@@ -842,6 +886,12 @@ namespace feeling
                 var val = mPirateInterval - delta.TotalMinutes;
                 lb_hd_info.Text = $"{DateTime.Now:G}|大概还差{Math.Ceiling(val)}分钟可自动海盗";
                 return;
+            }
+
+            if (mAutoPirateLogin)
+            {
+                NativeController.Instance.CanNotify = false;
+                await TryLogin();
             }
 
             doPirate();
@@ -887,6 +937,48 @@ namespace feeling
         {
             NativeController.Instance.RefreshPlanet();
             Redraw();
+        }
+
+        private void MainForm_Activated(object sender, EventArgs e)
+        {
+            HotKey.RegisterHotKey(Handle, 107, HotKey.KeyModifiers.Alt, Keys.D8);
+        }
+
+        private void MainForm_Leave(object sender, EventArgs e)
+        {
+            HotKey.UnregisterHotKey(Handle, 107);
+        }
+
+        protected override void WndProc(ref Message m)
+        {
+            const int WM_HOTKEY = 0x0312;
+            switch (m.Msg)
+            {
+                case WM_HOTKEY:
+                    switch (m.WParam.ToInt32())
+                    {
+                        case 107: // 按下的是Alt+8
+                            BossKey();
+                            break;
+                    }
+                    break;
+            }
+            base.WndProc(ref m);
+        }
+
+        //老板键：显示|隐藏 窗体
+        private void BossKey()
+        {
+            if (WindowState == FormWindowState.Normal)
+            {
+                WindowState = FormWindowState.Minimized;
+                Hide();//隐藏窗体
+            }
+            else
+            {
+                Visible = true;
+                WindowState = FormWindowState.Normal;
+            }
         }
     }
 }

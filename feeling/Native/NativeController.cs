@@ -723,7 +723,7 @@ namespace feeling
         /// <summary>
         /// 刷新NPC
         /// </summary>
-        internal void RefreshNpc()
+        internal void RefreshNpc(bool isAuto = false)
         {
             SwitchStatus(OperStatus.Pirate);
             Task.Run(async () =>
@@ -731,7 +731,10 @@ namespace feeling
                 try
                 {
                     OperTipsEvent.Invoke(OperStatus.Pirate, $"{DateTime.Now:MM:dd-HH:mm:ss}|刷球");
-                    mPlanet.Reset();
+                    if (!isAuto)
+                    {
+                        mPlanet.Reset();
+                    }
                     PirateUtil.ResetNpc();
                     Reload();
                     await GoHome(1500);
@@ -1009,14 +1012,36 @@ namespace feeling
 
             OperTipsEvent.Invoke(OperStatus.Pirate, $"{DateTime.Now:MM:dd-HH:mm:ss}|海盗任务结束{_count}/{pMission.MissionCount}");
 
+            var checkNpc = false;
             // 如果存在派遣成功的
             if (_count >= 0 || success)
             {
                 LastPirateTime = DateTime.Now;
+
+                if (IsPirateWorking && IsAutoPirate)
+                {
+                    checkNpc = CheckRefreshNpc(pMission);
+                }
             }
 
             IsPirateWorking = false;
             SwitchStatus(OperStatus.None);
+            if (checkNpc)
+            {
+                // 刷新一下NPC
+                RefreshNpc(true);
+            }
+        }
+
+        private bool CheckRefreshNpc(PirateMission pMission)
+        {
+            if (null == pMission) return false;
+            if (pMission.MissionCount <= 0) return false;
+
+            var pMissionCfg = PirateUtil.MyPirateMission;
+            if (null == pMissionCfg || pMissionCfg.MissionCount <= 0) return false;
+
+            return pMissionCfg.MissionCount - pMission.MissionCount >= 8;
         }
 
         #endregion

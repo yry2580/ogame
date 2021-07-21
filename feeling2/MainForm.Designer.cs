@@ -126,7 +126,6 @@ namespace feeling
             // 
             this.w_split_container.Dock = System.Windows.Forms.DockStyle.Fill;
             this.w_split_container.FixedPanel = System.Windows.Forms.FixedPanel.Panel2;
-            this.w_split_container.IsSplitterFixed = true;
             this.w_split_container.Location = new System.Drawing.Point(0, 0);
             this.w_split_container.Name = "w_split_container";
             this.w_split_container.Orientation = System.Windows.Forms.Orientation.Horizontal;
@@ -135,6 +134,7 @@ namespace feeling
             // 
             this.w_split_container.Panel2.Controls.Add(this.w_tab);
             this.w_split_container.Panel2.Controls.Add(this.w_user_box);
+            this.w_split_container.Panel2MinSize = 180;
             this.w_split_container.Size = new System.Drawing.Size(1213, 861);
             this.w_split_container.SplitterDistance = 666;
             this.w_split_container.TabIndex = 0;
@@ -1008,7 +1008,9 @@ namespace feeling
             this.Name = "MainForm";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "情怀";
+            this.Activated += new System.EventHandler(this.MainForm_Activated);
             this.Load += new System.EventHandler(this.MainForm_Load);
+            this.Leave += new System.EventHandler(this.MainForm_Leave);
             this.w_split_container.Panel2.ResumeLayout(false);
             ((System.ComponentModel.ISupportInitialize)(this.w_split_container)).EndInit();
             this.w_split_container.ResumeLayout(false);
