@@ -850,7 +850,7 @@ namespace feeling
             }
 
             var delta = DateTime.Now - NativeController.Instance.LastExeditionTime;
-            var val = mPirateInterval - delta.TotalMinutes;
+            var val = 120 - delta.TotalMinutes;
             val = val < 0 ? 0 : val;
 
             if (!cbox_tx_auto.Checked || !mAutoExpedition)
