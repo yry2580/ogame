@@ -382,47 +382,54 @@ namespace feeling
 
         public async Task LogoutAsync()
         {
-            OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}退出登录");
-
-            if (!HtmlUtil.IsGameUrl(MyAddress))
+            try
             {
-                if (CanNotify)
+                OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}退出登录");
+
+                if (!HtmlUtil.IsGameUrl(MyAddress))
                 {
-                    MessageBox.Show("退出失败，可能不在游戏页");
+                    if (CanNotify)
+                    {
+                        MessageBox.Show("退出失败，可能不在游戏页");
+                    }
+                    OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}退出失败，可能不在游戏页");
+                    return;
                 }
-                OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}退出失败，可能不在游戏页");
-                return;
-            }
 
-            if (OperStatus.System != MyOperStatus)
-            {
-                if (CanNotify)
+                if (OperStatus.System != MyOperStatus)
                 {
-                    MessageBox.Show("当前正在忙，不建议退出");
+                    if (CanNotify)
+                    {
+                        MessageBox.Show("当前正在忙，不建议退出");
+                    }
+                    OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}当前正在忙，不建议退出");
+                    return;
                 }
-                OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}当前正在忙，不建议退出");
-                return;
-            }
 
-            var source = await GetHauptframe().GetSourceAsync();
-            if (!HtmlUtil.HasLogoutBtn(source))
-            {
-                await GoHome();
-                await Task.Delay(1500);
-            }
-
-            if (!HtmlUtil.IsInGame(source))
-            {
-                if (CanNotify)
+                var source = await GetHauptframe().GetSourceAsync();
+                if (!HtmlUtil.HasLogoutBtn(source))
                 {
-                    MessageBox.Show("退出失败，无退出按钮");
+                    await GoHome();
+                    await Task.Delay(1500);
                 }
-                OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}退出失败，无退出按钮");
-                return;
-            }
 
-            FrameRunJs(NativeScript.ToLogout());
-            await Task.Delay(500);
+                if (!HtmlUtil.IsInGame(source))
+                {
+                    if (CanNotify)
+                    {
+                        MessageBox.Show("退出失败，无退出按钮");
+                    }
+                    OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}退出失败，无退出按钮");
+                    return;
+                }
+
+                FrameRunJs(NativeScript.ToLogout());
+                await Task.Delay(500);
+            }
+            catch(Exception)
+            {
+
+            }
 
             OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}退出操作结束");
         }
@@ -758,14 +765,14 @@ namespace feeling
             });
         }
 
-        internal void StartPirate(PirateMission pMission)
+        internal void StartPirate(PirateMission pMission, bool isAuto = false)
         {
             SwitchStatus(OperStatus.Pirate);
             IsPirateWorking = true;
 
             Task.Run(() =>
             {
-                DoPirate(pMission);
+                DoPirate(pMission, isAuto);
             });
         }
 
@@ -775,7 +782,7 @@ namespace feeling
             IsPirateWorking = false;
         }
 
-        protected async void DoPirate(PirateMission pMission)
+        protected async void DoPirate(PirateMission pMission, bool isAuto = false)
         {
             int index = 0;
             int _count = 0;
@@ -1013,6 +1020,7 @@ namespace feeling
             OperTipsEvent.Invoke(OperStatus.Pirate, $"{DateTime.Now:MM:dd-HH:mm:ss}|海盗任务结束{_count}/{pMission.MissionCount}");
 
             var checkNpc = false;
+            var autoLogout = false;
             // 如果存在派遣成功的
             if (_count >= 0 || success)
             {
@@ -1021,6 +1029,7 @@ namespace feeling
                 if (IsPirateWorking && IsAutoPirate)
                 {
                     checkNpc = CheckRefreshNpc(pMission);
+                    autoLogout = isAuto ? true : false;
                 }
             }
 
@@ -1030,6 +1039,12 @@ namespace feeling
             {
                 // 刷新一下NPC
                 RefreshNpc(true);
+            }
+            else if (autoLogout)
+            {
+                SwitchStatus(OperStatus.System);
+                await LogoutAsync();
+                SwitchStatus(OperStatus.None);
             }
         }
 
@@ -1042,6 +1057,63 @@ namespace feeling
             if (null == pMissionCfg || pMissionCfg.MissionCount <= 0) return false;
 
             return pMissionCfg.MissionCount - pMission.MissionCount >= 8;
+        }
+
+        #endregion
+
+        #region 验证码
+        internal async Task GetCode()
+        {
+            SwitchStatus(OperStatus.System);
+            OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}开始获取验证码");
+
+            try
+            {
+                Reload();
+                await GoHome(1500);
+                var source = await GetHauptframe().GetSourceAsync();
+                if (HtmlUtil.IsWechatCodePage(source))
+                {
+                    FrameRunJs(NativeScript.GetCode());
+                    OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}点击获取验证码");
+                }
+                else
+                {
+                    OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}不在验证码页");
+                }
+            }
+            catch (SystemException)
+            {
+                OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}获取验证码异常");
+            }
+        }
+
+        internal async Task AuthCode(string code)
+        {
+            SwitchStatus(OperStatus.System);
+            OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}输入验证码");
+
+            try
+            {
+                // Reload();
+                // await GoHome(1500);
+                var source = await GetHauptframe().GetSourceAsync();
+                if (HtmlUtil.IsWechatCodePage(source))
+                {
+                    FrameRunJs(NativeScript.AuthCode(code));
+                    await Task.Delay(200);
+                    FrameRunJs(NativeScript.SubmitCode());
+                    OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}输入验证码");
+                }
+                else
+                {
+                    OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}不在验证码页");
+                }
+            }
+            catch (SystemException)
+            {
+                OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}输入验证码异常");
+            }
         }
 
         #endregion

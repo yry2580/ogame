@@ -136,8 +136,8 @@ namespace OgameService
                     mClient = null;
                 }
 #if DEBUG
-                IPEndPoint ip = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 17201);
-                // IPEndPoint ip = new IPEndPoint(IPAddress.Parse("112.74.170.178"), 17201);
+                // IPEndPoint ip = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 17201);
+                IPEndPoint ip = new IPEndPoint(IPAddress.Parse("112.74.170.178"), 17201);
 #else
                 IPEndPoint ip = new IPEndPoint(IPAddress.Parse("112.74.170.178"), 17201);
 #endif
@@ -205,7 +205,7 @@ namespace OgameService
             }
         }
 
-        protected byte[] MakeGameData(CmdEnum cmd, StatusEnum status, string content = "", string pirateAutoMsg = "")
+        protected byte[] MakeGameData(CmdEnum cmd, StatusEnum status, string content = "", string pirateAutoMsg = "", string expeditionAutoMsg="")
         {
             var data = new OgameData
             {
@@ -214,21 +214,22 @@ namespace OgameService
                 Content = content,
                 Status = status,
                 PirateAutoMsg = pirateAutoMsg,
+                ExpeditionAutoMsg = expeditionAutoMsg,
             };
 
             return OgameData.ToBytes(data);
         }
 
-        protected void Post(CmdEnum cmd, StatusEnum status, string content = "", string pirateAutoMsg = "")
+        protected void Post(CmdEnum cmd, StatusEnum status, string content = "", string pirateAutoMsg = "", string expeditionAutoMsg="")
         {
-            Task.Run(() => DoPost(cmd, status, content, pirateAutoMsg));
+            Task.Run(() => DoPost(cmd, status, content, pirateAutoMsg, expeditionAutoMsg));
         }
 
-        protected void DoPost(CmdEnum cmd, StatusEnum status, string content = "", string pirateAutoMsg = "")
+        protected void DoPost(CmdEnum cmd, StatusEnum status, string content = "", string pirateAutoMsg = "", string expeditionAutoMsg  = "")
         {
             try
             {
-                mClient?.Send(MakeGameData(cmd, status, content, pirateAutoMsg));
+                mClient?.Send(MakeGameData(cmd, status, content, pirateAutoMsg, expeditionAutoMsg));
             }
             catch (Exception ex)
             {
@@ -237,16 +238,16 @@ namespace OgameService
         }
 
         #region API
-        public void SendAuth(StatusEnum status, string content = "", string pirateAutoMsg = "")
+        public void SendAuth(StatusEnum status, string content = "", string pirateAutoMsg = "", string expeditionAutoMsg = "")
         {
-            Post(CmdEnum.Auth, status, content, pirateAutoMsg);
+            Post(CmdEnum.Auth, status, content, pirateAutoMsg, expeditionAutoMsg);
         }
 
-        public void SendData(StatusEnum status, string content = "", string pirateAutoMsg = "")
+        public void SendData(StatusEnum status, string content = "", string pirateAutoMsg = "", string expeditionAutoMsg = "")
         {
             if (MyId.Length <= 0) return;
             
-            Post(CmdEnum.Data, status, content, pirateAutoMsg);
+            Post(CmdEnum.Data, status, content, pirateAutoMsg, expeditionAutoMsg);
         }
 
         public void SendHello()

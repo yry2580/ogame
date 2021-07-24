@@ -353,15 +353,20 @@ namespace feeling
 
         public static bool IsWechatCodePage(string source)
         {
+            Console.WriteLine($"1111");
             if (string.IsNullOrWhiteSpace(source)) return false;
             var parser = new OgameParser();
             parser.LoadHtml(source);
+            Console.WriteLine($"2222");
 #if !NET45
             var node = parser.QuerySelector("form[action='weixincode.php']");
 #else
             var node = parser.QuerySelector("//form[@action='weixincode.php']");
 #endif
-            return null != node;
+            if (null != node) return true;
+            Console.WriteLine($"3333");
+
+            return false;
         }
 
         public static bool HasPrecode(string source)

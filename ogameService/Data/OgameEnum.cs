@@ -21,6 +21,10 @@ namespace OgameService
         Data,
         Login,
         Pirate,
+        Logout,
+        Expedition,
+        GetCode,
+        AuthCode,
     }
 
     public enum StatusEnum

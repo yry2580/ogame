@@ -16,6 +16,7 @@ namespace OgameService
         public string Content = "";
         public string PirateAutoMsg = "";
         public string SessionKey = "";
+        public string ExpeditionAutoMsg = "";
 
         public static byte[] ToBytes(OgameData data)
         {

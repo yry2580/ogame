@@ -252,6 +252,25 @@ namespace OgameService
             return true;
         }
 
+        public bool OperLogout(string id, string key)
+        {
+            LogUtil.Info($"OperLogout {id}");
+            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+            var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+            if (null == result)
+            {
+                LogUtil.Warn($"OperLogout 没取到对应cell");
+                return false;
+            }
+
+            OgameData data = new OgameData();
+            data.Cmd = CmdEnum.Logout;
+
+            mServer.SendTo(result.SessionKey, OgameData.ToBytes(data));
+            return true;
+        }
+
         public bool OperPirate(string id, string key)
         {
             LogUtil.Info($"OperPirate {id}");
@@ -266,6 +285,64 @@ namespace OgameService
 
             OgameData data = new OgameData();
             data.Cmd = CmdEnum.Pirate;
+
+            mServer.SendTo(result.SessionKey, OgameData.ToBytes(data));
+            return true;
+        }
+
+        public bool OperExpedition(string id, string key)
+        {
+            LogUtil.Info($"OperExpedition {id}");
+            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+            var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+            if (null == result)
+            {
+                LogUtil.Warn($"OperExpedition 没取到对应cell");
+                return false;
+            }
+
+            OgameData data = new OgameData();
+            data.Cmd = CmdEnum.Expedition;
+
+            mServer.SendTo(result.SessionKey, OgameData.ToBytes(data));
+            return true;
+        }
+
+        public bool OperGetCode(string id, string key)
+        {
+            LogUtil.Info($"OperGetCode {id}");
+            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+            var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+            if (null == result)
+            {
+                LogUtil.Warn($"OperGetCode 没取到对应cell");
+                return false;
+            }
+
+            OgameData data = new OgameData();
+            data.Cmd = CmdEnum.GetCode;
+
+            mServer.SendTo(result.SessionKey, OgameData.ToBytes(data));
+            return true;
+        }
+
+        public bool OperAuthCode(string id, string key, string code)
+        {
+            LogUtil.Info($"OperGetCode {id}-{code}");
+            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+            var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+            if (null == result)
+            {
+                LogUtil.Warn($"OperGetCode 没取到对应cell");
+                return false;
+            }
+
+            OgameData data = new OgameData();
+            data.Cmd = CmdEnum.AuthCode;
+            data.Content = code;
 
             mServer.SendTo(result.SessionKey, OgameData.ToBytes(data));
             return true;

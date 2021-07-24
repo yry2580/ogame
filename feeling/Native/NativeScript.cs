@@ -174,5 +174,26 @@ namespace feeling
             script += $"doc.querySelector(\"#tutorial .tutorial_buttons a\").click()";
             return script;
         }
+
+        public static string GetCode()
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"form input[value = '点击发送微信验证码']\").click()";
+            return script;
+        }
+
+        public static string AuthCode(string code)
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"form input[name='overviewcode']\").value='{code}'";
+            return script;
+        }
+
+        public static string SubmitCode()
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"form input[value='提交']\").click()";
+            return script;
+        }
     }
 }
