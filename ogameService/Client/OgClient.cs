@@ -167,6 +167,8 @@ namespace OgameService
                     {
                         return;
                     }
+
+                    LogUtil.Error($"TryConnet Connect");
                     mClient.Connect();
                 }
                 catch (Exception ex)
@@ -229,6 +231,18 @@ namespace OgameService
         {
             try
             {
+                if (null == mClient)
+                {
+                    LogUtil.Warn($"DoPost mClient is null");
+                    return;
+                }
+
+                if (TcpSocketConnectionState.Connected != mClient.State)
+                {
+                    LogUtil.Warn($"DoPost mClient{mClient.State} no Connected");
+                    return;
+                }
+
                 mClient?.Send(MakeGameData(cmd, status, content, pirateAutoMsg, expeditionAutoMsg));
             }
             catch (Exception ex)

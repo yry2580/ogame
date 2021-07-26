@@ -32,6 +32,7 @@ namespace OgameService
             {
                 LogUtil.Info("Listen");
                 mServer.Listen();
+                DoCheckHello();
             }
             catch (Exception ex)
             {
@@ -190,11 +191,12 @@ namespace OgameService
                 var cell = mCellList.Find(i => i.SessionKey == sessionKey);
                 if (null != cell)
                 {
+                    LogUtil.Info($"RemoveCell mCellList 222 {cell.Id}");
                     mCellList.Remove(cell);
                     cell = null;
                 }
 
-                LogUtil.Info($"RemoveCell mCellList 222 {mCellList.Count}");
+                LogUtil.Info($"RemoveCell mCellList 333 {mCellList.Count}");
                 var session = mSessions.Find(e => e.SessionKey == sessionKey);
                 if (null != session)
                 {
@@ -203,7 +205,7 @@ namespace OgameService
                     session = null;
                 }
 
-                LogUtil.Info($"RemoveCell 222 {sessionKey}");
+                LogUtil.Info($"RemoveCell 444 {sessionKey}");
             }
             catch (Exception ex)
             {
