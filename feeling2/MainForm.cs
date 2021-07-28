@@ -407,21 +407,22 @@ namespace feeling
 
         private void RedrawOperTips(OperStatus operStatus, string tips)
         {
+            var content = tips.Trim();
             switch (operStatus)
             {
                 case OperStatus.Expedition:
-                    tx_content.Text = tips.Trim();
+                    tx_content.Text = content;
                     break;
                 case OperStatus.Pirate:
-                    w_hd_tips.Text = tips.Trim();
+                    w_hd_tips.Text = content;
                     break;
                 default:
                     break;
             }
 
-            if (tips.Trim().Length > 0)
+            if (content.Length > 0)
             {
-                mLastContent = tips;
+                mLastContent = content;
             }
             SendData();
         }

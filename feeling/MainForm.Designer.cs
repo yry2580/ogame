@@ -97,7 +97,19 @@ namespace feeling
             this.w_galaxy_page = new System.Windows.Forms.Label();
             this.w_galaxy_universe = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
+            this.w_imperium = new System.Windows.Forms.TabPage();
+            this.btn_tz_save = new System.Windows.Forms.Button();
+            this.w_tz_tips = new System.Windows.Forms.Label();
+            this.lb_tz_interval = new System.Windows.Forms.Label();
+            this.label19 = new System.Windows.Forms.Label();
+            this.btn_tz_interval = new System.Windows.Forms.Button();
+            this.w_tz_inverval = new System.Windows.Forms.TextBox();
+            this.label20 = new System.Windows.Forms.Label();
+            this.label21 = new System.Windows.Forms.Label();
+            this.cbox_tz_auto = new System.Windows.Forms.CheckBox();
             this.w_info = new System.Windows.Forms.TabPage();
+            this.lb_tz_info = new System.Windows.Forms.Label();
+            this.label17 = new System.Windows.Forms.Label();
             this.lb_hd_info = new System.Windows.Forms.Label();
             this.label16 = new System.Windows.Forms.Label();
             this.lb_tx_info = new System.Windows.Forms.Label();
@@ -118,6 +130,7 @@ namespace feeling
             this.tab_tanxian.SuspendLayout();
             this.tab_haidao.SuspendLayout();
             this.w_galaxy.SuspendLayout();
+            this.w_imperium.SuspendLayout();
             this.w_info.SuspendLayout();
             this.w_user_box.SuspendLayout();
             this.SuspendLayout();
@@ -144,6 +157,7 @@ namespace feeling
             this.w_tab.Controls.Add(this.tab_tanxian);
             this.w_tab.Controls.Add(this.tab_haidao);
             this.w_tab.Controls.Add(this.w_galaxy);
+            this.w_tab.Controls.Add(this.w_imperium);
             this.w_tab.Controls.Add(this.w_info);
             this.w_tab.Location = new System.Drawing.Point(209, 7);
             this.w_tab.Multiline = true;
@@ -566,7 +580,6 @@ namespace feeling
             this.w_hd_tips.Name = "w_hd_tips";
             this.w_hd_tips.Size = new System.Drawing.Size(185, 27);
             this.w_hd_tips.TabIndex = 54;
-            this.w_hd_tips.Text = "提示内容";
             // 
             // lb_hd_interval
             // 
@@ -853,8 +866,115 @@ namespace feeling
             this.label4.TabIndex = 4;
             this.label4.Text = "当前宇宙：";
             // 
+            // w_imperium
+            // 
+            this.w_imperium.Controls.Add(this.btn_tz_save);
+            this.w_imperium.Controls.Add(this.w_tz_tips);
+            this.w_imperium.Controls.Add(this.lb_tz_interval);
+            this.w_imperium.Controls.Add(this.label19);
+            this.w_imperium.Controls.Add(this.btn_tz_interval);
+            this.w_imperium.Controls.Add(this.w_tz_inverval);
+            this.w_imperium.Controls.Add(this.label20);
+            this.w_imperium.Controls.Add(this.label21);
+            this.w_imperium.Controls.Add(this.cbox_tz_auto);
+            this.w_imperium.Location = new System.Drawing.Point(4, 22);
+            this.w_imperium.Name = "w_imperium";
+            this.w_imperium.Padding = new System.Windows.Forms.Padding(3);
+            this.w_imperium.Size = new System.Drawing.Size(996, 150);
+            this.w_imperium.TabIndex = 5;
+            this.w_imperium.Text = "统治";
+            this.w_imperium.UseVisualStyleBackColor = true;
+            // 
+            // btn_tz_save
+            // 
+            this.btn_tz_save.Location = new System.Drawing.Point(11, 66);
+            this.btn_tz_save.Name = "btn_tz_save";
+            this.btn_tz_save.Size = new System.Drawing.Size(60, 22);
+            this.btn_tz_save.TabIndex = 63;
+            this.btn_tz_save.Text = "保存";
+            this.btn_tz_save.UseVisualStyleBackColor = true;
+            this.btn_tz_save.Click += new System.EventHandler(this.btn_tz_save_Click);
+            // 
+            // w_tz_tips
+            // 
+            this.w_tz_tips.AutoSize = true;
+            this.w_tz_tips.Location = new System.Drawing.Point(56, 102);
+            this.w_tz_tips.Name = "w_tz_tips";
+            this.w_tz_tips.Size = new System.Drawing.Size(17, 12);
+            this.w_tz_tips.TabIndex = 62;
+            this.w_tz_tips.Text = "无";
+            // 
+            // lb_tz_interval
+            // 
+            this.lb_tz_interval.AutoSize = true;
+            this.lb_tz_interval.Location = new System.Drawing.Point(158, 12);
+            this.lb_tz_interval.Name = "lb_tz_interval";
+            this.lb_tz_interval.Size = new System.Drawing.Size(23, 12);
+            this.lb_tz_interval.TabIndex = 61;
+            this.lb_tz_interval.Text = "240";
+            // 
+            // label19
+            // 
+            this.label19.AutoSize = true;
+            this.label19.Location = new System.Drawing.Point(75, 12);
+            this.label19.Name = "label19";
+            this.label19.Size = new System.Drawing.Size(77, 12);
+            this.label19.TabIndex = 60;
+            this.label19.Text = "间隔（分）：";
+            // 
+            // btn_tz_interval
+            // 
+            this.btn_tz_interval.Location = new System.Drawing.Point(157, 34);
+            this.btn_tz_interval.Name = "btn_tz_interval";
+            this.btn_tz_interval.Size = new System.Drawing.Size(60, 22);
+            this.btn_tz_interval.TabIndex = 59;
+            this.btn_tz_interval.Text = "设置";
+            this.btn_tz_interval.UseVisualStyleBackColor = true;
+            this.btn_tz_interval.Click += new System.EventHandler(this.btn_tz_interval_Click);
+            // 
+            // w_tz_inverval
+            // 
+            this.w_tz_inverval.Location = new System.Drawing.Point(79, 35);
+            this.w_tz_inverval.MaxLength = 3;
+            this.w_tz_inverval.Name = "w_tz_inverval";
+            this.w_tz_inverval.Size = new System.Drawing.Size(72, 21);
+            this.w_tz_inverval.TabIndex = 58;
+            this.w_tz_inverval.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.w_count_KeyPress);
+            // 
+            // label20
+            // 
+            this.label20.AutoSize = true;
+            this.label20.Location = new System.Drawing.Point(8, 38);
+            this.label20.Name = "label20";
+            this.label20.Size = new System.Drawing.Size(65, 12);
+            this.label20.TabIndex = 57;
+            this.label20.Text = "设置间隔：";
+            // 
+            // label21
+            // 
+            this.label21.AutoSize = true;
+            this.label21.ForeColor = System.Drawing.Color.Red;
+            this.label21.Location = new System.Drawing.Point(9, 102);
+            this.label21.Name = "label21";
+            this.label21.Size = new System.Drawing.Size(41, 12);
+            this.label21.TabIndex = 56;
+            this.label21.Text = "提示：";
+            // 
+            // cbox_tz_auto
+            // 
+            this.cbox_tz_auto.AutoSize = true;
+            this.cbox_tz_auto.Location = new System.Drawing.Point(11, 11);
+            this.cbox_tz_auto.Name = "cbox_tz_auto";
+            this.cbox_tz_auto.Size = new System.Drawing.Size(48, 16);
+            this.cbox_tz_auto.TabIndex = 55;
+            this.cbox_tz_auto.Text = "自动";
+            this.cbox_tz_auto.UseVisualStyleBackColor = true;
+            this.cbox_tz_auto.CheckedChanged += new System.EventHandler(this.cbox_tz_auto_CheckedChanged);
+            // 
             // w_info
             // 
+            this.w_info.Controls.Add(this.lb_tz_info);
+            this.w_info.Controls.Add(this.label17);
             this.w_info.Controls.Add(this.lb_hd_info);
             this.w_info.Controls.Add(this.label16);
             this.w_info.Controls.Add(this.lb_tx_info);
@@ -866,6 +986,25 @@ namespace feeling
             this.w_info.TabIndex = 4;
             this.w_info.Text = "信息";
             this.w_info.UseVisualStyleBackColor = true;
+            // 
+            // lb_tz_info
+            // 
+            this.lb_tz_info.AutoSize = true;
+            this.lb_tz_info.Location = new System.Drawing.Point(77, 53);
+            this.lb_tz_info.Name = "lb_tz_info";
+            this.lb_tz_info.Size = new System.Drawing.Size(17, 12);
+            this.lb_tz_info.TabIndex = 60;
+            this.lb_tz_info.Text = "无";
+            // 
+            // label17
+            // 
+            this.label17.AutoSize = true;
+            this.label17.ForeColor = System.Drawing.Color.Red;
+            this.label17.Location = new System.Drawing.Point(6, 53);
+            this.label17.Name = "label17";
+            this.label17.Size = new System.Drawing.Size(65, 12);
+            this.label17.TabIndex = 59;
+            this.label17.Text = "自动统治：";
             // 
             // lb_hd_info
             // 
@@ -1021,6 +1160,8 @@ namespace feeling
             this.tab_haidao.PerformLayout();
             this.w_galaxy.ResumeLayout(false);
             this.w_galaxy.PerformLayout();
+            this.w_imperium.ResumeLayout(false);
+            this.w_imperium.PerformLayout();
             this.w_info.ResumeLayout(false);
             this.w_info.PerformLayout();
             this.w_user_box.ResumeLayout(false);
@@ -1112,5 +1253,17 @@ namespace feeling
         private System.Windows.Forms.Button btn_tx_planet;
         private System.Windows.Forms.RadioButton rbtn_cfg1;
         private System.Windows.Forms.RadioButton rbtn_cfg0;
+        private System.Windows.Forms.Label lb_tz_info;
+        private System.Windows.Forms.Label label17;
+        private System.Windows.Forms.TabPage w_imperium;
+        private System.Windows.Forms.Label w_tz_tips;
+        private System.Windows.Forms.Label lb_tz_interval;
+        private System.Windows.Forms.Label label19;
+        private System.Windows.Forms.Button btn_tz_interval;
+        private System.Windows.Forms.TextBox w_tz_inverval;
+        private System.Windows.Forms.Label label20;
+        private System.Windows.Forms.Label label21;
+        private System.Windows.Forms.CheckBox cbox_tz_auto;
+        private System.Windows.Forms.Button btn_tz_save;
     }
 }

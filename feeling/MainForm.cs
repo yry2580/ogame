@@ -25,10 +25,17 @@ namespace feeling
         ChromiumWebBrowser mWebBrowser;
 
         Thread mThread;
+
         bool mAutoExpedition = false;
         bool mAutoPirate = false;
         bool mAutoPirateLogin = false;
         int mPirateInterval = 120; // 分
+
+        bool mAutoImperium = false;
+        int mImperiumInterval = 240; // 分
+        bool mAutoImperiumLogin = false;
+
+
 #if !NET45
         OgClient mClient;
 #endif
@@ -42,6 +49,11 @@ namespace feeling
             if (!Directory.Exists(NativeConst.FileDirectory))
             {
                 Directory.CreateDirectory(NativeConst.FileDirectory);
+            }
+
+            if (!Directory.Exists(NativeConst.CfgDirectory))
+            {
+                Directory.CreateDirectory(NativeConst.CfgDirectory);
             }
 
             NativeController.Instance.StatusChangeEvent += OnStatusChange;
@@ -80,6 +92,7 @@ namespace feeling
 
                 doAutoExpedtion();
                 doAutoPirate();
+                doAutoImperium();
                 SendData();
             }
             catch (Exception ex)
@@ -114,6 +127,27 @@ namespace feeling
 
             InitExpedition();
             RedrawAccount();
+            InitImperium();
+        }
+
+        protected void InitImperium()
+        {
+            // 读取配置
+            ImperiumUtil.ReadCfg();
+
+            var imperiumCfg = ImperiumUtil.MyImperium;
+            if (null == imperiumCfg)
+            {
+                lb_tz_interval.Text = mImperiumInterval.ToString();
+                return;
+            }
+
+            mAutoImperiumLogin = imperiumCfg.AutoLogin;
+            mImperiumInterval = imperiumCfg.Interval;
+            mAutoImperium = imperiumCfg.Open;
+            
+            lb_tz_interval.Text = mImperiumInterval.ToString();
+            cbox_tz_auto.Checked = mAutoImperium;
         }
 
         protected void InitExpedition()
@@ -407,21 +441,22 @@ namespace feeling
 
         private void RedrawOperTips(OperStatus operStatus, string tips)
         {
+            var content = tips.Trim();
             switch (operStatus)
             {
                 case OperStatus.Expedition:
-                    tx_content.Text = tips.Trim();
+                    tx_content.Text = content;
                     break;
                 case OperStatus.Pirate:
-                    w_hd_tips.Text = tips.Trim();
+                    w_hd_tips.Text = content;
                     break;
                 default:
                     break;
             }
 
-            if (tips.Trim().Length > 0)
+            if (content.Length > 0)
             {
-                mLastContent = tips;
+                mLastContent = content;
             }
             SendData();
         }
@@ -513,12 +548,9 @@ namespace feeling
         {
             try
             {
-                var operStatus = NativeController.Instance.MyOperStatus;
-                var lastContent = mLastContent;
-                var hdContent = lb_hd_info.Text.Trim();
-                if (OperStatus.None != operStatus)
+                if (OperStatus.None != NativeController.Instance.MyOperStatus)
                 {
-                    mClient.SendData((StatusEnum)((int)operStatus), lastContent, hdContent);
+                    SendData();
                     return;
                 }
                 switch (data.Cmd)
@@ -526,35 +558,36 @@ namespace feeling
                     case CmdEnum.Login:
                         NativeController.Instance.CanNotify = false;
                         await TryLogin();
-                        mClient.SendData((StatusEnum)((int)operStatus), lastContent, hdContent);
                         break;
                     case CmdEnum.Logout:
                         NativeController.Instance.CanNotify = false;
                         await TryLogout();
-                        mClient.SendData((StatusEnum)((int)operStatus), lastContent, hdContent);
                         break;
                     case CmdEnum.Pirate:
                         NativeController.Instance.CanNotify = false;
                         doPirate();
-                        mClient.SendData((StatusEnum)((int)operStatus), lastContent, hdContent);
                         break;
                     case CmdEnum.Expedition:
                         NativeController.Instance.CanNotify = false;
                         doExpedtion();
-                        mClient.SendData((StatusEnum)((int)operStatus), lastContent, hdContent);
                         break;
                     case CmdEnum.GetCode:
                         NativeController.Instance.CanNotify = false;
                         await TryGetAuth();
-                        mClient.SendData((StatusEnum)((int)operStatus), lastContent, hdContent);
                         break;
                     case CmdEnum.AuthCode:
                         NativeController.Instance.CanNotify = false;
                         await TryAuthCode(data.Content);
-                        mClient.SendData((StatusEnum)((int)operStatus), lastContent, hdContent);
+                        break;
+                    case CmdEnum.Imperium:
+                        NativeController.Instance.CanNotify = false;
+                        await doImperium();
+                        break;
+                    case CmdEnum.Npc:
+                        NativeController.Instance.CanNotify = false;
+                        doRefreshNpc();
                         break;
                     default:
-                        mClient.SendData((StatusEnum)((int)operStatus), lastContent, hdContent);
                         break;
                 }
             }
@@ -562,24 +595,46 @@ namespace feeling
             {
                 LogUtil.Error($"feeling OnServerReceived catch {ex.Message}");
             }
+
+            SendData();
         }
 
 #endif
-        private void SendData()
+        private void SendData(CmdEnum cmd = CmdEnum.Data)
         {
 #if !NET45
             var operStatus = (int)NativeController.Instance.MyOperStatus;
             var status = (StatusEnum)operStatus;
-            mClient?.SendData(status, mLastContent, lb_hd_info.Text.Trim(), lb_tx_info.Text.Trim());
+
+            var fleetContent = "";
+            var content = tx_content.Text.Trim();
+
+            fleetContent = content;
+
+            content = w_hd_tips.Text.Trim();
+            if (content.Length > 0)
+            {
+                fleetContent = fleetContent.Length > 0 ? $"{fleetContent}|{content}" : content;
+            }
+            
+            var gameData = new OgameData
+            {
+                Cmd = cmd,
+                Status = status,
+                Content = mLastContent,
+                ExpeditionAutoMsg = lb_tx_info.Text.Trim(),
+                PirateAutoMsg = lb_hd_info.Text.Trim(),
+                FleetContent = fleetContent
+            };
+
+            mClient?.SendData(gameData);
 #endif
         }
 
         private void OnServerConnected()
         {
 #if !NET45
-            var operStatus = (int)NativeController.Instance.MyOperStatus;
-            var status = (StatusEnum)operStatus;
-            mClient?.SendAuth(status, mLastContent, lb_hd_info.Text.Trim(), lb_tx_info.Text.Trim());
+            SendData(CmdEnum.Auth);
 #endif
         }
 
@@ -947,6 +1002,13 @@ namespace feeling
 
         private void btn_hd_refresh_Click(object sender, EventArgs e)
         {
+            doRefreshNpc();
+        }
+
+        private void doRefreshNpc()
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
+
             NativeController.Instance.RefreshNpc();
             Redraw();
         }
@@ -1042,6 +1104,7 @@ namespace feeling
             HotKey.UnregisterHotKey(Handle, 107);
         }
 
+        #region hotkey
         protected override void WndProc(ref Message m)
         {
             const int WM_HOTKEY = 0x0312;
@@ -1072,6 +1135,109 @@ namespace feeling
                 Visible = true;
                 WindowState = FormWindowState.Normal;
             }
+        }
+        #endregion
+
+        private void btn_tz_interval_Click(object sender, EventArgs e)
+        {
+            var txt = w_tz_inverval.Text.Trim();
+            if (txt.Length <= 0)
+            {
+                MessageBox.Show("请输入数值");
+                return;
+            }
+
+            var interval = int.Parse(txt);
+            if (interval < 60)
+            {
+                MessageBox.Show("间隔不能小于60分钟");
+                return;
+            }
+
+            mImperiumInterval = interval;
+            lb_tz_interval.Text = mImperiumInterval.ToString();
+        }
+
+        private void btn_tz_save_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                var cfg = new Imperium {
+                    AutoLogin = mAutoImperiumLogin,
+                    Interval = mImperiumInterval,
+                    Open = mAutoImperium,
+                };
+
+                ImperiumUtil.Save(cfg);
+                w_tz_tips.Text = $"{DateTime.Now:G} 统治保存成功";
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine($"tz_save catch {ex.Message}");
+            }
+        }
+
+        private void cbox_tz_auto_CheckedChanged(object sender, EventArgs e)
+        {
+            mAutoImperium = cbox_tz_auto.Checked;
+            NativeController.Instance.IsAutoImperium = mAutoImperium;
+        }
+
+        private async void doAutoImperium()
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                lb_tz_info.Text = $"{DateTime.Now:G}|其他操作正忙";
+                return;
+            }
+
+            var delta = DateTime.Now - NativeController.Instance.LastImperiumTime;
+            var val = mImperiumInterval - delta.TotalMinutes;
+            val = val < 0 ? 0 : val;
+
+            if (!cbox_tz_auto.Checked || !mAutoImperium)
+            {
+                lb_tz_info.Text = $"{DateTime.Now:G}|没有自动统治；时间差{Math.Ceiling(val)}分钟";
+                return;
+            }
+
+            if (mAutoPirate)
+            {
+                lb_tz_info.Text = $"{DateTime.Now:G}|已自动海盗；时间差{Math.Ceiling(val)}分钟";
+                return;
+            }
+
+            if (delta.TotalMinutes < mImperiumInterval)
+            {
+                lb_tz_info.Text = $"{DateTime.Now:G}|大概还差{Math.Ceiling(val)}分钟可自动统治";
+                return;
+            }
+
+            if (mAutoImperiumLogin)
+            {
+                NativeController.Instance.CanNotify = false;
+                await TryLogin();
+            }
+
+            await doImperium();
+        }
+
+        private async Task doImperium()
+        {
+            try
+            {
+                if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
+
+                NativeController.Instance.SwitchStatus(OperStatus.System);
+
+                await NativeController.Instance.StartImperium();
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Error($"doImperium catch {ex.Message}");
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.None);
         }
     }
 }

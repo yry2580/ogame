@@ -195,5 +195,19 @@ namespace feeling
             script += $"doc.querySelector(\"form input[value='提交']\").click()";
             return script;
         }
+
+        public static string ToImperium()
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"#header_top a[href='imperium.php']\").click()";
+            return script;
+        }
+
+        public static string ToImperiumDetail()
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"form[action='imperium.php'] input[type='submit'][value='查看详情']\").click()";
+            return script;
+        }
     }
 }

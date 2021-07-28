@@ -25,6 +25,10 @@ namespace OgameService
         Expedition,
         GetCode,
         AuthCode,
+        Imperium,
+        Npc,
+        Screenshot,
+        Fs,
     }
 
     public enum StatusEnum

@@ -98,6 +98,8 @@
     <Compile Include="Html\Expedition\ExMission.cs" />
     <Compile Include="Html\Expedition\Expedition.cs" />
     <Compile Include="Html\Galaxy\Galaxy.cs" />
+    <Compile Include="Html\Imperium\Imperium.cs" />
+    <Compile Include="Html\Imperium\ImperiumUtil.cs" />
     <Compile Include="Parser\HtmlUtil.cs" />
     <Compile Include="Html\Pirate\PirateUtil.cs" />
     <Compile Include="Html\Pirate\PirateMission.cs" />

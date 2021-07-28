@@ -381,5 +381,23 @@ namespace feeling
 #endif
             return null != node;
         }
+
+        public static bool HasImperium(string source)
+        {
+            if (string.IsNullOrWhiteSpace(source)) return false;
+            var parser = new OgameParser();
+            parser.LoadHtml(source);
+            var node = parser.QuerySelector("#header_top a[href='imperium.php']");
+            return null != node;
+        }
+
+        public static bool HasImperiumDetail(string source)
+        {
+            if (string.IsNullOrWhiteSpace(source)) return false;
+            var parser = new OgameParser();
+            parser.LoadHtml(source);
+            var node = parser.QuerySelector("form[action='imperium.php'] input[type='submit'][value='查看详情']");
+            return null != node;
+        }
     }
 }

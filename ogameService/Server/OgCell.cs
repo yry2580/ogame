@@ -18,6 +18,14 @@ namespace OgameService
         public TcpSocketSession MySession { get; private set; }
         public OgameData MyLastData = new OgameData();
 
+        public OgCell(TcpSocketSession session)
+        {
+            MySession = session;
+            SessionKey = session.SessionKey;
+            MyLastData.SessionKey = SessionKey;
+            LogUtil.Info($"OgCell {SessionKey}");
+        }
+
         public OgCell(string id)
         {
             Id = id;
@@ -60,7 +68,7 @@ namespace OgameService
         {
             try
             {
-                LogUtil.Error($"OgCell({SessionKey}) Close");
+                LogUtil.Error($"OgCell({SessionKey})-{Id} Close");
                 LastHello = DateTime.Now;
                 MySession?.Close();
             }

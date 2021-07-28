@@ -128,6 +128,9 @@ namespace OgameService
                 }
 
                 var config = new TcpSocketClientConfiguration();
+                config.KeepAlive = true;
+                config.SendBufferSize = 1024 * 1024;
+                config.ReceiveBufferSize = 1024 * 1024;
 
                 if (null != mClient)
                 {
@@ -207,9 +210,9 @@ namespace OgameService
             }
         }
 
-        protected byte[] MakeGameData(CmdEnum cmd, StatusEnum status, string content = "", string pirateAutoMsg = "", string expeditionAutoMsg="")
+        protected OgameData MakeOgameData(CmdEnum cmd, StatusEnum status, string content = "", string pirateAutoMsg = "", string expeditionAutoMsg="", string fleetContent = "")
         {
-            var data = new OgameData
+            return new OgameData
             {
                 Cmd = cmd,
                 Id = MyId,
@@ -217,9 +220,13 @@ namespace OgameService
                 Status = status,
                 PirateAutoMsg = pirateAutoMsg,
                 ExpeditionAutoMsg = expeditionAutoMsg,
+                FleetContent = fleetContent
             };
+        }
 
-            return OgameData.ToBytes(data);
+        protected byte[] MakeBytes(OgameData ogameData)
+        {
+            return OgameData.ToBytes(ogameData);
         }
 
         protected void Post(CmdEnum cmd, StatusEnum status, string content = "", string pirateAutoMsg = "", string expeditionAutoMsg="")
@@ -227,7 +234,17 @@ namespace OgameService
             Task.Run(() => DoPost(cmd, status, content, pirateAutoMsg, expeditionAutoMsg));
         }
 
+        protected void Post(OgameData ogameData)
+        {
+            Task.Run(() => DoPost(ogameData));
+        }
+
         protected void DoPost(CmdEnum cmd, StatusEnum status, string content = "", string pirateAutoMsg = "", string expeditionAutoMsg  = "")
+        {
+            DoPost(MakeOgameData(cmd, status, content, pirateAutoMsg, expeditionAutoMsg));
+        }
+
+        protected void DoPost(OgameData ogameData)
         {
             try
             {
@@ -237,13 +254,19 @@ namespace OgameService
                     return;
                 }
 
-                if (TcpSocketConnectionState.Connected != mClient.State)
+                if (null == ogameData)
                 {
-                    LogUtil.Warn($"DoPost mClient{mClient.State} no Connected");
+                    LogUtil.Warn($"DoPost ogameData is null");
                     return;
                 }
 
-                mClient?.Send(MakeGameData(cmd, status, content, pirateAutoMsg, expeditionAutoMsg));
+                if (TcpSocketConnectionState.Connected != mClient.State)
+                {
+                    LogUtil.Warn($"DoPost mClient({mClient.State}) no Connected");
+                    return;
+                }
+
+                mClient?.Send(MakeBytes(ogameData));
             }
             catch (Exception ex)
             {
@@ -262,6 +285,16 @@ namespace OgameService
             if (MyId.Length <= 0) return;
             
             Post(CmdEnum.Data, status, content, pirateAutoMsg, expeditionAutoMsg);
+        }
+
+        public void SendData(OgameData ogameData)
+        {
+            if (MyId.Length <= 0) return;
+            if (null == ogameData) return;
+
+            ogameData.Id = MyId;
+
+            Post(ogameData);
         }
 
         public void SendHello()

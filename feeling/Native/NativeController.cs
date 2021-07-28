@@ -55,6 +55,10 @@ namespace feeling
 
         public bool CanNotify = true;
 
+        public bool IsAutoImperium = false;
+        public DateTime LastImperiumTime = DateTime.Now;
+
+
         public void HandleWebBrowserFrameEnd(string url)
         {
             MyAddress = MyWebBrowser.Address;
@@ -732,12 +736,12 @@ namespace feeling
         /// </summary>
         internal void RefreshNpc(bool isAuto = false)
         {
-            SwitchStatus(OperStatus.Pirate);
+            SwitchStatus(OperStatus.System);
             Task.Run(async () =>
             {
                 try
                 {
-                    OperTipsEvent.Invoke(OperStatus.Pirate, $"{DateTime.Now:MM:dd-HH:mm:ss}|刷球");
+                    OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:MM:dd-HH:mm:ss}|刷球");
                     if (!isAuto)
                     {
                         mPlanet.Reset();
@@ -760,7 +764,7 @@ namespace feeling
                     Console.WriteLine($"RefreshNpc catch {ex.Message}");
                 }
 
-                OperTipsEvent.Invoke(OperStatus.Pirate, $"{DateTime.Now:MM:dd-HH:mm:ss}|刷球完成");
+                OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:MM:dd-HH:mm:ss}|刷球完成");
                 SwitchStatus(OperStatus.None);
             });
         }
@@ -1035,6 +1039,12 @@ namespace feeling
 
             IsPirateWorking = false;
             SwitchStatus(OperStatus.None);
+
+            if (IsAutoImperium)
+            {
+                await StartImperium();
+            }
+
             if (checkNpc)
             {
                 // 刷新一下NPC
@@ -1117,6 +1127,59 @@ namespace feeling
         }
 
         #endregion
+
+        #region 统治
+        public async Task StartImperium()
+        {
+            try
+            {
+                OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}统治");
+
+                Reload();
+
+                if (!HtmlUtil.IsGameUrl(MyAddress))
+                {
+                    OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}统治失败，可能不在游戏页");
+                    return;
+                }
+
+                var source = await GetHauptframe().GetSourceAsync();
+                if (!HtmlUtil.HasImperium(source))
+                {
+                    await GoHome();
+                    await Task.Delay(1500);
+                }
+
+                source = await GetHauptframe().GetSourceAsync();
+                if (!HtmlUtil.HasImperium(source))
+                {
+                    OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}统治失败，没有统治按钮");
+                    return;
+                }
+
+                FrameRunJs(NativeScript.ToImperium());
+                await Task.Delay(1500);
+                source = await GetHauptframe().GetSourceAsync();
+                if (!HtmlUtil.HasImperiumDetail(source))
+                {
+                    OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}统治失败，没有统治详情按钮");
+                    return;
+                }
+
+                FrameRunJs(NativeScript.ToImperiumDetail());
+                await Task.Delay(1500);
+                source = await GetHauptframe().GetSourceAsync();
+
+                Reload();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"StartImperium catch {ex.Message}");
+            }
+
+            OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}统治结束");
+        }
+        #endregion 统治
 
         public void SwitchStatus(OperStatus operStatus)
         {
