@@ -609,14 +609,24 @@ namespace feeling
             var fleetContent = "";
             var content = tx_content.Text.Trim();
 
+            if (content.Contains("|"))
+            {
+                content = content.Substring(content.IndexOf("|"));
+            }
+
             fleetContent = content;
 
             content = w_hd_tips.Text.Trim();
             if (content.Length > 0)
             {
+                if (content.Contains("|"))
+                {
+                    content = content.Substring(content.IndexOf("|"));
+                }
+                
                 fleetContent = fleetContent.Length > 0 ? $"{fleetContent}|{content}" : content;
             }
-            
+
             var gameData = new OgameData
             {
                 Cmd = cmd,
