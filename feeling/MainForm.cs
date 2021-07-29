@@ -611,7 +611,7 @@ namespace feeling
 
             if (content.Contains("|"))
             {
-                content = content.Substring(content.IndexOf("|"));
+                content = content.Substring(content.IndexOf("|") + 1);
             }
 
             fleetContent = content;
@@ -621,7 +621,7 @@ namespace feeling
             {
                 if (content.Contains("|"))
                 {
-                    content = content.Substring(content.IndexOf("|"));
+                    content = content.Substring(content.IndexOf("|") + 1);
                 }
                 
                 fleetContent = fleetContent.Length > 0 ? $"{fleetContent}|{content}" : content;

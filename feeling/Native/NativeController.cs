@@ -911,6 +911,12 @@ namespace feeling
 
                     // 查看舰队队列
                     source = await GetHauptframe().GetSourceAsync();
+                    if (!source.Contains("id=\"fleetdelaybox\""))
+                    {
+                        GoFleetPage();
+                        source = await GetHauptframe().GetSourceAsync();
+                    }
+
                     if (!HtmlUtil.ParseFleetQueue(source, out FleetQueue fq))
                     {
                         _nextFunc(false);
