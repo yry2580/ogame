@@ -387,7 +387,12 @@ namespace feeling
             if (string.IsNullOrWhiteSpace(source)) return false;
             var parser = new OgameParser();
             parser.LoadHtml(source);
+#if !NET45
             var node = parser.QuerySelector("#header_top a[href='imperium.php']");
+#else
+            var node = parser.QuerySelector("//*[@id='header_top']//a[@href='imperium.php']");
+#endif
+
             return null != node;
         }
 
@@ -396,7 +401,13 @@ namespace feeling
             if (string.IsNullOrWhiteSpace(source)) return false;
             var parser = new OgameParser();
             parser.LoadHtml(source);
+
+#if !NET45
             var node = parser.QuerySelector("form[action='imperium.php'] input[type='submit'][value='查看详情']");
+#else
+            var node = parser.QuerySelector("//form[@action='imperium.php']//input[@value='查看详情']");
+#endif
+
             return null != node;
         }
     }

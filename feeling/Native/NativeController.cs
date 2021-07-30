@@ -66,12 +66,9 @@ namespace feeling
             if (url.Contains("ogame/frames.php"))
             {
                 ScanPlanet();
-            }
-
-            if (url.Contains("ogame/galaxy.php"))
-            {
                 ScanNpc();
             }
+
         }
 
         public void ScanPlanet()
@@ -103,8 +100,11 @@ namespace feeling
                     if (!PirateUtil.HasNpcData)
                     {
                         var source = await GetHauptframe()?.GetSourceAsync();
-                        PirateUtil.ParseNpc(source);
-                        NpcChangeEvent?.Invoke();
+                        if (source.Contains("id=\"galaxy_form\""))
+                        {
+                            PirateUtil.ParseNpc(source);
+                            NpcChangeEvent?.Invoke();
+                        }
                     }
                 }
                 catch (Exception)
@@ -410,6 +410,7 @@ namespace feeling
                     return;
                 }
 
+                Reload();
                 var source = await GetHauptframe().GetSourceAsync();
                 if (!HtmlUtil.HasLogoutBtn(source))
                 {
@@ -516,50 +517,51 @@ namespace feeling
                 }
             });
 
-            OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:G}|开始处理探险");
-
-            if (exMission.List.Count <= 0)
-            {
-                OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|没有探险任务");
-                
-                LastExeditionTime = DateTime.Now;
-                IsExpeditionWorking = false;
-                SwitchStatus(OperStatus.None);
-                return;
-            }
-
-            Reload();
-            if (HtmlUtil.IsGameUrl(MyAddress))
-            {
-                source = await GetHauptframe().GetSourceAsync();
-                if (HtmlUtil.HasTutorial(source))
-                {
-                    FrameRunJs(NativeScript.TutorialConfirm());
-                    await Task.Delay(1500);
-                    source = await GetHauptframe().GetSourceAsync();
-                    if (!HtmlUtil.IsInGame(source))
-                    {
-                        OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|探险结束，没有登录");
-                        LastExeditionTime = DateTime.Now;
-                        IsExpeditionWorking = false;
-                        SwitchStatus(OperStatus.None);
-                        return;
-                    }
-                }
-            }
-            else
-            {
-                OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|探险结束，没有登录");
-                LastExeditionTime = DateTime.Now;
-                IsExpeditionWorking = false;
-                SwitchStatus(OperStatus.None);
-                return;
-            }
-
-            await GoHome(1500);
-
             try
             {
+                
+                OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:G}|开始处理探险");
+
+                if (exMission.List.Count <= 0)
+                {
+                    OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|没有探险任务");
+                
+                    LastExeditionTime = DateTime.Now;
+                    IsExpeditionWorking = false;
+                    SwitchStatus(OperStatus.None);
+                    return;
+                }
+
+                Reload();
+                if (HtmlUtil.IsGameUrl(MyAddress))
+                {
+                    source = await GetHauptframe().GetSourceAsync();
+                    if (HtmlUtil.HasTutorial(source))
+                    {
+                        FrameRunJs(NativeScript.TutorialConfirm());
+                        await Task.Delay(1500);
+                        source = await GetHauptframe().GetSourceAsync();
+                        if (!HtmlUtil.IsInGame(source))
+                        {
+                            OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|探险结束，没有登录");
+                            LastExeditionTime = DateTime.Now;
+                            IsExpeditionWorking = false;
+                            SwitchStatus(OperStatus.None);
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+                    OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|探险结束，没有登录");
+                    LastExeditionTime = DateTime.Now;
+                    IsExpeditionWorking = false;
+                    SwitchStatus(OperStatus.None);
+                    return;
+                }
+
+                await GoHome(1500);
+
                 do
                 {
                     Console.WriteLine($"ex-mession index{index}");
@@ -587,6 +589,10 @@ namespace feeling
 
                     Console.WriteLine($"mission {JsonConvert.SerializeObject(mission)}");
 
+                    if (lastErr)
+                    {
+                        Reload();
+                    }
                     source = await GetHauptframe().GetSourceAsync();
                     if (HtmlUtil.HasTutorial(source, mExpedition.Parser))
                     {
@@ -756,6 +762,8 @@ namespace feeling
                         FrameRunJs(NativeScript.ToGalaxy());
                         await Task.Delay(1500);
                         source = await GetHauptframe().GetSourceAsync();
+                        PirateUtil.ParseNpc(source);
+                        NpcChangeEvent?.Invoke();
                         await Task.Delay(500);
                     }
                 }
@@ -794,8 +802,6 @@ namespace feeling
             string source = "";
             bool success = false;
 
-            OperTipsEvent.Invoke(OperStatus.Pirate, $"{DateTime.Now:MM:dd-HH:mm:ss}|开始海盗");
-
             var _nextFunc = new Action<bool>(isSkip =>
             {
                 if (lastErr || isSkip)
@@ -809,47 +815,50 @@ namespace feeling
                 }
             });
 
-            if (pMission.MissionCount <= 0)
-            {
-                OperTipsEvent.Invoke(OperStatus.Pirate, $"{DateTime.Now:MM:dd-HH:mm:ss}|没有海盗任务");
-                LastPirateTime = DateTime.Now;
-                IsPirateWorking = false;
-                SwitchStatus(OperStatus.None);
-                return;
-            }
-
-            Reload();
-
-            if (HtmlUtil.IsGameUrl(MyAddress))
-            {
-                source = await GetHauptframe().GetSourceAsync();
-                if (HtmlUtil.HasTutorial(source))
-                {
-                    FrameRunJs(NativeScript.TutorialConfirm());
-                    await Task.Delay(1500);
-                    source = await GetHauptframe().GetSourceAsync();
-                    if (!HtmlUtil.IsInGame(source))
-                    {
-                        OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|海盗结束，没有登录");
-                        LastExeditionTime = DateTime.Now;
-                        IsExpeditionWorking = false;
-                        SwitchStatus(OperStatus.None);
-                        return;
-                    }
-                }
-            }  else
-            {
-                OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|海盗结束，没有登录");
-                LastExeditionTime = DateTime.Now;
-                IsExpeditionWorking = false;
-                SwitchStatus(OperStatus.None);
-                return;
-            }
-
-            await GoHome(1500);
-
             try
             {
+                OperTipsEvent.Invoke(OperStatus.Pirate, $"{DateTime.Now:MM:dd-HH:mm:ss}|开始海盗");
+
+                if (pMission.MissionCount <= 0)
+                {
+                    OperTipsEvent.Invoke(OperStatus.Pirate, $"{DateTime.Now:MM:dd-HH:mm:ss}|没有海盗任务");
+                    LastPirateTime = DateTime.Now;
+                    IsPirateWorking = false;
+                    SwitchStatus(OperStatus.None);
+                    return;
+                }
+
+                Reload();
+
+                if (HtmlUtil.IsGameUrl(MyAddress))
+                {
+                    source = await GetHauptframe().GetSourceAsync();
+                    if (HtmlUtil.HasTutorial(source))
+                    {
+                        FrameRunJs(NativeScript.TutorialConfirm());
+                        await Task.Delay(1500);
+                        source = await GetHauptframe().GetSourceAsync();
+                        if (!HtmlUtil.IsInGame(source))
+                        {
+                            OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|海盗结束，没有登录");
+                            LastExeditionTime = DateTime.Now;
+                            IsExpeditionWorking = false;
+                            SwitchStatus(OperStatus.None);
+                            return;
+                        }
+                    }
+                }  else
+                {
+                    OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|海盗结束，没有登录");
+                    LastExeditionTime = DateTime.Now;
+                    IsExpeditionWorking = false;
+                    SwitchStatus(OperStatus.None);
+                    return;
+                }
+
+                await GoHome(1500);
+
+           
                 do
                 {
                     Console.WriteLine($"{DateTime.Now:MM:dd-HH:mm:ss}|PirateMission index{index}");
@@ -876,6 +885,11 @@ namespace feeling
                     var mission = pMission.GetMission(index);
 
                     Console.WriteLine($"{DateTime.Now:G}|mission {JsonConvert.SerializeObject(mission)}");
+
+                    if (lastErr)
+                    {
+                        Reload();
+                    }
 
                     source = await GetHauptframe().GetSourceAsync();
                     if (HtmlUtil.HasTutorial(source, mHtmlParser))

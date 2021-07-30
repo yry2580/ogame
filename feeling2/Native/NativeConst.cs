@@ -10,6 +10,7 @@ namespace feeling
 
         public static string CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
         public static string FileDirectory = CurrentDirectory + "Out/";
+        public static string CfgDirectory = CurrentDirectory + "UserCfg/";
     }
 
     public enum OperStatus

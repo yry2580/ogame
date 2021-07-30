@@ -26,8 +26,8 @@ namespace OgameService
         {
             var config = new TcpSocketServerConfiguration();
             config.AllowNatTraversal = true;
-            config.ReceiveBufferSize = 1024 * 1024;
-            config.SendBufferSize = 1024 * 1024;
+            config.ReceiveBufferSize = 1024 * 100;
+            config.SendBufferSize = 1024 * 100;
             mServer = new TcpSocketServer(17201, config);
             mServer.ClientConnected += OnClientConnected;
             mServer.ClientDisconnected += OnClientDisconnected;

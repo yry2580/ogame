@@ -93,7 +93,9 @@ namespace feeling
                 doAutoExpedtion();
                 doAutoPirate();
                 doAutoImperium();
+#if !NET45
                 SendData();
+#endif
             }
             catch (Exception ex)
             {
@@ -337,7 +339,9 @@ namespace feeling
                     mLastContent = sDesc;
                 }
 
+#if !NET45
                 SendData();
+#endif
             }));
         }
 
@@ -388,7 +392,9 @@ namespace feeling
                 Console.WriteLine($"Redraw catch {ex.Message}");
             }
 
-            SendData();
+#if !NET45
+                SendData();
+#endif
         }
 
         protected void RedrawPlanet()
@@ -458,7 +464,9 @@ namespace feeling
             {
                 mLastContent = content;
             }
-            SendData();
+#if !NET45
+                SendData();
+#endif
         }
 
         public void SetUserButton(bool enabled)
@@ -600,9 +608,10 @@ namespace feeling
         }
 
 #endif
+
+#if !NET45
         private void SendData(CmdEnum cmd = CmdEnum.Data)
         {
-#if !NET45
             var operStatus = (int)NativeController.Instance.MyOperStatus;
             var status = (StatusEnum)operStatus;
 
@@ -638,9 +647,8 @@ namespace feeling
             };
 
             mClient?.SendData(gameData);
-#endif
         }
-
+#endif
         private void OnServerConnected()
         {
 #if !NET45
@@ -725,7 +733,9 @@ namespace feeling
             }
             catch(Exception ex)
             {
+#if !NET45
                 LogUtil.Error($"TryLogin catch {ex.Message}");
+#endif
             }
 
             SetUserButton(true);
@@ -753,7 +763,9 @@ namespace feeling
             }
             catch (Exception ex)
             {
+#if !NET45
                 LogUtil.Error($"TryGetAuth catch {ex.Message}");
+#endif
             }
 
             SetUserButton(true);
@@ -774,7 +786,9 @@ namespace feeling
             }
             catch (Exception ex)
             {
+#if !NET45
                 LogUtil.Error($"TryAuthCode catch {ex.Message}");
+#endif
             }
 
             SetUserButton(true);
@@ -800,7 +814,9 @@ namespace feeling
             }
             catch(Exception ex)
             {
+#if !NET45
                 LogUtil.Error($"TryLogout catch {ex.Message}");
+#endif
             }
             SetUserButton(true);
             NativeController.Instance.SwitchStatus(OperStatus.None);
@@ -1114,7 +1130,7 @@ namespace feeling
             HotKey.UnregisterHotKey(Handle, 107);
         }
 
-        #region hotkey
+#region hotkey
         protected override void WndProc(ref Message m)
         {
             const int WM_HOTKEY = 0x0312;
@@ -1146,7 +1162,7 @@ namespace feeling
                 WindowState = FormWindowState.Normal;
             }
         }
-        #endregion
+#endregion
 
         private void btn_tz_interval_Click(object sender, EventArgs e)
         {
@@ -1244,7 +1260,9 @@ namespace feeling
             }
             catch (Exception ex)
             {
+#if !NET45
                 LogUtil.Error($"doImperium catch {ex.Message}");
+#endif
             }
 
             NativeController.Instance.SwitchStatus(OperStatus.None);

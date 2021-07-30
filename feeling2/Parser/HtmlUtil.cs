@@ -353,15 +353,20 @@ namespace feeling
 
         public static bool IsWechatCodePage(string source)
         {
+            Console.WriteLine($"1111");
             if (string.IsNullOrWhiteSpace(source)) return false;
             var parser = new OgameParser();
             parser.LoadHtml(source);
+            Console.WriteLine($"2222");
 #if !NET45
             var node = parser.QuerySelector("form[action='weixincode.php']");
 #else
             var node = parser.QuerySelector("//form[@action='weixincode.php']");
 #endif
-            return null != node;
+            if (null != node) return true;
+            Console.WriteLine($"3333");
+
+            return false;
         }
 
         public static bool HasPrecode(string source)
@@ -374,6 +379,35 @@ namespace feeling
 #else
             var node = parser.QuerySelector("//*[@id='overviewdata']//a[@href='overview.php?precode=true']");
 #endif
+            return null != node;
+        }
+
+        public static bool HasImperium(string source)
+        {
+            if (string.IsNullOrWhiteSpace(source)) return false;
+            var parser = new OgameParser();
+            parser.LoadHtml(source);
+#if !NET45
+            var node = parser.QuerySelector("#header_top a[href='imperium.php']");
+#else
+            var node = parser.QuerySelector("//*[@id='header_top']//a[@href='imperium.php']");
+#endif
+
+            return null != node;
+        }
+
+        public static bool HasImperiumDetail(string source)
+        {
+            if (string.IsNullOrWhiteSpace(source)) return false;
+            var parser = new OgameParser();
+            parser.LoadHtml(source);
+
+#if !NET45
+            var node = parser.QuerySelector("form[action='imperium.php'] input[type='submit'][value='查看详情']");
+#else
+            var node = parser.QuerySelector("//form[@action='imperium.php']//input[@value='查看详情']");
+#endif
+
             return null != node;
         }
     }

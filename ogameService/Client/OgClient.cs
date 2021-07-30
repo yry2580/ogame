@@ -129,8 +129,8 @@ namespace OgameService
 
                 var config = new TcpSocketClientConfiguration();
                 config.KeepAlive = true;
-                config.SendBufferSize = 1024 * 1024;
-                config.ReceiveBufferSize = 1024 * 1024;
+                config.SendBufferSize = 1024 * 100;
+                config.ReceiveBufferSize = 1024 * 100;
 
                 if (null != mClient)
                 {

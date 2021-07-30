@@ -174,5 +174,40 @@ namespace feeling
             script += $"doc.querySelector(\"#tutorial .tutorial_buttons a\").click()";
             return script;
         }
+
+        public static string GetCode()
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"form input[value = '点击发送微信验证码']\").click()";
+            return script;
+        }
+
+        public static string AuthCode(string code)
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"form input[name='overviewcode']\").value='{code}'";
+            return script;
+        }
+
+        public static string SubmitCode()
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"form input[value='提交']\").click()";
+            return script;
+        }
+
+        public static string ToImperium()
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"#header_top a[href='imperium.php']\").click()";
+            return script;
+        }
+
+        public static string ToImperiumDetail()
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"form[action='imperium.php'] input[type='submit'][value='查看详情']\").click()";
+            return script;
+        }
     }
 }
