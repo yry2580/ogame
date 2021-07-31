@@ -21,7 +21,7 @@ namespace feeling
         protected static string GetFilePath(int idx = 0)
         {
             string flag = idx <= 0 ? "" : idx.ToString();
-            return $"{NativeConst.CurrentDirectory}pirate_mission{flag}.cfg";
+            return $"{NativeConst.CfgDirectory}pirate_mission{flag}.cfg";
         }
 
         public static void Save(PirateMission pMission, int idx = 0)

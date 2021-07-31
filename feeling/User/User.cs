@@ -10,7 +10,7 @@ namespace feeling
 {
     class User
     {
-        string mConfigFile = NativeConst.CurrentDirectory + "UserData.dat";
+        string mConfigFile = NativeConst.CfgDirectory + "UserData.dat";
         UserData MyUserData = null;
 
         public string Account => MyUserData.Account;

@@ -11,7 +11,7 @@ namespace feeling
 {
     class Expedition
     {
-        static string missionCfgFile = NativeConst.CurrentDirectory + "ex_mission.cfg";
+        static string missionCfgFile = NativeConst.CfgDirectory + "ex_mission.cfg";
 
         public static ExMission MyExMissionCfg;
         public static List<ShipType> ShipOptions = new List<ShipType> {

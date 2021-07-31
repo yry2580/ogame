@@ -160,7 +160,7 @@ namespace feeling
         public static string SetAttackConfirm()
         {
             var script = "doc = window.parent.frames['Hauptframe'].document;";
-            script += $"doc.querySelector(\"#tjsubmit input[type=submit]\").click()";
+            script += $"doc.querySelector(\"#tjsubmit #sendbutton\").click()";
             return script;
         }
 

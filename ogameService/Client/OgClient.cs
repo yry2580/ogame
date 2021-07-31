@@ -13,7 +13,7 @@ namespace OgameService
 {
     public class OgClient
     {
-        string mClientFile = AppDomain.CurrentDomain.BaseDirectory + "OgClient.cfg";
+        string mClientFile = AppDomain.CurrentDomain.BaseDirectory + "UserCfg/OgClient.cfg";
 
         public event OgEventHandler Connected;
         public event OgEventHandler<OgameData> DataReceived;
@@ -67,6 +67,13 @@ namespace OgameService
                     MyCfg.Id = MyId;
                 }
                 string text = JsonConvert.SerializeObject(MyCfg, Formatting.Indented);
+
+                var dir = Path.GetDirectoryName(mClientFile);
+                if (!Directory.Exists(mClientFile))
+                {
+                    Directory.CreateDirectory(mClientFile);
+                }
+
                 File.WriteAllText(mClientFile, text);
             }
             catch (Exception ex)
