@@ -410,5 +410,28 @@ namespace feeling
 
             return null != node;
         }
+
+        public static int AttackConfirmType(string source)
+        {
+            if (string.IsNullOrWhiteSpace(source)) return 0;
+            var parser = new OgameParser();
+            parser.LoadHtml(source);
+#if !NET45
+            var node = parser.QuerySelector("#tjsubmit input[value='继续']");
+            if (null != node) return 1;
+            node = parser.QuerySelector("#tjsubmit input[type='submit']");
+            if (null != node) return 2;
+            node = parser.QuerySelector("#tjsubmit input[name='submit1']");
+            if (null != node) return 3;
+#else
+            var node = parser.QuerySelector("//*[@id='tjsubmit']//input[@value='继续']");
+            if (null != node) return 1;
+            node = parser.QuerySelector("//*[@id='tjsubmit']//input[@type='submit']");
+            if (null != node) return 2;
+            node = parser.QuerySelector("//*[@id='tjsubmit']//input[@name='submit1']");
+            if (null != node) return 3;
+#endif
+            return 0;
+        }
     }
 }

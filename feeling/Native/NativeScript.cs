@@ -157,10 +157,26 @@ namespace feeling
         /// 攻击确认
         /// </summary>
         /// <returns></returns>
-        public static string SetAttackConfirm()
+        public static string SetAttackConfirm(int type = 0)
         {
             var script = "doc = window.parent.frames['Hauptframe'].document;";
-            script += $"doc.querySelector(\"#tjsubmit #sendbutton\").click()";
+            if (type == 1)
+            {
+                script += $"doc.querySelector(\"#tjsubmit input[value='继续']\").click()";
+            }
+            else if(type == 2)
+            {
+                script += $"doc.querySelector(\"#tjsubmit input[type='submit']\").click()";
+            }
+            else if(type == 3)
+            {
+                script += $"doc.querySelector(\"#tjsubmit input[name='submit1']\").click()";
+            }
+            else
+            {
+                script += $"doc.querySelector(\"#tjsubmit input\").click()";
+            }
+            
             return script;
         }
 

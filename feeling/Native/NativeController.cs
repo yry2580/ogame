@@ -692,8 +692,10 @@ namespace feeling
                     await Task.Delay(1500);
 
                     source = await GetHauptframe().GetSourceAsync();
+
+                    var confirmType = HtmlUtil.AttackConfirmType(source);
                     // 攻击确认
-                    FrameRunJs(NativeScript.SetAttackConfirm());
+                    FrameRunJs(NativeScript.SetAttackConfirm(confirmType));
                     await Task.Delay(1500);
 
                     // 查看结果
@@ -1010,8 +1012,9 @@ namespace feeling
                     FrameRunJs(NativeScript.SetAttack());
                     await Task.Delay(300);
 
+                    var confirmType = HtmlUtil.AttackConfirmType(source);
                     // 攻击确认
-                    FrameRunJs(NativeScript.SetAttackConfirm());
+                    FrameRunJs(NativeScript.SetAttackConfirm(confirmType));
                     await Task.Delay(1500);
 
                     // 查看结果
