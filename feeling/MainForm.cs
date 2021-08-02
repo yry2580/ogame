@@ -358,24 +358,28 @@ namespace feeling
                         btn_galaxy_stop.Enabled = false;
                         SetExpeditionButton(false);
                         SetPirateButton(false);
+                        btn_tz_start.Enabled = false;
                         break;
                     case OperStatus.Galaxy:
                         btn_galaxy_start.Enabled = false;
                         btn_galaxy_stop.Enabled = true;
                         SetExpeditionButton(false);
                         SetPirateButton(false);
+                        btn_tz_start.Enabled = false;
                         break;
                     case OperStatus.Expedition:
                         btn_galaxy_start.Enabled = false;
                         btn_galaxy_stop.Enabled = false;
                         SetExpeditionButton(false, true);
                         SetPirateButton(false);
+                        btn_tz_start.Enabled = false;
                         break;
                     case OperStatus.Pirate:
                         btn_galaxy_start.Enabled = false;
                         btn_galaxy_stop.Enabled = false;
                         SetExpeditionButton(false);
                         SetPirateButton(false, true);
+                        btn_tz_start.Enabled = false;
                         break;
                     case OperStatus.None:
                     default:
@@ -383,6 +387,7 @@ namespace feeling
                         btn_galaxy_stop.Enabled = false;
                         SetExpeditionButton(true);
                         SetPirateButton(true);
+                        btn_tz_start.Enabled = true;
                         break;
                 }
 
@@ -1266,6 +1271,17 @@ namespace feeling
             }
 
             NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private async void btn_tz_start_Click(object sender, EventArgs e)
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                MessageBox.Show("当前不是空闲状态，不能统治");
+                return;
+            }
+
+            await doImperium();
         }
     }
 }

@@ -123,6 +123,7 @@ namespace feeling
             this.label5 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
+            this.btn_tz_start = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.w_split_container)).BeginInit();
             this.w_split_container.Panel2.SuspendLayout();
             this.w_split_container.SuspendLayout();
@@ -868,6 +869,7 @@ namespace feeling
             // 
             // w_imperium
             // 
+            this.w_imperium.Controls.Add(this.btn_tz_start);
             this.w_imperium.Controls.Add(this.btn_tz_save);
             this.w_imperium.Controls.Add(this.w_tz_tips);
             this.w_imperium.Controls.Add(this.lb_tz_interval);
@@ -887,7 +889,7 @@ namespace feeling
             // 
             // btn_tz_save
             // 
-            this.btn_tz_save.Location = new System.Drawing.Point(11, 66);
+            this.btn_tz_save.Location = new System.Drawing.Point(79, 66);
             this.btn_tz_save.Name = "btn_tz_save";
             this.btn_tz_save.Size = new System.Drawing.Size(60, 22);
             this.btn_tz_save.TabIndex = 63;
@@ -1137,6 +1139,16 @@ namespace feeling
             this.label1.TabIndex = 10;
             this.label1.Text = "账 号:";
             // 
+            // btn_tz_start
+            // 
+            this.btn_tz_start.Location = new System.Drawing.Point(10, 66);
+            this.btn_tz_start.Name = "btn_tz_start";
+            this.btn_tz_start.Size = new System.Drawing.Size(60, 22);
+            this.btn_tz_start.TabIndex = 64;
+            this.btn_tz_start.Text = "开始";
+            this.btn_tz_start.UseVisualStyleBackColor = true;
+            this.btn_tz_start.Click += new System.EventHandler(this.btn_tz_start_Click);
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -1265,5 +1277,6 @@ namespace feeling
         private System.Windows.Forms.Label label21;
         private System.Windows.Forms.CheckBox cbox_tz_auto;
         private System.Windows.Forms.Button btn_tz_save;
+        private System.Windows.Forms.Button btn_tz_start;
     }
 }

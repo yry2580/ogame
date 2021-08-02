@@ -1,5 +1,4 @@
-﻿using Cowboy.Sockets;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -15,33 +14,20 @@ namespace OgameService
         public string SessionKey = "";
         public string Id = "";
 
-        public TcpSocketSession MySession { get; private set; }
+        public string MySession { get; private set; }
         public OgameData MyLastData = new OgameData();
 
-        public OgCell(TcpSocketSession session)
+        public OgCell(string sessionKey)
         {
-            MySession = session;
-            SessionKey = session.SessionKey;
+            MySession = sessionKey;
+            SessionKey = sessionKey;
             MyLastData.SessionKey = SessionKey;
             LogUtil.Info($"OgCell {SessionKey}");
-        }
-
-        public OgCell(string id)
-        {
-            Id = id;
         }
 
         public void SetID(string id)
         {
             Id = id;
-        }
-
-        public void SetSession(TcpSocketSession session)
-        {
-            LogUtil.Info($"Cell SetSession {Id}");
-            MySession = session;
-            SessionKey = session.SessionKey;
-            MyLastData.SessionKey = SessionKey;
         }
 
         public void SetData(OgameData data)
@@ -62,20 +48,6 @@ namespace OgameService
         public bool IsOvertime()
         {
             return (DateTime.Now - LastHello).TotalSeconds > (60 * 5);
-        }
-
-        internal void Close()
-        {
-            try
-            {
-                LogUtil.Error($"OgCell({SessionKey})-{Id} Close");
-                LastHello = DateTime.Now;
-                MySession?.Close();
-            }
-            catch(Exception ex)
-            {
-                LogUtil.Error($"OgCell({SessionKey}) Close catch {ex.Message}");
-            }
         }
     }
 }

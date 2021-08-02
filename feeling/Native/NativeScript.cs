@@ -24,7 +24,7 @@ namespace feeling
         public static string ToHome()
         {
             var script = "doc = window.parent.frames['Hauptframe'].document;";
-            script += "doc.querySelectorAll('#menuTable .menubutton_table a')[0].click();";
+            script += "doc.querySelector(\"#menuTable .menubutton_table a[title='概 况']\").click();";
             return script;
         }
 

@@ -416,6 +416,7 @@ namespace feeling
                 {
                     await GoHome();
                     await Task.Delay(1500);
+                    source = await GetHauptframe().GetSourceAsync();
                 }
 
                 if (!HtmlUtil.IsInGame(source))
@@ -860,7 +861,6 @@ namespace feeling
 
                 await GoHome(1500);
 
-           
                 do
                 {
                     Console.WriteLine($"{DateTime.Now:MM:dd-HH:mm:ss}|PirateMission index{index}");
@@ -1167,11 +1167,15 @@ namespace feeling
                 }
 
                 var source = await GetHauptframe().GetSourceAsync();
+                Console.WriteLine($"1111");
                 if (!HtmlUtil.HasImperium(source))
                 {
                     await GoHome();
                     await Task.Delay(1500);
+                    Console.WriteLine($"2222");
                 }
+
+                Console.WriteLine($"33333");
 
                 source = await GetHauptframe().GetSourceAsync();
                 if (!HtmlUtil.HasImperium(source))
