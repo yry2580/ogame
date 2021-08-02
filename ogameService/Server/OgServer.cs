@@ -34,7 +34,7 @@ namespace OgameService
             mServer.Events.ClientConnected += OnClientConnected;
             mServer.Events.ClientDisconnected += OnClientDisconnected;
             mServer.Events.MessageReceived += OnClientDataReceived;
-
+            mServer.Keepalive.EnableTcpKeepAlives = true;
             try
             {
                 LogUtil.Info("Listen");
@@ -80,13 +80,13 @@ namespace OgameService
         {
             try
             {
+                var sessionKey = e.IpPort;
                 var text = Encoding.UTF8.GetString(e.Data);
+                LogUtil.Warn($"Received {sessionKey}|{text}");
                 var data = OgameData.ParseData(text);
                 if (data == null) return;
 
-                var sessionKey = e.IpPort;
-
-                LogUtil.Info($"Received {data.Id}|{data.Cmd}|{data.Status}|{data.Content}|{data.PirateAutoMsg}");
+                LogUtil.Info($"Received {data.Id}|{data.Cmd}|{data.Status}|{data.Content}|{data.FleetContent}");
 
                 switch (data.Cmd)
                 {
@@ -101,9 +101,12 @@ namespace OgameService
                         break;
                 }
             }
-            catch (Exception)
+            catch (Exception ex)
             {
+                LogUtil.Error($"OnClientDataReceived catch {ex.Message}");
             }
+
+            LogUtil.Warn($"Received end");
         }
 
         protected void DoAuth(string sessionKey, OgameData data)

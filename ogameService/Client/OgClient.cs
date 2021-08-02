@@ -103,20 +103,20 @@ namespace OgameService
         {
             try
             {
+                HeartbeatHandler?.Invoke();
+
                 if (null != mClient)
                 {
-                    HeartbeatHandler?.Invoke();
-
                     if (mClient.Connected)
                     {
                         SendHello();
                         return;
                     }
+                }
 
-                    if (!mCanReconnect)
-                    {
-                        return;
-                    }
+                if (!mCanReconnect)
+                {
+                    return;
                 }
 
                 ConnectServer();
@@ -139,8 +139,9 @@ namespace OgameService
 
                 if (null != mClient)
                 {
-                    mClient.Disconnect();
+                    mClient.Dispose();
                     mClient = null;
+                    mCanReconnect = true;
                     return;
                 }
 #if DEBUG
@@ -152,6 +153,7 @@ namespace OgameService
                 mClient.Events.ServerConnected += OnServerConnected;
                 mClient.Events.ServerDisconnected += OnServerDisconnected;
                 mClient.Events.MessageReceived += OnServerDataReceived;
+                // mClient.Keepalive.EnableTcpKeepAlives = true;
             }
             catch (Exception ex)
             {
@@ -183,6 +185,9 @@ namespace OgameService
                 }
                 catch (Exception ex)
                 {
+                    mClient.Dispose();
+                    mClient = null;
+                    mCanReconnect = true;
                     LogUtil.Error($"TryConnet catch {ex.Message}");
                 }
             });
