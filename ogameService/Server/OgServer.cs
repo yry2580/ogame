@@ -82,7 +82,7 @@ namespace OgameService
             {
                 var sessionKey = e.IpPort;
                 var text = Encoding.UTF8.GetString(e.Data);
-                LogUtil.Warn($"Received {sessionKey}|{text}");
+                LogUtil.Warn($"Received {sessionKey}");
                 var data = OgameData.ParseData(text);
                 if (data == null) return;
 
