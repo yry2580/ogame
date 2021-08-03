@@ -145,8 +145,8 @@ namespace OgameService
                     return;
                 }
 #if DEBUG
-                // mClient = new WatsonTcpClient("127.0.0.1", 17201);
-                mClient = new WatsonTcpClient("112.74.170.178", 17201);
+                mClient = new WatsonTcpClient("127.0.0.1", 17201);
+                // mClient = new WatsonTcpClient("112.74.170.178", 17201);
 #else
                 mClient = new WatsonTcpClient("112.74.170.178", 17201);
 #endif

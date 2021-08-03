@@ -14,7 +14,7 @@ namespace OgameService
         WatsonTcpServer mServer;
         volatile List<string> mSessions = new List<string>();
 
-        IDictionary<string, OgCell> mCellDict = new ConcurrentDictionary<string, OgCell>();
+        ConcurrentDictionary<string, OgCell> mCellDict = new ConcurrentDictionary<string, OgCell>();
 
         public OgServer()
         {
@@ -37,7 +37,7 @@ namespace OgameService
             mServer.Keepalive.EnableTcpKeepAlives = true;
             try
             {
-                LogUtil.Info("Listen");
+                LogUtil.Info("Listen: Connect、Disconnected、Auth、Received");
                 mServer.Start();
                 DoCheckHello();
             }
@@ -175,17 +175,32 @@ namespace OgameService
         {
             Task.Run(async() =>
             {
-                await Task.Delay(1000 * 60);
-
-                var arr = mCellDict.Values.ToList();
-                arr.ForEach(c =>
+                do
                 {
-                    if (null != c && c.IsOvertime())
+                    try
                     {
-                        LogUtil.Error($"超时 {c.Id}");
-                        mServer.DisconnectClient(c.MySession);
+                        await Task.Delay(1000 * 60);
+
+                        var arr = mCellDict.Values.ToList();
+                        arr.ForEach(c =>
+                        {
+                            if (null != c && !mSessions.Contains(c.MySession))
+                            {
+                                RemoveCell(c.MySession);
+                            }
+
+                            if (null != c && c.IsOvertime())
+                            {
+                                LogUtil.Error($"超时 {c.Id}");
+                                mServer.DisconnectClient(c.MySession);
+                            }
+                        });
                     }
-                });
+                    catch(Exception ex)
+                    {
+                        LogUtil.Error($"DoCheckHello catch {ex.Message}");
+                    }
+                } while (true);
             });
         }
 
@@ -201,11 +216,10 @@ namespace OgameService
                     // cell.Close();
                     cell = null;
                 }
-                mCellDict.Remove(sessionKey);
-                LogUtil.Info($"RemoveCell 333");
-                mSessions.Remove(sessionKey);
-
-                LogUtil.Info($"RemoveCell 444 {sessionKey}");
+                var ret = mCellDict.TryRemove(sessionKey, out _);
+                LogUtil.Info($"RemoveCell 333 TryRemove: {ret}");
+                ret = mSessions.Remove(sessionKey);
+                LogUtil.Info($"RemoveCell 444 Sessions Remove -{ret}");
             }
             catch (Exception ex)
             {
@@ -220,7 +234,7 @@ namespace OgameService
             LogUtil.Info($"GetData {id}");
             if (string.IsNullOrWhiteSpace(id)) return null;
 
-            var result = mCellDict.Values.Where(c => c.Id == id).Select(c => c.MyLastData).ToList();
+            var result = mCellDict.Values.Where(c => c.Id == id && mSessions.Contains(c.MySession)).Select(c => c.MyLastData).ToList();
             // var result = mCellList.FindAll(c => c.Id == id).Select(c => c.MyLastData).ToList();
             if (null == result)
             {
@@ -231,6 +245,27 @@ namespace OgameService
             result.ForEach(d =>
             {
                 LogUtil.Info($"GetData {d.Id}|{d.SessionKey}|{d.Status}|{d.Content}|{d.PirateAutoMsg}");
+            });
+
+            return result;
+        }
+
+        public List<OgameData> GetAllData()
+        {
+
+            LogUtil.Warn($"GetAllData");
+            
+            var result = mCellDict.Values.Select(c => c.MyLastData).ToList();
+            // var result = mCellList.FindAll(c => c.Id == id).Select(c => c.MyLastData).ToList();
+            if (null == result)
+            {
+                LogUtil.Warn($"GetAllData 没取到对应cell");
+                return null;
+            }
+
+            result.ForEach(d =>
+            {
+                LogUtil.Info($"GetAllData {d.Id}|{d.SessionKey}|{d.Status}|{d.Content}|{d.FleetContent}");
             });
 
             return result;
@@ -442,7 +477,7 @@ namespace OgameService
             LogUtil.Warn("=============== ShowAllCell =====================");
             mCellDict.Values.ToList().ForEach(e =>
             {
-                LogUtil.Info($"{e.Id}-{e.MyLastData.Status}-{e.MyLastData.Content}");
+                LogUtil.Info($"{e.Id}-{e.SessionKey}-{e.MyLastData.Status}-{e.MyLastData.Content}");
             });
             LogUtil.Warn("=============== ShowAllCell end =================");
         }
