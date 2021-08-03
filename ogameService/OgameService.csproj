@@ -56,6 +56,7 @@
     <Compile Include="Client\OgClient.cs" />
     <Compile Include="Client\OgClientCfg.cs" />
     <Compile Include="Common\EventConst.cs" />
+    <Compile Include="Common\LimitedConcurrencyLevelTaskScheduler.cs" />
     <Compile Include="Data\OgameData.cs" />
     <Compile Include="Data\OgameEnum.cs" />
     <Compile Include="Server\OgCell.cs" />

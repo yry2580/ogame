@@ -71,9 +71,9 @@ namespace OgameService
                 string text = JsonConvert.SerializeObject(MyCfg, Formatting.Indented);
 
                 var dir = Path.GetDirectoryName(mClientFile);
-                if (!Directory.Exists(mClientFile))
+                if (!Directory.Exists(dir))
                 {
-                    Directory.CreateDirectory(mClientFile);
+                    Directory.CreateDirectory(dir);
                 }
 
                 File.WriteAllText(mClientFile, text);

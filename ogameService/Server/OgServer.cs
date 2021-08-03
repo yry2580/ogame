@@ -13,8 +13,9 @@ namespace OgameService
     {
         WatsonTcpServer mServer;
         volatile List<string> mSessions = new List<string>();
+        TaskFactory mTaskFactory;
 
-        ConcurrentDictionary<string, OgCell> mCellDict = new ConcurrentDictionary<string, OgCell>();
+        IDictionary<string, OgCell> mCellDict = new ConcurrentDictionary<string, OgCell>();
 
         public OgServer()
         {
@@ -37,6 +38,9 @@ namespace OgameService
             mServer.Keepalive.EnableTcpKeepAlives = true;
             try
             {
+                var scheduler = new LimitedConcurrencyLevelTaskScheduler(1);
+                mTaskFactory = new TaskFactory(scheduler);
+
                 LogUtil.Info("Listen: Connect、Disconnected、Auth、Received");
                 mServer.Start();
                 DoCheckHello();
@@ -49,24 +53,41 @@ namespace OgameService
 
         protected void OnClientConnected(object sender, ConnectionEventArgs e)
         {
-            var sessionKey = e.IpPort;
-            LogUtil.Warn($"Connect {sessionKey}");
-            if (mSessions.Contains(sessionKey))
+            mTaskFactory.StartNew(() =>
             {
-                LogUtil.Warn($"连接已存在");
-                return;
-            }
+                DoConnected(e.IpPort);
+            });
+        }
 
-            LogUtil.Info($"添加 {sessionKey}");
-            mSessions.Add(sessionKey);
-            mCellDict[sessionKey] = new OgCell(sessionKey);
+        protected void DoConnected(object arg)
+        {
+            try
+            {
+                string sessionKey = arg as string;
+                LogUtil.Warn($"Connect {sessionKey}");
+                mSessions.Add(sessionKey);
+                LogUtil.Info($"添加 {sessionKey}");
+                mCellDict[sessionKey] = new OgCell(sessionKey);
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Error($"Disconnected catch {ex.Message}");
+            }
         }
 
         protected void OnClientDisconnected(object sender, DisconnectionEventArgs e)
         {
+            mTaskFactory.StartNew(() =>
+            {
+                DoDisconnected(e.IpPort);
+            });
+        }
+
+        protected void DoDisconnected(object arg)
+        {
             try
             {
-                var sessionKey = e.IpPort;
+                var sessionKey = arg as string;
                 LogUtil.Error($"Disconnected {sessionKey}");
                 RemoveCell(sessionKey);
             }
@@ -184,15 +205,11 @@ namespace OgameService
                         var arr = mCellDict.Values.ToList();
                         arr.ForEach(c =>
                         {
-                            if (null != c && !mSessions.Contains(c.MySession))
-                            {
-                                RemoveCell(c.MySession);
-                            }
-
                             if (null != c && c.IsOvertime())
                             {
                                 LogUtil.Error($"超时 {c.Id}");
                                 mServer.DisconnectClient(c.MySession);
+                                RemoveCell(c.MySession);
                             }
                         });
                     }
@@ -216,7 +233,7 @@ namespace OgameService
                     // cell.Close();
                     cell = null;
                 }
-                var ret = mCellDict.TryRemove(sessionKey, out _);
+                var ret = mCellDict.Remove(sessionKey);
                 LogUtil.Info($"RemoveCell 333 TryRemove: {ret}");
                 ret = mSessions.Remove(sessionKey);
                 LogUtil.Info($"RemoveCell 444 Sessions Remove -{ret}");
