@@ -111,7 +111,11 @@ namespace OgameService
                 switch (data.Cmd)
                 {
                     case CmdEnum.Auth:
-                        DoAuth(sessionKey, data);
+                        // DoAuth(sessionKey, data);
+                        mTaskFactory.StartNew(() =>
+                        {
+                            DoAuth(sessionKey, data);
+                        });
                         break;
                     case CmdEnum.Hello:
                         DoHello(sessionKey, data);
@@ -576,6 +580,93 @@ namespace OgameService
             catch (Exception ex)
             {
                 LogUtil.Error($"OperFs {key} catch {ex.Message}");
+            }
+            return false;
+        }
+
+        public bool OperAutoPirateOpen(string id, string key, bool open)
+        {
+            LogUtil.Warn($"OperAutoPirateOpen {id}");
+            try
+            {
+                if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+                mCellDict.TryGetValue(key, out OgCell result);
+                // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+                if (null == result || null == result.MySession)
+                {
+                    LogUtil.Warn($"OperAutoPirateOpen 没取到对应cell");
+                    return false;
+                }
+
+                OgameData data = new OgameData();
+                data.Cmd = CmdEnum.AutoPirateOpen;
+                data.AutoPirateOpen = open;
+
+                mServer.SendTo(result.MySession, OgameData.ToBytes(data));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Error($"OperAutoPirateOpen {key} catch {ex.Message}");
+            }
+            return false;
+        }
+
+        public bool OperPirateCfg(string id, string key, int index)
+        {
+            LogUtil.Warn($"OperPirateCfg {id}");
+            try
+            {
+                if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+                mCellDict.TryGetValue(key, out OgCell result);
+                // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+                if (null == result || null == result.MySession)
+                {
+                    LogUtil.Warn($"OperPirateCfg 没取到对应cell");
+                    return false;
+                }
+
+                OgameData data = new OgameData();
+                data.Cmd = CmdEnum.PirateCfg;
+                data.PirateCfgIndex = index;
+
+                mServer.SendTo(result.MySession, OgameData.ToBytes(data));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Error($"OperPirateCfg {key} catch {ex.Message}");
+            }
+            return false;
+        }
+
+        public bool OperAutoExpeditionOpen(string id, string key, bool open)
+        {
+            LogUtil.Warn($"OperAutoExpeditionOpen {id}");
+            try
+            {
+                if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+                mCellDict.TryGetValue(key, out OgCell result);
+                // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+                if (null == result || null == result.MySession)
+                {
+                    LogUtil.Warn($"OperAutoExpeditionOpen 没取到对应cell");
+                    return false;
+                }
+
+                OgameData data = new OgameData();
+                data.Cmd = CmdEnum.AutoExpeditionOpen;
+                data.AutoExpeditionOpen = open;
+
+                mServer.SendTo(result.MySession, OgameData.ToBytes(data));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Error($"OperAutoExpeditionOpen {key} catch {ex.Message}");
             }
             return false;
         }

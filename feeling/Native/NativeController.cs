@@ -780,14 +780,14 @@ namespace feeling
             });
         }
 
-        internal void StartPirate(PirateMission pMission, bool isAuto = false)
+        internal void StartPirate(PirateMission pMission, bool isAuto = false, bool autoLogin = false)
         {
             SwitchStatus(OperStatus.Pirate);
             IsPirateWorking = true;
 
             Task.Run(() =>
             {
-                DoPirate(pMission, isAuto);
+                DoPirate(pMission, isAuto, autoLogin);
             });
         }
 
@@ -797,7 +797,7 @@ namespace feeling
             IsPirateWorking = false;
         }
 
-        protected async void DoPirate(PirateMission pMission, bool isAuto = false)
+        protected async void DoPirate(PirateMission pMission, bool isAuto = false, bool autoLogin = false)
         {
             int index = 0;
             int _count = 0;
@@ -1056,7 +1056,7 @@ namespace feeling
                 if (IsPirateWorking && IsAutoPirate)
                 {
                     checkNpc = CheckRefreshNpc(pMission);
-                    autoLogout = isAuto ? true : false;
+                    autoLogout = autoLogin ? true : false;
                 }
             }
 

@@ -29,6 +29,11 @@ namespace OgameService
         Npc,
         Screenshot,
         Fs,
+        AutoPirateOpen,
+        AutoExpeditionOpen,
+        PirateCfg,
+        ToW,
+        ToU,
     }
 
     public enum StatusEnum

@@ -151,8 +151,8 @@ namespace OgameService
 
                 var config = new TcpSocketClientConfiguration();
 #if DEBUG
-                IPEndPoint ip = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 17201);
-                // IPEndPoint ip = new IPEndPoint(IPAddress.Parse("112.74.170.178"), 17201);
+                // IPEndPoint ip = new IPEndPoint(IPAddress.Parse("127.0.0.1"), 17201);
+                IPEndPoint ip = new IPEndPoint(IPAddress.Parse("112.74.170.178"), 17201);
 #else
                 IPEndPoint ip = new IPEndPoint(IPAddress.Parse("112.74.170.178"), 17201);
 #endif

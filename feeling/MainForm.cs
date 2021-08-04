@@ -600,6 +600,18 @@ namespace feeling
                         NativeController.Instance.CanNotify = false;
                         doRefreshNpc();
                         break;
+                    case CmdEnum.AutoPirateOpen:
+                        NativeController.Instance.CanNotify = false;
+                        await SetAutoPirateOpen(data.AutoPirateOpen);
+                        break;
+                    case CmdEnum.PirateCfg:
+                        NativeController.Instance.CanNotify = false;
+                        await SetPirateCfg(data.PirateCfgIndex);
+                        break;
+                    case CmdEnum.AutoExpeditionOpen:
+                        NativeController.Instance.CanNotify = false;
+                        await SetAutoExpeditionOpen(data.AutoExpeditionOpen);
+                        break;
                     default:
                         break;
                 }
@@ -611,7 +623,6 @@ namespace feeling
 
             SendData();
         }
-
 #endif
 
 #if !NET45
@@ -648,7 +659,10 @@ namespace feeling
                 Content = mLastContent,
                 ExpeditionAutoMsg = lb_tx_info.Text.Trim(),
                 PirateAutoMsg = lb_hd_info.Text.Trim(),
-                FleetContent = fleetContent
+                FleetContent = fleetContent,
+                AutoPirateOpen = mAutoPirate,
+                AutoExpeditionOpen = mAutoExpedition,
+                PirateCfgIndex = rbtn_cfg1.Checked ? 1 : 0,
             };
 
             mClient?.SendData(gameData);
@@ -997,12 +1011,12 @@ namespace feeling
             doPirate();
         }
 
-        private void doPirate(bool isAuto = false)
+        private void doPirate(bool isAuto = false, bool autoLogin = false)
         {
             if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
 
             var pMission = GetPirateMission();
-            NativeController.Instance.StartPirate(pMission, isAuto);
+            NativeController.Instance.StartPirate(pMission, isAuto, autoLogin);
             Redraw();
         }
 
@@ -1080,7 +1094,7 @@ namespace feeling
                 await TryLogin();
             }
 
-            doPirate(true);
+            doPirate(true, mAutoPirateLogin);
         }
 
         private void cbox_hd_auto_CheckedChanged(object sender, EventArgs e)
@@ -1282,6 +1296,112 @@ namespace feeling
             }
 
             await doImperium();
+        }
+
+        private async Task SetAutoPirateOpen(bool open)
+        {
+            try
+            {
+                mLastContent = "设置自动海盗";
+                if (OperStatus.None != NativeController.Instance.MyOperStatus)
+                {
+                    mLastContent = "当前不是空闲状态，不能设置";
+                    return;
+                }
+
+                NativeController.Instance.SwitchStatus(OperStatus.System);
+
+                if (cbox_hd_auto.Checked != open)
+                {
+                    cbox_hd_auto.Checked = open;
+                    await Task.Delay(100);
+                }
+
+                mLastContent = "设置自动海盗完成";
+            }
+            catch (Exception ex)
+            {
+#if !NET45
+                LogUtil.Error($"SetAutoPirateOpen catch {ex.Message}");
+#endif
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private async Task SetPirateCfg(int idx)
+        {
+            try
+            {
+                mLastContent = $"读取海盗配置（{idx + 1}）";
+                if (OperStatus.None != NativeController.Instance.MyOperStatus)
+                {
+                    mLastContent = "当前不是空闲状态，不能读取";
+                    return;
+                }
+
+                NativeController.Instance.SwitchStatus(OperStatus.System);
+
+                //
+                // var lastIdx = rbtn_cfg1.Checked ? 1 : 0;
+                if (idx == 1)
+                {
+                    rbtn_cfg1.Checked = true;
+                }
+                else
+                {
+                    rbtn_cfg0.Checked = true;
+                }
+                await Task.Delay(200);
+
+                var ret = PirateCfg();
+                if (ret)
+                {
+                    mLastContent = $"读取海盗配置（{idx + 1}）完成"; ;
+                }
+                else
+                {
+                    mLastContent = $"读取海盗配置（{idx + 1}）失败"; ;
+                }
+            }
+            catch (Exception ex)
+            {
+#if !NET45
+                LogUtil.Error($"SetPirateCfg catch {ex.Message}");
+#endif
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private async Task SetAutoExpeditionOpen(bool open)
+        {
+            try
+            {
+                mLastContent = "设置自动探险";
+                if (OperStatus.None != NativeController.Instance.MyOperStatus)
+                {
+                    mLastContent = "当前不是空闲状态，不能设置";
+                    return;
+                }
+
+                NativeController.Instance.SwitchStatus(OperStatus.System);
+
+                if (cbox_tx_auto.Checked != open)
+                {
+                    cbox_tx_auto.Checked = open;
+                    await Task.Delay(100);
+                }
+                mLastContent = "设置自动探险完成";
+            }
+            catch (Exception ex)
+            {
+#if !NET45
+                LogUtil.Error($"SetAutoPirateOpen catch {ex.Message}");
+#endif
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.None);
         }
     }
 }

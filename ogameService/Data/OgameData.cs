@@ -18,6 +18,9 @@ namespace OgameService
         public string SessionKey = "";
         public string ExpeditionAutoMsg = "";
         public string FleetContent = "";
+        public bool AutoPirateOpen = false;
+        public bool AutoExpeditionOpen = false;
+        public int PirateCfgIndex = 0;
 
         public static byte[] ToBytes(OgameData data)
         {
