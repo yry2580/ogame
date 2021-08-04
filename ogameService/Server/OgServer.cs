@@ -155,7 +155,7 @@ namespace OgameService
 
         protected void DoRecv(string sessionKey, OgameData data)
         {
-            LogUtil.Info($"DoRecv {data.Id}");
+            LogUtil.Info($"DoRecv {sessionKey}|{data.Id}");
 
             // var cell = mCellList.Find(c => c.SessionKey == sessionKey && c.Id == data.Id);
             mCellDict.TryGetValue(sessionKey, out OgCell cell);
@@ -171,7 +171,7 @@ namespace OgameService
 
         protected void DoHello(string sessionKey, OgameData data)
         {
-            LogUtil.Info($"DoHello {data.Id}");
+            LogUtil.Info($"DoHello {sessionKey}|{data.Id}");
 
             mCellDict.TryGetValue(sessionKey, out OgCell cell);
             // var cell = mCellList.Find(c => c.SessionKey == sessionKey && c.Id == data.Id);
@@ -256,7 +256,7 @@ namespace OgameService
 
                 result.ForEach(d =>
                 {
-                    LogUtil.Info($"GetData {d.Id}|{d.SessionKey}|{d.Status}|{d.Content}|{d.PirateAutoMsg}");
+                    LogUtil.Info($"GetData => {d.Id}|{d.SessionKey}|{d.Status}|{d.Content}|{d.FleetContent}");
                 });
             }
             catch(Exception ex)
@@ -272,7 +272,6 @@ namespace OgameService
         {
             LogUtil.Warn($"GetAllData");
             List<OgameData> result;
-
             try
             {
                 result = mCellDict.Values.Select(c => c.MyLastData).ToList();
@@ -285,7 +284,7 @@ namespace OgameService
 
                 result.ForEach(d =>
                 {
-                    LogUtil.Info($"GetAllData {d.Id}|{d.SessionKey}|{d.Status}|{d.Content}|{d.FleetContent}");
+                    LogUtil.Info($"GetAllData => {d.Id}|{d.SessionKey}|{d.Status}|{d.Content}|{d.FleetContent}");
                 });
             }
             catch(Exception ex)
@@ -306,7 +305,7 @@ namespace OgameService
 
                 mCellDict.TryGetValue(key, out OgCell result);
                 // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
-                if (null == result)
+                if (null == result || null == result.MySession)
                 {
                     LogUtil.Warn($"OperLogin 没取到对应cell");
                     return false;
@@ -316,12 +315,13 @@ namespace OgameService
                 data.Cmd = CmdEnum.Login;
 
                 mServer.SendTo(result.MySession, OgameData.ToBytes(data));
+                return true;
             }
             catch(Exception ex)
             {
                 LogUtil.Error($"OperLogin {key} catch {ex.Message}");
             }
-            return true;
+            return false;
         }
 
         public bool OperLogout(string id, string key)
@@ -343,12 +343,13 @@ namespace OgameService
                 data.Cmd = CmdEnum.Logout;
 
                 mServer.SendTo(result.MySession, OgameData.ToBytes(data));
+                return true;
             }
             catch(Exception ex)
             {
                 LogUtil.Error($"OperLogout {key} catch {ex.Message}");
             }
-            return true;
+            return false;
         }
 
         public bool OperPirate(string id, string key)
@@ -361,7 +362,7 @@ namespace OgameService
 
                 mCellDict.TryGetValue(key, out OgCell result);
                 // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
-                if (null == result)
+                if (null == result || null == result.MySession)
                 {
                     LogUtil.Warn($"OperPirate 没取到对应cell");
                     return false;
@@ -371,12 +372,13 @@ namespace OgameService
                 data.Cmd = CmdEnum.Pirate;
 
                 mServer.SendTo(result.MySession, OgameData.ToBytes(data));
+                return true;
             }
             catch(Exception ex)
             {
                 LogUtil.Error($"OperPirate {key} catch {ex.Message}");
             }
-            return true;
+            return false;
         }
 
         public bool OperExpedition(string id, string key)
@@ -398,12 +400,13 @@ namespace OgameService
                 data.Cmd = CmdEnum.Expedition;
 
                 mServer.SendTo(result.MySession, OgameData.ToBytes(data));
+                return true;
             }
             catch (Exception ex)
             {
                 LogUtil.Error($"OperExpedition {key} catch {ex.Message}");
             }
-            return true;
+            return false;
         }
 
         public bool OperGetCode(string id, string key)
@@ -425,13 +428,14 @@ namespace OgameService
                 data.Cmd = CmdEnum.GetCode;
 
                 mServer.SendTo(result.MySession, OgameData.ToBytes(data));
+                return true;
             }
             catch (Exception ex)
             {
                 LogUtil.Error($"OperGetCode {key} catch {ex.Message}");
             }
             
-            return true;
+            return false;
         }
 
         public bool OperAuthCode(string id, string key, string code)
@@ -454,12 +458,13 @@ namespace OgameService
                 data.Content = code;
 
                 mServer.SendTo(result.MySession, OgameData.ToBytes(data));
+                return true;
             }
             catch (Exception ex)
             {
                 LogUtil.Error($"OperAuthCode {key} catch {ex.Message}");
             }
-            return true;
+            return false;
         }
 
         public bool OperImperium(string id, string key)
@@ -481,13 +486,14 @@ namespace OgameService
                 data.Cmd = CmdEnum.Imperium;
 
                 mServer.SendTo(result.MySession, OgameData.ToBytes(data));
+                return true;
             }
             catch (Exception ex)
             {
                 LogUtil.Error($"OperImperium {key} catch {ex.Message}");
             }
 
-            return true;
+            return false;
         }
 
         public bool OperRefreshNpc(string id, string key)
@@ -509,12 +515,13 @@ namespace OgameService
                 data.Cmd = CmdEnum.Npc;
 
                 mServer.SendTo(result.MySession, OgameData.ToBytes(data));
+                return true;
             }
             catch (Exception ex)
             {
                 LogUtil.Error($"OperRefreshNpc {key} catch {ex.Message}");
             }
-            return true;
+            return false;
         }
 
         public bool OperScreenshot(string id, string key)
@@ -536,12 +543,13 @@ namespace OgameService
                 data.Cmd = CmdEnum.Screenshot;
 
                 mServer.SendTo(result.MySession, OgameData.ToBytes(data));
+                return true;
             }
             catch (Exception ex)
             {
                 LogUtil.Error($"OperScreenshot {key} catch {ex.Message}");
             }
-            return true;
+            return false;
         }
 
         public bool OperFs(string id, string key)
@@ -563,12 +571,13 @@ namespace OgameService
                 data.Cmd = CmdEnum.Fs;
 
                 mServer.SendTo(result.MySession, OgameData.ToBytes(data));
+                return true;
             }
             catch (Exception ex)
             {
                 LogUtil.Error($"OperFs {key} catch {ex.Message}");
             }
-            return true;
+            return false;
         }
 
         public void ShowAllCell()
