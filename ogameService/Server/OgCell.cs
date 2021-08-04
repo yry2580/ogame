@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Cowboy.Sockets;
 
 namespace OgameService
 {
@@ -14,13 +15,13 @@ namespace OgameService
         public string SessionKey = "";
         public string Id = "";
 
-        public string MySession { get; private set; }
+        public TcpSocketSession MySession { get; private set; }
         public OgameData MyLastData = new OgameData();
 
-        public OgCell(string sessionKey)
+        public OgCell(TcpSocketSession session)
         {
-            MySession = sessionKey;
-            SessionKey = sessionKey;
+            MySession = session;
+            SessionKey = session.RemoteEndPoint.ToString();
             MyLastData.SessionKey = SessionKey;
             LogUtil.Info($"OgCell {SessionKey}");
         }

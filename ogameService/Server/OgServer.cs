@@ -4,14 +4,13 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using WatsonTcp;
+using Cowboy.Sockets;
 
 namespace OgameService
 {
-#if WTCP
     public class OgServer
     {
-        WatsonTcpServer mServer;
+        TcpSocketServer mServer;
         volatile List<string> mSessions = new List<string>();
         TaskFactory mTaskFactory;
 
@@ -25,24 +24,24 @@ namespace OgameService
 
         protected void Start()
         {
+            var config = new TcpSocketServerConfiguration();
+            config.KeepAlive = true;
+            // "112.74.170.178"-"172.20.170.52"
 #if DEBUG
-            mServer = new WatsonTcpServer("127.0.0.1", 17201);
-            // mClient = new WatsonTcpServer("112.74.170.178", 17201);
+            mServer = new TcpSocketServer(17201, config);
 #else
-            // mServer = new WatsonTcpServer("112.74.170.178", 17201);
-            mServer = new WatsonTcpServer("172.20.170.52", 17201);
+            mServer = new TcpSocketServer(17201, config);
 #endif
-            mServer.Events.ClientConnected += OnClientConnected;
-            mServer.Events.ClientDisconnected += OnClientDisconnected;
-            mServer.Events.MessageReceived += OnClientDataReceived;
-            mServer.Keepalive.EnableTcpKeepAlives = true;
+            mServer.ClientConnected += OnClientConnected;
+            mServer.ClientDisconnected += OnClientDisconnected;
+            mServer.ClientDataReceived += OnClientDataReceived;
             try
             {
                 var scheduler = new LimitedConcurrencyLevelTaskScheduler(1);
                 mTaskFactory = new TaskFactory(scheduler);
 
                 LogUtil.Info("Listen: Connect、Disconnected、Auth、Received");
-                mServer.Start();
+                mServer.Listen();
                 DoCheckHello();
             }
             catch (Exception ex)
@@ -51,43 +50,43 @@ namespace OgameService
             }
         }
 
-        protected void OnClientConnected(object sender, ConnectionEventArgs e)
+        protected void OnClientConnected(object sender, TcpClientConnectedEventArgs e)
         {
             mTaskFactory.StartNew(() =>
             {
-                DoConnected(e.IpPort);
+                DoConnected(e.Session);
             });
         }
 
-        protected void DoConnected(object arg)
+        protected void DoConnected(TcpSocketSession session)
         {
             try
             {
-                string sessionKey = arg as string;
+                string sessionKey = session.RemoteEndPoint.ToString();
                 LogUtil.Warn($"Connect {sessionKey}");
                 mSessions.Add(sessionKey);
                 LogUtil.Info($"添加 {sessionKey}");
-                mCellDict[sessionKey] = new OgCell(sessionKey);
+                mCellDict[sessionKey] = new OgCell(session);
             }
             catch (Exception ex)
             {
-                LogUtil.Error($"Disconnected catch {ex.Message}");
+                LogUtil.Error($"Connect catch {ex.Message}");
             }
         }
 
-        protected void OnClientDisconnected(object sender, DisconnectionEventArgs e)
+        protected void OnClientDisconnected(object sender, TcpClientDisconnectedEventArgs e)
         {
             mTaskFactory.StartNew(() =>
             {
-                DoDisconnected(e.IpPort);
+                DoDisconnected(e.Session);
             });
         }
 
-        protected void DoDisconnected(object arg)
+        protected void DoDisconnected(TcpSocketSession session)
         {
             try
             {
-                var sessionKey = arg as string;
+                var sessionKey = session.RemoteEndPoint.ToString();
                 LogUtil.Error($"Disconnected {sessionKey}");
                 RemoveCell(sessionKey);
             }
@@ -97,12 +96,12 @@ namespace OgameService
             }
         }
 
-        protected void OnClientDataReceived(object sender, MessageReceivedEventArgs e)
+        protected void OnClientDataReceived(object sender, TcpClientDataReceivedEventArgs e)
         {
             try
             {
-                var sessionKey = e.IpPort;
-                var text = Encoding.UTF8.GetString(e.Data);
+                var sessionKey = e.Session.RemoteEndPoint.ToString();
+                var text = Encoding.UTF8.GetString(e.Data, e.DataOffset, e.DataLength);
                 LogUtil.Warn($"Received {sessionKey}");
                 var data = OgameData.ParseData(text);
                 if (data == null) return;
@@ -148,14 +147,9 @@ namespace OgameService
             if (null != cell)
             {
                 cell.SetID(data.Id);
-            } else
-            {
-                cell = new OgCell(sessionKey);
-                cell.SetID(data.Id);
-                mCellDict[sessionKey] = cell;
+                cell.SetData(data);
             }
 
-            cell.SetData(data);
             LogUtil.Info($"DoAuth end");
         }
 
@@ -205,11 +199,10 @@ namespace OgameService
                         var arr = mCellDict.Values.ToList();
                         arr.ForEach(c =>
                         {
-                            if (null != c && c.IsOvertime())
+                            if (null != c && !mSessions.Contains(c.SessionKey))
                             {
-                                LogUtil.Error($"超时 {c.Id}");
-                                mServer.DisconnectClient(c.MySession);
-                                RemoveCell(c.MySession);
+                                LogUtil.Error($"失效 {c.Id}");
+                                RemoveCell(c.SessionKey);
                             }
                         });
                     }
@@ -244,46 +237,62 @@ namespace OgameService
             }
         }
 
-        #region API
+    #region API
         public List<OgameData> GetData(string id)
         {
-            
-            LogUtil.Info($"GetData {id}");
-            if (string.IsNullOrWhiteSpace(id)) return null;
-
-            var result = mCellDict.Values.Where(c => c.Id == id && mSessions.Contains(c.MySession)).Select(c => c.MyLastData).ToList();
-            // var result = mCellList.FindAll(c => c.Id == id).Select(c => c.MyLastData).ToList();
-            if (null == result)
+            List<OgameData> result;
+            try
             {
-                LogUtil.Warn($"GetData 没取到对应cell");
-                return null;
+                LogUtil.Info($"GetData {id}");
+                if (string.IsNullOrWhiteSpace(id)) return null;
+
+                result = mCellDict.Values.Where(c => c.Id == id && mSessions.Contains(c.SessionKey)).Select(c => c.MyLastData).ToList();
+                // var result = mCellList.FindAll(c => c.Id == id).Select(c => c.MyLastData).ToList();
+                if (null == result)
+                {
+                    LogUtil.Warn($"GetData 没取到对应cell");
+                    return null;
+                }
+
+                result.ForEach(d =>
+                {
+                    LogUtil.Info($"GetData {d.Id}|{d.SessionKey}|{d.Status}|{d.Content}|{d.PirateAutoMsg}");
+                });
             }
-
-            result.ForEach(d =>
+            catch(Exception ex)
             {
-                LogUtil.Info($"GetData {d.Id}|{d.SessionKey}|{d.Status}|{d.Content}|{d.PirateAutoMsg}");
-            });
+                LogUtil.Error($"GetData {id} catch {ex.Message}");
+                result = null;
+            }
 
             return result;
         }
 
         public List<OgameData> GetAllData()
         {
-
             LogUtil.Warn($"GetAllData");
-            
-            var result = mCellDict.Values.Select(c => c.MyLastData).ToList();
-            // var result = mCellList.FindAll(c => c.Id == id).Select(c => c.MyLastData).ToList();
-            if (null == result)
-            {
-                LogUtil.Warn($"GetAllData 没取到对应cell");
-                return null;
-            }
+            List<OgameData> result;
 
-            result.ForEach(d =>
+            try
             {
-                LogUtil.Info($"GetAllData {d.Id}|{d.SessionKey}|{d.Status}|{d.Content}|{d.FleetContent}");
-            });
+                result = mCellDict.Values.Select(c => c.MyLastData).ToList();
+                // var result = mCellList.FindAll(c => c.Id == id).Select(c => c.MyLastData).ToList();
+                if (null == result)
+                {
+                    LogUtil.Warn($"GetAllData 没取到对应cell");
+                    return null;
+                }
+
+                result.ForEach(d =>
+                {
+                    LogUtil.Info($"GetAllData {d.Id}|{d.SessionKey}|{d.Status}|{d.Content}|{d.FleetContent}");
+                });
+            }
+            catch(Exception ex)
+            {
+                LogUtil.Error($"GetAllData catch {ex.Message}");
+                result = null;
+            }
 
             return result;
         }
@@ -291,201 +300,274 @@ namespace OgameService
         public bool OperLogin(string id, string key)
         {
             LogUtil.Info($"OperLogin {id}");
-            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
-
-            mCellDict.TryGetValue(key, out OgCell result);
-            // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
-            if (null == result)
+            try
             {
-                LogUtil.Warn($"OperLogin 没取到对应cell");
-                return false;
+                if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+                mCellDict.TryGetValue(key, out OgCell result);
+                // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+                if (null == result)
+                {
+                    LogUtil.Warn($"OperLogin 没取到对应cell");
+                    return false;
+                }
+
+                OgameData data = new OgameData();
+                data.Cmd = CmdEnum.Login;
+
+                mServer.SendTo(result.MySession, OgameData.ToBytes(data));
             }
-
-            OgameData data = new OgameData();
-            data.Cmd = CmdEnum.Login;
-
-            mServer.Send(result.SessionKey, OgameData.ToBytes(data));
+            catch(Exception ex)
+            {
+                LogUtil.Error($"OperLogin {key} catch {ex.Message}");
+            }
             return true;
         }
 
         public bool OperLogout(string id, string key)
         {
             LogUtil.Info($"OperLogout {id}");
-            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
-
-            mCellDict.TryGetValue(key, out OgCell result);
-            // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
-            if (null == result)
+            try
             {
-                LogUtil.Warn($"OperLogout 没取到对应cell");
-                return false;
+                if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+                mCellDict.TryGetValue(key, out OgCell result);
+                // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+                if (null == result || null == result.MySession)
+                {
+                    LogUtil.Warn($"OperLogout 没取到对应cell");
+                    return false;
+                }
+
+                OgameData data = new OgameData();
+                data.Cmd = CmdEnum.Logout;
+
+                mServer.SendTo(result.MySession, OgameData.ToBytes(data));
             }
-
-            OgameData data = new OgameData();
-            data.Cmd = CmdEnum.Logout;
-
-            mServer.Send(result.SessionKey, OgameData.ToBytes(data));
+            catch(Exception ex)
+            {
+                LogUtil.Error($"OperLogout {key} catch {ex.Message}");
+            }
             return true;
         }
 
         public bool OperPirate(string id, string key)
         {
             LogUtil.Info($"OperPirate {id}");
-            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
-
-            mCellDict.TryGetValue(key, out OgCell result);
-            // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
-            if (null == result)
+            try
             {
-                LogUtil.Warn($"OperPirate 没取到对应cell");
-                return false;
+
+                if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+                mCellDict.TryGetValue(key, out OgCell result);
+                // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+                if (null == result)
+                {
+                    LogUtil.Warn($"OperPirate 没取到对应cell");
+                    return false;
+                }
+
+                OgameData data = new OgameData();
+                data.Cmd = CmdEnum.Pirate;
+
+                mServer.SendTo(result.MySession, OgameData.ToBytes(data));
             }
-
-            OgameData data = new OgameData();
-            data.Cmd = CmdEnum.Pirate;
-
-            mServer.Send(result.SessionKey, OgameData.ToBytes(data));
+            catch(Exception ex)
+            {
+                LogUtil.Error($"OperPirate {key} catch {ex.Message}");
+            }
             return true;
         }
 
         public bool OperExpedition(string id, string key)
         {
             LogUtil.Info($"OperExpedition {id}");
-            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
-
-            mCellDict.TryGetValue(key, out OgCell result);
-            // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
-            if (null == result)
+            try
             {
-                LogUtil.Warn($"OperExpedition 没取到对应cell");
-                return false;
+                if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+                mCellDict.TryGetValue(key, out OgCell result);
+                // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+                if (null == result || null == result.MySession)
+                {
+                    LogUtil.Warn($"OperExpedition 没取到对应cell");
+                    return false;
+                }
+
+                OgameData data = new OgameData();
+                data.Cmd = CmdEnum.Expedition;
+
+                mServer.SendTo(result.MySession, OgameData.ToBytes(data));
             }
-
-            OgameData data = new OgameData();
-            data.Cmd = CmdEnum.Expedition;
-
-            mServer.Send(result.SessionKey, OgameData.ToBytes(data));
+            catch (Exception ex)
+            {
+                LogUtil.Error($"OperExpedition {key} catch {ex.Message}");
+            }
             return true;
         }
 
         public bool OperGetCode(string id, string key)
         {
             LogUtil.Info($"OperGetCode {id}");
-            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
-
-            mCellDict.TryGetValue(key, out OgCell result);
-            // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
-            if (null == result)
+            try
             {
-                LogUtil.Warn($"OperGetCode 没取到对应cell");
-                return false;
+                if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+                mCellDict.TryGetValue(key, out OgCell result);
+                // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+                if (null == result || null == result.MySession)
+                {
+                    LogUtil.Warn($"OperGetCode 没取到对应cell");
+                    return false;
+                }
+
+                OgameData data = new OgameData();
+                data.Cmd = CmdEnum.GetCode;
+
+                mServer.SendTo(result.MySession, OgameData.ToBytes(data));
             }
-
-            OgameData data = new OgameData();
-            data.Cmd = CmdEnum.GetCode;
-
-            mServer.Send(result.SessionKey, OgameData.ToBytes(data));
+            catch (Exception ex)
+            {
+                LogUtil.Error($"OperGetCode {key} catch {ex.Message}");
+            }
+            
             return true;
         }
 
         public bool OperAuthCode(string id, string key, string code)
         {
-            LogUtil.Warn($"OperGetCode {id}|{code}");
-            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
-
-            mCellDict.TryGetValue(key, out OgCell result);
-            // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
-            if (null == result)
+            LogUtil.Warn($"OperAuthCode {id}|{code}");
+            try
             {
-                LogUtil.Warn($"OperGetCode 没取到对应cell");
-                return false;
+                if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+                mCellDict.TryGetValue(key, out OgCell result);
+                // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+                if (null == result || null == result.MySession)
+                {
+                    LogUtil.Warn($"OperGetCode 没取到对应cell");
+                    return false;
+                }
+
+                OgameData data = new OgameData();
+                data.Cmd = CmdEnum.AuthCode;
+                data.Content = code;
+
+                mServer.SendTo(result.MySession, OgameData.ToBytes(data));
             }
-
-            OgameData data = new OgameData();
-            data.Cmd = CmdEnum.AuthCode;
-            data.Content = code;
-
-            mServer.Send(result.SessionKey, OgameData.ToBytes(data));
+            catch (Exception ex)
+            {
+                LogUtil.Error($"OperAuthCode {key} catch {ex.Message}");
+            }
             return true;
         }
 
         public bool OperImperium(string id, string key)
         {
             LogUtil.Warn($"OperImperium {id}");
-            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
-
-            mCellDict.TryGetValue(key, out OgCell result);
-            // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
-            if (null == result)
+            try
             {
-                LogUtil.Warn($"OperImperium 没取到对应cell");
-                return false;
+                if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+                mCellDict.TryGetValue(key, out OgCell result);
+                // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+                if (null == result || null == result.MySession)
+                {
+                    LogUtil.Warn($"OperImperium 没取到对应cell");
+                    return false;
+                }
+
+                OgameData data = new OgameData();
+                data.Cmd = CmdEnum.Imperium;
+
+                mServer.SendTo(result.MySession, OgameData.ToBytes(data));
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Error($"OperImperium {key} catch {ex.Message}");
             }
 
-            OgameData data = new OgameData();
-            data.Cmd = CmdEnum.Imperium;
-
-            mServer.Send(result.SessionKey, OgameData.ToBytes(data));
             return true;
         }
 
         public bool OperRefreshNpc(string id, string key)
         {
             LogUtil.Warn($"OperRefreshNpc {id}");
-            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
-
-            mCellDict.TryGetValue(key, out OgCell result);
-            // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
-            if (null == result)
+            try
             {
-                LogUtil.Warn($"OperRefreshNpc 没取到对应cell");
-                return false;
+                if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+                mCellDict.TryGetValue(key, out OgCell result);
+                // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+                if (null == result || null == result.MySession)
+                {
+                    LogUtil.Warn($"OperRefreshNpc 没取到对应cell");
+                    return false;
+                }
+
+                OgameData data = new OgameData();
+                data.Cmd = CmdEnum.Npc;
+
+                mServer.SendTo(result.MySession, OgameData.ToBytes(data));
             }
-
-            OgameData data = new OgameData();
-            data.Cmd = CmdEnum.Npc;
-
-            mServer.Send(result.SessionKey, OgameData.ToBytes(data));
+            catch (Exception ex)
+            {
+                LogUtil.Error($"OperRefreshNpc {key} catch {ex.Message}");
+            }
             return true;
         }
 
         public bool OperScreenshot(string id, string key)
         {
             LogUtil.Warn($"OperScreenshot {id}");
-            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
-
-            mCellDict.TryGetValue(key, out OgCell result);
-            // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
-            if (null == result)
+            try
             {
-                LogUtil.Warn($"OperScreenshot 没取到对应cell");
-                return false;
+                if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+                mCellDict.TryGetValue(key, out OgCell result);
+                // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+                if (null == result || null == result.MySession)
+                {
+                    LogUtil.Warn($"OperScreenshot 没取到对应cell");
+                    return false;
+                }
+
+                OgameData data = new OgameData();
+                data.Cmd = CmdEnum.Screenshot;
+
+                mServer.SendTo(result.MySession, OgameData.ToBytes(data));
             }
-
-            OgameData data = new OgameData();
-            data.Cmd = CmdEnum.Screenshot;
-
-            mServer.Send(result.SessionKey, OgameData.ToBytes(data));
+            catch (Exception ex)
+            {
+                LogUtil.Error($"OperScreenshot {key} catch {ex.Message}");
+            }
             return true;
         }
 
         public bool OperFs(string id, string key)
         {
             LogUtil.Warn($"OperFs {id}");
-            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
-
-            mCellDict.TryGetValue(key, out OgCell result);
-            // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
-            if (null == result)
+            try
             {
-                LogUtil.Warn($"OperFs 没取到对应cell");
-                return false;
+                if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+                mCellDict.TryGetValue(key, out OgCell result);
+                // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+                if (null == result || null == result.MySession)
+                {
+                    LogUtil.Warn($"OperFs 没取到对应cell");
+                    return false;
+                }
+
+                OgameData data = new OgameData();
+                data.Cmd = CmdEnum.Fs;
+
+                mServer.SendTo(result.MySession, OgameData.ToBytes(data));
             }
-
-            OgameData data = new OgameData();
-            data.Cmd = CmdEnum.Fs;
-
-            mServer.Send(result.SessionKey, OgameData.ToBytes(data));
+            catch (Exception ex)
+            {
+                LogUtil.Error($"OperFs {key} catch {ex.Message}");
+            }
             return true;
         }
 
@@ -499,453 +581,6 @@ namespace OgameService
             LogUtil.Warn("=============== ShowAllCell end =================");
         }
 
-        #endregion
-    }
-#else
-    public class OgServer
-    {
-        TcpSocketServer mServer;
-        volatile List<TcpSocketSession> mSessions = new List<TcpSocketSession>();
-        // volatile List<OgCell> mCellList = new List<OgCell>();
-
-        IDictionary<string, OgCell> mCellDict = new ConcurrentDictionary<string, OgCell>();
-
-        public OgServer()
-        {
-            LogUtil.Info("OgServer");
-            Start();
-        }
-
-        protected void Start()
-        {
-            var config = new TcpSocketServerConfiguration();
-            config.AllowNatTraversal = true;
-            config.ReceiveBufferSize = 1024 * 100;
-            config.SendBufferSize = 1024 * 100;
-            mServer = new TcpSocketServer(17201, config);
-            mServer.ClientConnected += OnClientConnected;
-            mServer.ClientDisconnected += OnClientDisconnected;
-            mServer.ClientDataReceived += OnClientDataReceived;
-
-            try
-            {
-                LogUtil.Info("Listen");
-                mServer.Listen();
-                DoCheckHello();
-            }
-            catch (Exception ex)
-            {
-                LogUtil.Error($"Listen catch {ex.Message}");
-            }
-        }
-
-        protected void OnClientConnected(object sender, TcpClientConnectedEventArgs e)
-        {
-            var sessionKey = e.Session.SessionKey;
-            LogUtil.Warn($"Connect {sessionKey}|{e.Session.RemoteEndPoint}");
-            var session = mSessions.Find(item => item.SessionKey == sessionKey);
-            if (session != null)
-            {
-                LogUtil.Warn($"连接已存在");
-                return;
-            }
-
-            LogUtil.Info($"添加 {sessionKey}");
-            mSessions.Add(e.Session);
-            mCellDict[sessionKey] = new OgCell(e.Session);
-        }
-
-        protected void OnClientDisconnected(object sender, TcpClientDisconnectedEventArgs e)
-        {
-            try
-            {
-                var sessionKey = e.Session.SessionKey;
-                LogUtil.Error($"Disconnected {sessionKey}");
-                RemoveCell(sessionKey);
-            }
-            catch (Exception ex)
-            {
-                LogUtil.Error($"Disconnected catch {ex.Message}");
-            }
-        }
-
-        protected void OnClientDataReceived(object sender, TcpClientDataReceivedEventArgs e)
-        {
-            try
-            {
-                var text = Encoding.UTF8.GetString(e.Data, e.DataOffset, e.DataLength);
-                var data = OgameData.ParseData(text);
-                if (data == null) return;
-
-                var sessionKey = e.Session.SessionKey;
-
-                LogUtil.Info($"Received {data.Id}|{data.Cmd}|{data.Status}|{data.Content}|{data.PirateAutoMsg}");
-
-                switch (data.Cmd)
-                {
-                    case CmdEnum.Auth:
-                        DoAuth(sessionKey, e.Session, data);
-                        break;
-                    case CmdEnum.Hello:
-                        DoHello(sessionKey, data);
-                        break;
-                    default:
-                        DoRecv(sessionKey, data);
-                        break;
-                }
-            }
-            catch (Exception)
-            {
-            }
-        }
-
-        protected void DoAuth(string sessionKey, TcpSocketSession session, OgameData data)
-        {
-            LogUtil.Info($"DoAuth {sessionKey}|{data.Id}");
-            if (string.IsNullOrWhiteSpace(sessionKey)) return;
-
-            var valid = Guid.TryParse(data.Id, out _);
-            if (!valid)
-            {
-                LogUtil.Info($"DoAuth failed! Id invalid");
-                return;
-            }
-
-            mCellDict.TryGetValue(sessionKey, out OgCell cell);
-            // var cell = mCellList.Find(c => c.SessionKey == sessionKey);
-
-            if (null != cell)
-            {
-                cell.SetID(data.Id);
-            } else
-            {
-                cell = new OgCell(session);
-                cell.SetID(data.Id);
-                // cell.SetSession(session);
-                // mCellList.Add(cell);
-                mCellDict[sessionKey] = cell;
-            }
-
-            cell.SetData(data);
-            LogUtil.Info($"DoAuth end");
-        }
-
-        protected void DoRecv(string sessionKey, OgameData data)
-        {
-            LogUtil.Info($"DoRecv {data.Id}");
-
-            // var cell = mCellList.Find(c => c.SessionKey == sessionKey && c.Id == data.Id);
-            mCellDict.TryGetValue(sessionKey, out OgCell cell);
-            if (null == cell)
-            {
-                LogUtil.Error($"DoRecv 没有取到cell");
-                return;
-            }
-
-            cell.SetData(data);
-            LogUtil.Info($"DoRecv end");
-        }
-
-        protected void DoHello(string sessionKey, OgameData data)
-        {
-            LogUtil.Info($"DoHello {data.Id}");
-
-            mCellDict.TryGetValue(sessionKey, out OgCell cell);
-            // var cell = mCellList.Find(c => c.SessionKey == sessionKey && c.Id == data.Id);
-
-            if (null == cell)
-            {
-                LogUtil.Error($"DoRecv 没有取到cell");
-                return;
-            }
-
-            cell.SetHello(data);
-            LogUtil.Info($"DoHello end");
-        }
-
-        protected void DoCheckHello()
-        {
-            Task.Run(async() =>
-            {
-                await Task.Delay(1000 * 60);
-
-                var arr = mCellDict.Values.ToList();
-                arr.ForEach(c =>
-                {
-                    if (null != c && c.IsOvertime())
-                    {
-                        LogUtil.Error($"超时 {c.Id}");
-                        c.Close();
-                    }
-                });
-            });
-        }
-
-        protected void RemoveCell(string sessionKey)
-        {
-            try
-            {
-                LogUtil.Info($"RemoveCell 111 {sessionKey}");
-                mCellDict.TryGetValue(sessionKey, out OgCell cell);
-                if (null != cell)
-                {
-                    LogUtil.Info($"RemoveCell 222 {cell.Id}");
-                    // cell.Close();
-                    cell = null;
-                }
-                mCellDict.Remove(sessionKey);
-                LogUtil.Info($"RemoveCell 333");
-                var session = mSessions.Find(e => e.SessionKey == sessionKey);
-                if (null != session)
-                {
-                    mSessions.Remove(session);
-                    session?.Close();
-                    session = null;
-                }
-
-                LogUtil.Info($"RemoveCell 444 {sessionKey}");
-            }
-            catch (Exception ex)
-            {
-                LogUtil.Error($"RemoveCell catch {sessionKey} - {ex.Message}");
-            }
-        }
-
-    #region API
-        public List<OgameData> GetData(string id)
-        {
-            
-            LogUtil.Info($"GetData {id}");
-            if (string.IsNullOrWhiteSpace(id)) return null;
-
-            var result = mCellDict.Values.Where(c => c.Id == id).Select(c => c.MyLastData).ToList();
-            // var result = mCellList.FindAll(c => c.Id == id).Select(c => c.MyLastData).ToList();
-            if (null == result)
-            {
-                LogUtil.Warn($"GetData 没取到对应cell");
-                return null;
-            }
-
-            result.ForEach(d =>
-            {
-                LogUtil.Info($"GetData {d.Id}|{d.SessionKey}|{d.Status}|{d.Content}|{d.PirateAutoMsg}");
-            });
-
-            return result;
-        }
-
-        public bool OperLogin(string id, string key)
-        {
-            LogUtil.Info($"OperLogin {id}");
-            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
-
-            mCellDict.TryGetValue(key, out OgCell result);
-            // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
-            if (null == result)
-            {
-                LogUtil.Warn($"OperLogin 没取到对应cell");
-                return false;
-            }
-
-            OgameData data = new OgameData();
-            data.Cmd = CmdEnum.Login;
-
-            mServer.SendTo(result.SessionKey, OgameData.ToBytes(data));
-            return true;
-        }
-
-        public bool OperLogout(string id, string key)
-        {
-            LogUtil.Info($"OperLogout {id}");
-            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
-
-            mCellDict.TryGetValue(key, out OgCell result);
-            // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
-            if (null == result)
-            {
-                LogUtil.Warn($"OperLogout 没取到对应cell");
-                return false;
-            }
-
-            OgameData data = new OgameData();
-            data.Cmd = CmdEnum.Logout;
-
-            mServer.SendTo(result.SessionKey, OgameData.ToBytes(data));
-            return true;
-        }
-
-        public bool OperPirate(string id, string key)
-        {
-            LogUtil.Info($"OperPirate {id}");
-            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
-
-            mCellDict.TryGetValue(key, out OgCell result);
-            // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
-            if (null == result)
-            {
-                LogUtil.Warn($"OperPirate 没取到对应cell");
-                return false;
-            }
-
-            OgameData data = new OgameData();
-            data.Cmd = CmdEnum.Pirate;
-
-            mServer.SendTo(result.SessionKey, OgameData.ToBytes(data));
-            return true;
-        }
-
-        public bool OperExpedition(string id, string key)
-        {
-            LogUtil.Info($"OperExpedition {id}");
-            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
-
-            mCellDict.TryGetValue(key, out OgCell result);
-            // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
-            if (null == result)
-            {
-                LogUtil.Warn($"OperExpedition 没取到对应cell");
-                return false;
-            }
-
-            OgameData data = new OgameData();
-            data.Cmd = CmdEnum.Expedition;
-
-            mServer.SendTo(result.SessionKey, OgameData.ToBytes(data));
-            return true;
-        }
-
-        public bool OperGetCode(string id, string key)
-        {
-            LogUtil.Info($"OperGetCode {id}");
-            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
-
-            mCellDict.TryGetValue(key, out OgCell result);
-            // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
-            if (null == result)
-            {
-                LogUtil.Warn($"OperGetCode 没取到对应cell");
-                return false;
-            }
-
-            OgameData data = new OgameData();
-            data.Cmd = CmdEnum.GetCode;
-
-            mServer.SendTo(result.SessionKey, OgameData.ToBytes(data));
-            return true;
-        }
-
-        public bool OperAuthCode(string id, string key, string code)
-        {
-            LogUtil.Info($"OperGetCode {id}|{code}");
-            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
-
-            mCellDict.TryGetValue(key, out OgCell result);
-            // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
-            if (null == result)
-            {
-                LogUtil.Warn($"OperGetCode 没取到对应cell");
-                return false;
-            }
-
-            OgameData data = new OgameData();
-            data.Cmd = CmdEnum.AuthCode;
-            data.Content = code;
-
-            mServer.SendTo(result.SessionKey, OgameData.ToBytes(data));
-            return true;
-        }
-
-        public bool OperImperium(string id, string key)
-        {
-            LogUtil.Info($"OperImperium {id}");
-            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
-
-            mCellDict.TryGetValue(key, out OgCell result);
-            // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
-            if (null == result)
-            {
-                LogUtil.Warn($"OperImperium 没取到对应cell");
-                return false;
-            }
-
-            OgameData data = new OgameData();
-            data.Cmd = CmdEnum.Imperium;
-
-            mServer.SendTo(result.SessionKey, OgameData.ToBytes(data));
-            return true;
-        }
-
-        public bool OperRefreshNpc(string id, string key)
-        {
-            LogUtil.Info($"OperRefreshNpc {id}");
-            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
-
-            mCellDict.TryGetValue(key, out OgCell result);
-            // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
-            if (null == result)
-            {
-                LogUtil.Warn($"OperRefreshNpc 没取到对应cell");
-                return false;
-            }
-
-            OgameData data = new OgameData();
-            data.Cmd = CmdEnum.Npc;
-
-            mServer.SendTo(result.SessionKey, OgameData.ToBytes(data));
-            return true;
-        }
-
-        public bool OperScreenshot(string id, string key)
-        {
-            LogUtil.Info($"OperScreenshot {id}");
-            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
-
-            mCellDict.TryGetValue(key, out OgCell result);
-            // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
-            if (null == result)
-            {
-                LogUtil.Warn($"OperScreenshot 没取到对应cell");
-                return false;
-            }
-
-            OgameData data = new OgameData();
-            data.Cmd = CmdEnum.Screenshot;
-
-            mServer.SendTo(result.SessionKey, OgameData.ToBytes(data));
-            return true;
-        }
-
-        public bool OperFs(string id, string key)
-        {
-            LogUtil.Info($"OperFs {id}");
-            if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
-
-            mCellDict.TryGetValue(key, out OgCell result);
-            // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
-            if (null == result)
-            {
-                LogUtil.Warn($"OperFs 没取到对应cell");
-                return false;
-            }
-
-            OgameData data = new OgameData();
-            data.Cmd = CmdEnum.Fs;
-
-            mServer.SendTo(result.SessionKey, OgameData.ToBytes(data));
-            return true;
-        }
-
-        public void ShowAllCell()
-        {
-            LogUtil.Info("=============== ShowAllCell =====================");
-            mCellDict.Values.ToList().ForEach(e =>
-            {
-                LogUtil.Info($"{e.Id}-{e.MyLastData.Status}-{e.MyLastData.Content}");
-            });
-            LogUtil.Info("=============== ShowAllCell end =================");
-        }
-
     #endregion
     }
-#endif
 }
