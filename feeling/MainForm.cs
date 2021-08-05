@@ -546,6 +546,7 @@ namespace feeling
             mClient = new OgClient();
             mClient.Connected += OnServerConnected;
             mClient.DataReceived += OnServerReceived;
+            mClient.HeartbeatHandler += onHeartbeat;
 #endif
         }
 
@@ -554,6 +555,13 @@ namespace feeling
         {
             Invoke(new Action(() => {
                 DoServerReceived(data);
+            }));
+        }
+
+        private void onHeartbeat()
+        {
+            Invoke(new Action(() => {
+                SendData(CmdEnum.Hello);
             }));
         }
 

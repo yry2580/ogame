@@ -39,10 +39,6 @@ namespace OgameService
 
             MyLastData = data;
             MyLastData.SessionKey = SessionKey;
-        }
-
-        public void SetHello(OgameData data)
-        {
             LastHello = DateTime.Now;
         }
 

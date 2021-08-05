@@ -108,7 +108,6 @@ namespace OgameService
                 {
                     if (TcpSocketConnectionState.Connected == mClient.State)
                     {
-                        SendHello();
                         return;
                     }
 
@@ -298,31 +297,17 @@ namespace OgameService
         }
 
         #region API
-        public void SendAuth(StatusEnum status, string content = "", string pirateAutoMsg = "", string expeditionAutoMsg = "")
-        {
-            Post(CmdEnum.Auth, status, content, pirateAutoMsg, expeditionAutoMsg);
-        }
-
-        public void SendData(StatusEnum status, string content = "", string pirateAutoMsg = "", string expeditionAutoMsg = "")
-        {
-            if (MyId.Length <= 0) return;
-            
-            Post(CmdEnum.Data, status, content, pirateAutoMsg, expeditionAutoMsg);
-        }
 
         public void SendData(OgameData ogameData)
         {
+            if (null == mClient) return;
             if (MyId.Length <= 0) return;
             if (null == ogameData) return;
+            if (TcpSocketConnectionState.Connected != mClient.State) return;
 
             ogameData.Id = MyId;
 
             Post(ogameData);
-        }
-
-        public void SendHello()
-        {
-            Post(CmdEnum.Hello, StatusEnum.None, "", "");
         }
 
         #endregion

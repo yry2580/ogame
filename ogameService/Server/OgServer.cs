@@ -117,9 +117,6 @@ namespace OgameService
                             DoAuth(sessionKey, data);
                         });
                         break;
-                    case CmdEnum.Hello:
-                        DoHello(sessionKey, data);
-                        break;
                     default:
                         DoRecv(sessionKey, data);
                         break;
@@ -171,23 +168,6 @@ namespace OgameService
 
             cell.SetData(data);
             LogUtil.Info($"DoRecv end");
-        }
-
-        protected void DoHello(string sessionKey, OgameData data)
-        {
-            LogUtil.Info($"DoHello {sessionKey}|{data.Id}");
-
-            mCellDict.TryGetValue(sessionKey, out OgCell cell);
-            // var cell = mCellList.Find(c => c.SessionKey == sessionKey && c.Id == data.Id);
-
-            if (null == cell)
-            {
-                LogUtil.Error($"DoRecv 没有取到cell");
-                return;
-            }
-
-            cell.SetHello(data);
-            LogUtil.Info($"DoHello end");
         }
 
         protected void DoCheckHello()
