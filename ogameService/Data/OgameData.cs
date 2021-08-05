@@ -21,6 +21,7 @@ namespace OgameService
         public bool AutoPirateOpen = false;
         public bool AutoExpeditionOpen = false;
         public int PirateCfgIndex = 0;
+        public string Universe = "";
 
         public static byte[] ToBytes(OgameData data)
         {

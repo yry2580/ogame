@@ -652,6 +652,14 @@ namespace feeling
                 fleetContent = fleetContent.Length > 0 ? $"{fleetContent}|{content}" : content;
             }
 
+            var url = mWebBrowser?.Address ?? "";
+            var mat = Regex.Match(url, $@"://(?<universe>\S*).cicihappy.com");
+            var universe = "";
+            if (mat.Success)
+            {
+                universe = mat.Groups["universe"].Value;
+            }
+
             var gameData = new OgameData
             {
                 Cmd = cmd,
@@ -663,6 +671,7 @@ namespace feeling
                 AutoPirateOpen = mAutoPirate,
                 AutoExpeditionOpen = mAutoExpedition,
                 PirateCfgIndex = rbtn_cfg1.Checked ? 1 : 0,
+                Universe = universe,
             };
 
             mClient?.SendData(gameData);
