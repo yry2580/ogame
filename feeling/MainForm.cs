@@ -523,11 +523,18 @@ namespace feeling
         {
             Console.WriteLine($"Web_OnFrameEnd {e.Url}");
             NativeController.Instance.HandleWebBrowserFrameEnd(e.Url);
+#if !NET45
+            SendData();
+#endif
         }
 
         private void Web_OnFrameStart(object sender, FrameLoadStartEventArgs e)
         {
             Console.WriteLine("Web_OnFrameStart");
+#if !NET45
+            SendData();
+#endif
+
 #if DEBUG
             // mWebBrowser.GetBrowser().ShowDevTools();
 #endif
