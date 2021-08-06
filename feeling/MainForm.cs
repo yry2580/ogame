@@ -246,8 +246,10 @@ namespace feeling
 
         protected bool RevertCfg()
         {
+            var cfgIdx = rbtn_ex_cfg1.Checked ? 1 : 0;
             // 读取配置
-            Expedition.ReadCfg();
+            if (!Expedition.ReadCfg(cfgIdx)) return false;
+
 
             var exMissionCfg = Expedition.MyExMissionCfg;
 
@@ -645,6 +647,10 @@ namespace feeling
                         NativeController.Instance.CanNotify = false;
                         await BackUniverse();
                         break;
+                    case CmdEnum.ExpeditionCfg:
+                        NativeController.Instance.CanNotify = false;
+                        await SetExpeditionCfg(data.ExpeditionCfgIndex);
+                        break;
                     default:
                         break;
                 }
@@ -948,16 +954,26 @@ namespace feeling
             if (exMission.List.Count <= 0)
             {
                 MessageBox.Show("探险任务配置无效，请检测后再保存");
+                return;
             }
 
-            Expedition.Save(exMission);
+            var idx = rbtn_ex_cfg1.Checked ? 1 : 0;
+            var ret = MessageBox.Show($"确定保存配置 {idx + 1} 吗", "提示", MessageBoxButtons.YesNo);
+            if (ret == DialogResult.Yes)
+            {
+                Expedition.Save(exMission, idx);
+            }
         }
 
         private void btn_tx_revert_Click(object sender, EventArgs e)
         {
+            var idx = rbtn_ex_cfg1.Checked ? 1 : 0;
+            var ret = MessageBox.Show($"确定读取配置 {idx + 1} 吗", "提示", MessageBoxButtons.YesNo);
+            if (DialogResult.Yes != ret) return;
+
             if (!RevertCfg())
             {
-                MessageBox.Show("读取配置失败");
+                MessageBox.Show($"读取探险配置 {idx + 1} 失败");
             }
         }
 
@@ -1065,7 +1081,7 @@ namespace feeling
         private void btn_hd_save_Click(object sender, EventArgs e)
         {
             var idx = rbtn_cfg1.Checked ? 1 : 0;
-            var ret = MessageBox.Show($"确定保存配置{idx + 1}吗", "提示", MessageBoxButtons.YesNo);
+            var ret = MessageBox.Show($"确定保存配置 {idx + 1} 吗", "提示", MessageBoxButtons.YesNo);
             if (ret == DialogResult.Yes)
             {
                 var pMission = GetPirateMission();
@@ -1078,12 +1094,12 @@ namespace feeling
         private void btn_hd_revert_Click(object sender, EventArgs e)
         {
             var idx = rbtn_cfg1.Checked ? 1 : 0;
-            var ret = MessageBox.Show($"确定读取配置{idx + 1}吗", "提示", MessageBoxButtons.YesNo);
+            var ret = MessageBox.Show($"确定读取配置 {idx + 1} 吗", "提示", MessageBoxButtons.YesNo);
             if (DialogResult.Yes != ret) return;
 
             if (!PirateCfg())
             {
-                MessageBox.Show("读取配置还原失败");
+                MessageBox.Show($"读取还原配置配置 {idx + 1} 失败");
             }
         }
 
@@ -1440,6 +1456,51 @@ namespace feeling
             {
 #if !NET45
                 LogUtil.Error($"SetAutoPirateOpen catch {ex.Message}");
+#endif
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private async Task SetExpeditionCfg(int idx)
+        {
+            try
+            {
+                mLastContent = $"读取探险配置（{idx + 1}）";
+                if (OperStatus.None != NativeController.Instance.MyOperStatus)
+                {
+                    mLastContent = "当前不是空闲状态，不能读取";
+                    return;
+                }
+
+                NativeController.Instance.SwitchStatus(OperStatus.System);
+
+                //
+                // var lastIdx = rbtn_cfg1.Checked ? 1 : 0;
+                if (idx == 1)
+                {
+                    rbtn_ex_cfg1.Checked = true;
+                }
+                else
+                {
+                    rbtn_ex_cfg0.Checked = true;
+                }
+                await Task.Delay(200);
+
+                var ret = RevertCfg();
+                if (ret)
+                {
+                    mLastContent = $"读取探险配置（{idx + 1}）完成"; ;
+                }
+                else
+                {
+                    mLastContent = $"读取探险配置（{idx + 1}）失败"; ;
+                }
+            }
+            catch (Exception ex)
+            {
+#if !NET45
+                LogUtil.Error($"SetExpeditionCfg catch {ex.Message}");
 #endif
             }
 

@@ -679,7 +679,6 @@ namespace OgameService
             return false;
         }
 
-
         public bool OperBackUniverse(string id, string key)
         {
             LogUtil.Warn($"OperBackUniverse {id}");
@@ -708,7 +707,34 @@ namespace OgameService
             return false;
         }
 
+        public bool OperExpeditionCfg(string id, string key, int index)
+        {
+            LogUtil.Warn($"OperExpeditionCfg {id}");
+            try
+            {
+                if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
 
+                mCellDict.TryGetValue(key, out OgCell result);
+                // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+                if (null == result || null == result.MySession)
+                {
+                    LogUtil.Warn($"OperExpeditionCfg 没取到对应cell");
+                    return false;
+                }
+
+                OgameData data = new OgameData();
+                data.Cmd = CmdEnum.ExpeditionCfg;
+                data.ExpeditionCfgIndex = index;
+
+                mServer.SendTo(result.MySession, OgameData.ToBytes(data));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Error($"OperExpeditionCfg {key} catch {ex.Message}");
+            }
+            return false;
+        }
 
         public void ShowAllCell()
         {

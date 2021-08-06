@@ -34,6 +34,7 @@ namespace OgameService
         PirateCfg,
         GoCross,
         BackUniverse,
+        ExpeditionCfg,
     }
 
     public enum StatusEnum

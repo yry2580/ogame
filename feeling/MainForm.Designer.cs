@@ -33,6 +33,8 @@ namespace feeling
             this.w_split_container = new System.Windows.Forms.SplitContainer();
             this.w_tab = new System.Windows.Forms.TabControl();
             this.tab_tanxian = new System.Windows.Forms.TabPage();
+            this.rbtn_ex_cfg1 = new System.Windows.Forms.RadioButton();
+            this.rbtn_ex_cfg0 = new System.Windows.Forms.RadioButton();
             this.btn_tx_planet = new System.Windows.Forms.Button();
             this.btn_tx_stop = new System.Windows.Forms.Button();
             this.tx_content = new System.Windows.Forms.Label();
@@ -116,6 +118,8 @@ namespace feeling
             this.lb_tx_info = new System.Windows.Forms.Label();
             this.label15 = new System.Windows.Forms.Label();
             this.w_user_box = new System.Windows.Forms.GroupBox();
+            this.btn_universe = new System.Windows.Forms.Button();
+            this.btn_cross = new System.Windows.Forms.Button();
             this.w_user_account = new System.Windows.Forms.ComboBox();
             this.btn_user_logout = new System.Windows.Forms.Button();
             this.btn_user_login = new System.Windows.Forms.Button();
@@ -124,8 +128,6 @@ namespace feeling
             this.label5 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.btn_cross = new System.Windows.Forms.Button();
-            this.btn_universe = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.w_split_container)).BeginInit();
             this.w_split_container.Panel2.SuspendLayout();
             this.w_split_container.SuspendLayout();
@@ -171,6 +173,8 @@ namespace feeling
             // 
             // tab_tanxian
             // 
+            this.tab_tanxian.Controls.Add(this.rbtn_ex_cfg1);
+            this.tab_tanxian.Controls.Add(this.rbtn_ex_cfg0);
             this.tab_tanxian.Controls.Add(this.btn_tx_planet);
             this.tab_tanxian.Controls.Add(this.btn_tx_stop);
             this.tab_tanxian.Controls.Add(this.tx_content);
@@ -211,9 +215,31 @@ namespace feeling
             this.tab_tanxian.Text = "探险";
             this.tab_tanxian.UseVisualStyleBackColor = true;
             // 
+            // rbtn_ex_cfg1
+            // 
+            this.rbtn_ex_cfg1.AutoSize = true;
+            this.rbtn_ex_cfg1.Location = new System.Drawing.Point(8, 38);
+            this.rbtn_ex_cfg1.Name = "rbtn_ex_cfg1";
+            this.rbtn_ex_cfg1.Size = new System.Drawing.Size(53, 16);
+            this.rbtn_ex_cfg1.TabIndex = 59;
+            this.rbtn_ex_cfg1.Text = "配置2";
+            this.rbtn_ex_cfg1.UseVisualStyleBackColor = true;
+            // 
+            // rbtn_ex_cfg0
+            // 
+            this.rbtn_ex_cfg0.AutoSize = true;
+            this.rbtn_ex_cfg0.Checked = true;
+            this.rbtn_ex_cfg0.Location = new System.Drawing.Point(8, 13);
+            this.rbtn_ex_cfg0.Name = "rbtn_ex_cfg0";
+            this.rbtn_ex_cfg0.Size = new System.Drawing.Size(53, 16);
+            this.rbtn_ex_cfg0.TabIndex = 58;
+            this.rbtn_ex_cfg0.TabStop = true;
+            this.rbtn_ex_cfg0.Text = "配置1";
+            this.rbtn_ex_cfg0.UseVisualStyleBackColor = true;
+            // 
             // btn_tx_planet
             // 
-            this.btn_tx_planet.Location = new System.Drawing.Point(3, 122);
+            this.btn_tx_planet.Location = new System.Drawing.Point(8, 123);
             this.btn_tx_planet.Name = "btn_tx_planet";
             this.btn_tx_planet.Size = new System.Drawing.Size(50, 22);
             this.btn_tx_planet.TabIndex = 49;
@@ -223,7 +249,7 @@ namespace feeling
             // 
             // btn_tx_stop
             // 
-            this.btn_tx_stop.Location = new System.Drawing.Point(232, 122);
+            this.btn_tx_stop.Location = new System.Drawing.Point(125, 124);
             this.btn_tx_stop.Name = "btn_tx_stop";
             this.btn_tx_stop.Size = new System.Drawing.Size(50, 22);
             this.btn_tx_stop.TabIndex = 48;
@@ -244,7 +270,7 @@ namespace feeling
             // 
             this.label10.AutoSize = true;
             this.label10.ForeColor = System.Drawing.Color.Red;
-            this.label10.Location = new System.Drawing.Point(403, 126);
+            this.label10.Location = new System.Drawing.Point(301, 129);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(41, 12);
             this.label10.TabIndex = 46;
@@ -253,7 +279,7 @@ namespace feeling
             // cbox_tx_auto
             // 
             this.cbox_tx_auto.AutoSize = true;
-            this.cbox_tx_auto.Location = new System.Drawing.Point(288, 126);
+            this.cbox_tx_auto.Location = new System.Drawing.Point(181, 128);
             this.cbox_tx_auto.Name = "cbox_tx_auto";
             this.cbox_tx_auto.Size = new System.Drawing.Size(114, 16);
             this.cbox_tx_auto.TabIndex = 45;
@@ -263,7 +289,7 @@ namespace feeling
             // 
             // btn_tx_revert
             // 
-            this.btn_tx_revert.Location = new System.Drawing.Point(64, 122);
+            this.btn_tx_revert.Location = new System.Drawing.Point(8, 66);
             this.btn_tx_revert.Name = "btn_tx_revert";
             this.btn_tx_revert.Size = new System.Drawing.Size(50, 22);
             this.btn_tx_revert.TabIndex = 44;
@@ -273,7 +299,7 @@ namespace feeling
             // 
             // btn_tx_save
             // 
-            this.btn_tx_save.Location = new System.Drawing.Point(120, 122);
+            this.btn_tx_save.Location = new System.Drawing.Point(8, 94);
             this.btn_tx_save.Name = "btn_tx_save";
             this.btn_tx_save.Size = new System.Drawing.Size(50, 22);
             this.btn_tx_save.TabIndex = 43;
@@ -283,7 +309,7 @@ namespace feeling
             // 
             // btn_tx_start
             // 
-            this.btn_tx_start.Location = new System.Drawing.Point(176, 122);
+            this.btn_tx_start.Location = new System.Drawing.Point(66, 124);
             this.btn_tx_start.Name = "btn_tx_start";
             this.btn_tx_start.Size = new System.Drawing.Size(50, 22);
             this.btn_tx_start.TabIndex = 10;
@@ -295,7 +321,7 @@ namespace feeling
             // 
             this.tx3_planet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tx3_planet.FormattingEnabled = true;
-            this.tx3_planet.Location = new System.Drawing.Point(521, 91);
+            this.tx3_planet.Location = new System.Drawing.Point(585, 91);
             this.tx3_planet.Name = "tx3_planet";
             this.tx3_planet.Size = new System.Drawing.Size(162, 20);
             this.tx3_planet.TabIndex = 42;
@@ -303,7 +329,7 @@ namespace feeling
             // label9
             // 
             this.label9.AutoSize = true;
-            this.label9.Location = new System.Drawing.Point(3, 95);
+            this.label9.Location = new System.Drawing.Point(67, 97);
             this.label9.Name = "label9";
             this.label9.Size = new System.Drawing.Size(47, 12);
             this.label9.TabIndex = 37;
@@ -313,14 +339,14 @@ namespace feeling
             // 
             this.tx3_ship1_cb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tx3_ship1_cb.FormattingEnabled = true;
-            this.tx3_ship1_cb.Location = new System.Drawing.Point(290, 91);
+            this.tx3_ship1_cb.Location = new System.Drawing.Point(354, 92);
             this.tx3_ship1_cb.Name = "tx3_ship1_cb";
             this.tx3_ship1_cb.Size = new System.Drawing.Size(130, 20);
             this.tx3_ship1_cb.TabIndex = 41;
             // 
             // tx3_ship1
             // 
-            this.tx3_ship1.Location = new System.Drawing.Point(426, 92);
+            this.tx3_ship1.Location = new System.Drawing.Point(490, 91);
             this.tx3_ship1.MaxLength = 20;
             this.tx3_ship1.Name = "tx3_ship1";
             this.tx3_ship1.Size = new System.Drawing.Size(86, 21);
@@ -332,14 +358,14 @@ namespace feeling
             // 
             this.tx3_ship0_cb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tx3_ship0_cb.FormattingEnabled = true;
-            this.tx3_ship0_cb.Location = new System.Drawing.Point(56, 93);
+            this.tx3_ship0_cb.Location = new System.Drawing.Point(120, 94);
             this.tx3_ship0_cb.Name = "tx3_ship0_cb";
             this.tx3_ship0_cb.Size = new System.Drawing.Size(131, 20);
             this.tx3_ship0_cb.TabIndex = 39;
             // 
             // tx3_ship0
             // 
-            this.tx3_ship0.Location = new System.Drawing.Point(193, 93);
+            this.tx3_ship0.Location = new System.Drawing.Point(257, 92);
             this.tx3_ship0.MaxLength = 20;
             this.tx3_ship0.Name = "tx3_ship0";
             this.tx3_ship0.Size = new System.Drawing.Size(85, 21);
@@ -351,7 +377,7 @@ namespace feeling
             // 
             this.tx2_planet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tx2_planet.FormattingEnabled = true;
-            this.tx2_planet.Location = new System.Drawing.Point(521, 65);
+            this.tx2_planet.Location = new System.Drawing.Point(585, 63);
             this.tx2_planet.Name = "tx2_planet";
             this.tx2_planet.Size = new System.Drawing.Size(162, 20);
             this.tx2_planet.TabIndex = 36;
@@ -359,7 +385,7 @@ namespace feeling
             // label8
             // 
             this.label8.AutoSize = true;
-            this.label8.Location = new System.Drawing.Point(3, 69);
+            this.label8.Location = new System.Drawing.Point(67, 67);
             this.label8.Name = "label8";
             this.label8.Size = new System.Drawing.Size(47, 12);
             this.label8.TabIndex = 31;
@@ -369,14 +395,14 @@ namespace feeling
             // 
             this.tx2_ship1_cb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tx2_ship1_cb.FormattingEnabled = true;
-            this.tx2_ship1_cb.Location = new System.Drawing.Point(290, 65);
+            this.tx2_ship1_cb.Location = new System.Drawing.Point(354, 63);
             this.tx2_ship1_cb.Name = "tx2_ship1_cb";
             this.tx2_ship1_cb.Size = new System.Drawing.Size(130, 20);
             this.tx2_ship1_cb.TabIndex = 35;
             // 
             // tx2_ship1
             // 
-            this.tx2_ship1.Location = new System.Drawing.Point(426, 66);
+            this.tx2_ship1.Location = new System.Drawing.Point(490, 64);
             this.tx2_ship1.MaxLength = 20;
             this.tx2_ship1.Name = "tx2_ship1";
             this.tx2_ship1.Size = new System.Drawing.Size(86, 21);
@@ -388,14 +414,14 @@ namespace feeling
             // 
             this.tx2_ship0_cb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tx2_ship0_cb.FormattingEnabled = true;
-            this.tx2_ship0_cb.Location = new System.Drawing.Point(56, 67);
+            this.tx2_ship0_cb.Location = new System.Drawing.Point(120, 65);
             this.tx2_ship0_cb.Name = "tx2_ship0_cb";
             this.tx2_ship0_cb.Size = new System.Drawing.Size(131, 20);
             this.tx2_ship0_cb.TabIndex = 33;
             // 
             // tx2_ship0
             // 
-            this.tx2_ship0.Location = new System.Drawing.Point(193, 67);
+            this.tx2_ship0.Location = new System.Drawing.Point(257, 65);
             this.tx2_ship0.MaxLength = 20;
             this.tx2_ship0.Name = "tx2_ship0";
             this.tx2_ship0.Size = new System.Drawing.Size(85, 21);
@@ -407,7 +433,7 @@ namespace feeling
             // 
             this.tx1_planet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tx1_planet.FormattingEnabled = true;
-            this.tx1_planet.Location = new System.Drawing.Point(521, 39);
+            this.tx1_planet.Location = new System.Drawing.Point(585, 37);
             this.tx1_planet.Name = "tx1_planet";
             this.tx1_planet.Size = new System.Drawing.Size(162, 20);
             this.tx1_planet.TabIndex = 30;
@@ -415,7 +441,7 @@ namespace feeling
             // label7
             // 
             this.label7.AutoSize = true;
-            this.label7.Location = new System.Drawing.Point(3, 43);
+            this.label7.Location = new System.Drawing.Point(67, 41);
             this.label7.Name = "label7";
             this.label7.Size = new System.Drawing.Size(47, 12);
             this.label7.TabIndex = 25;
@@ -425,14 +451,14 @@ namespace feeling
             // 
             this.tx1_ship1_cb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tx1_ship1_cb.FormattingEnabled = true;
-            this.tx1_ship1_cb.Location = new System.Drawing.Point(290, 39);
+            this.tx1_ship1_cb.Location = new System.Drawing.Point(354, 37);
             this.tx1_ship1_cb.Name = "tx1_ship1_cb";
             this.tx1_ship1_cb.Size = new System.Drawing.Size(130, 20);
             this.tx1_ship1_cb.TabIndex = 29;
             // 
             // tx1_ship1
             // 
-            this.tx1_ship1.Location = new System.Drawing.Point(426, 40);
+            this.tx1_ship1.Location = new System.Drawing.Point(490, 36);
             this.tx1_ship1.MaxLength = 20;
             this.tx1_ship1.Name = "tx1_ship1";
             this.tx1_ship1.Size = new System.Drawing.Size(86, 21);
@@ -444,14 +470,14 @@ namespace feeling
             // 
             this.tx1_ship0_cb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tx1_ship0_cb.FormattingEnabled = true;
-            this.tx1_ship0_cb.Location = new System.Drawing.Point(56, 41);
+            this.tx1_ship0_cb.Location = new System.Drawing.Point(120, 37);
             this.tx1_ship0_cb.Name = "tx1_ship0_cb";
             this.tx1_ship0_cb.Size = new System.Drawing.Size(131, 20);
             this.tx1_ship0_cb.TabIndex = 27;
             // 
             // tx1_ship0
             // 
-            this.tx1_ship0.Location = new System.Drawing.Point(193, 41);
+            this.tx1_ship0.Location = new System.Drawing.Point(257, 37);
             this.tx1_ship0.MaxLength = 20;
             this.tx1_ship0.Name = "tx1_ship0";
             this.tx1_ship0.Size = new System.Drawing.Size(85, 21);
@@ -463,7 +489,7 @@ namespace feeling
             // 
             this.tx0_planet.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tx0_planet.FormattingEnabled = true;
-            this.tx0_planet.Location = new System.Drawing.Point(521, 13);
+            this.tx0_planet.Location = new System.Drawing.Point(585, 9);
             this.tx0_planet.Name = "tx0_planet";
             this.tx0_planet.Size = new System.Drawing.Size(162, 20);
             this.tx0_planet.TabIndex = 24;
@@ -471,7 +497,7 @@ namespace feeling
             // label6
             // 
             this.label6.AutoSize = true;
-            this.label6.Location = new System.Drawing.Point(3, 17);
+            this.label6.Location = new System.Drawing.Point(67, 13);
             this.label6.Name = "label6";
             this.label6.Size = new System.Drawing.Size(47, 12);
             this.label6.TabIndex = 19;
@@ -481,14 +507,14 @@ namespace feeling
             // 
             this.tx0_ship1_cb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tx0_ship1_cb.FormattingEnabled = true;
-            this.tx0_ship1_cb.Location = new System.Drawing.Point(290, 15);
+            this.tx0_ship1_cb.Location = new System.Drawing.Point(354, 8);
             this.tx0_ship1_cb.Name = "tx0_ship1_cb";
             this.tx0_ship1_cb.Size = new System.Drawing.Size(130, 20);
             this.tx0_ship1_cb.TabIndex = 23;
             // 
             // tx0_ship1
             // 
-            this.tx0_ship1.Location = new System.Drawing.Point(426, 14);
+            this.tx0_ship1.Location = new System.Drawing.Point(490, 9);
             this.tx0_ship1.MaxLength = 20;
             this.tx0_ship1.Name = "tx0_ship1";
             this.tx0_ship1.Size = new System.Drawing.Size(86, 21);
@@ -500,14 +526,14 @@ namespace feeling
             // 
             this.tx0_ship0_cb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tx0_ship0_cb.FormattingEnabled = true;
-            this.tx0_ship0_cb.Location = new System.Drawing.Point(56, 15);
+            this.tx0_ship0_cb.Location = new System.Drawing.Point(120, 9);
             this.tx0_ship0_cb.Name = "tx0_ship0_cb";
             this.tx0_ship0_cb.Size = new System.Drawing.Size(131, 20);
             this.tx0_ship0_cb.TabIndex = 21;
             // 
             // tx0_ship0
             // 
-            this.tx0_ship0.Location = new System.Drawing.Point(193, 15);
+            this.tx0_ship0.Location = new System.Drawing.Point(257, 8);
             this.tx0_ship0.MaxLength = 20;
             this.tx0_ship0.Name = "tx0_ship0";
             this.tx0_ship0.Size = new System.Drawing.Size(85, 21);
@@ -1077,6 +1103,26 @@ namespace feeling
             this.w_user_box.TabStop = false;
             this.w_user_box.Text = "用户";
             // 
+            // btn_universe
+            // 
+            this.btn_universe.Location = new System.Drawing.Point(129, 146);
+            this.btn_universe.Name = "btn_universe";
+            this.btn_universe.Size = new System.Drawing.Size(56, 23);
+            this.btn_universe.TabIndex = 20;
+            this.btn_universe.Text = "本宇宙";
+            this.btn_universe.UseVisualStyleBackColor = true;
+            this.btn_universe.Click += new System.EventHandler(this.btn_universe_Click);
+            // 
+            // btn_cross
+            // 
+            this.btn_cross.Location = new System.Drawing.Point(129, 117);
+            this.btn_cross.Name = "btn_cross";
+            this.btn_cross.Size = new System.Drawing.Size(56, 23);
+            this.btn_cross.TabIndex = 19;
+            this.btn_cross.Text = "多 维";
+            this.btn_cross.UseVisualStyleBackColor = true;
+            this.btn_cross.Click += new System.EventHandler(this.btn_cross_Click);
+            // 
             // w_user_account
             // 
             this.w_user_account.FormattingEnabled = true;
@@ -1152,26 +1198,6 @@ namespace feeling
             this.label1.Size = new System.Drawing.Size(41, 12);
             this.label1.TabIndex = 10;
             this.label1.Text = "账 号:";
-            // 
-            // btn_cross
-            // 
-            this.btn_cross.Location = new System.Drawing.Point(129, 117);
-            this.btn_cross.Name = "btn_cross";
-            this.btn_cross.Size = new System.Drawing.Size(56, 23);
-            this.btn_cross.TabIndex = 19;
-            this.btn_cross.Text = "多 维";
-            this.btn_cross.UseVisualStyleBackColor = true;
-            this.btn_cross.Click += new System.EventHandler(this.btn_cross_Click);
-            // 
-            // btn_universe
-            // 
-            this.btn_universe.Location = new System.Drawing.Point(129, 146);
-            this.btn_universe.Name = "btn_universe";
-            this.btn_universe.Size = new System.Drawing.Size(56, 23);
-            this.btn_universe.TabIndex = 20;
-            this.btn_universe.Text = "本宇宙";
-            this.btn_universe.UseVisualStyleBackColor = true;
-            this.btn_universe.Click += new System.EventHandler(this.btn_universe_Click);
             // 
             // MainForm
             // 
@@ -1304,5 +1330,7 @@ namespace feeling
         private System.Windows.Forms.Button btn_tz_start;
         private System.Windows.Forms.Button btn_universe;
         private System.Windows.Forms.Button btn_cross;
+        private System.Windows.Forms.RadioButton rbtn_ex_cfg1;
+        private System.Windows.Forms.RadioButton rbtn_ex_cfg0;
     }
 }

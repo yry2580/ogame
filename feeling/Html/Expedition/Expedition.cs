@@ -11,8 +11,7 @@ namespace feeling
 {
     class Expedition
     {
-        static string missionCfgFile = NativeConst.CfgDirectory + "ex_mission.cfg";
-
+        // static string missionCfgFile = NativeConst.CfgDirectory + "ex_mission.cfg";
         public static ExMission MyExMissionCfg;
         public static List<ShipType> ShipOptions = new List<ShipType> {
             ShipType.SC,
@@ -27,13 +26,19 @@ namespace feeling
             return (from type in ShipOptions select Ship.GetShipName(type)).ToList();
         }
 
-        public static void Save(ExMission exMission)
+        protected static string GetFilePath(int idx = 0)
+        {
+            string flag = idx <= 0 ? "" : idx.ToString();
+            return $"{NativeConst.CfgDirectory}ex_mission{flag}.cfg";
+        }
+
+        public static void Save(ExMission exMission, int idx = 0)
         {
             try
             {
                 MyExMissionCfg = exMission;
                 string text = JsonConvert.SerializeObject(exMission, Formatting.Indented);
-                File.WriteAllText(missionCfgFile, text);
+                File.WriteAllText(GetFilePath(idx), text);
             }
             catch (Exception ex)
             {
@@ -41,18 +46,21 @@ namespace feeling
             }
         }
 
-        public static void ReadCfg()
+        public static bool ReadCfg(int idx = 0)
         {
-            if (!File.Exists(missionCfgFile)) return;
+            var filePath = GetFilePath(idx);
+            if (!File.Exists(filePath)) return false;
 
             try
             {
-                var text = File.ReadAllText(missionCfgFile);
+                var text = File.ReadAllText(filePath);
                 MyExMissionCfg = JsonConvert.DeserializeObject<ExMission>(text);
+                return true;
             }
             catch (Exception ex)
             {
                 NativeLog.Error($"expedition readCfg catch {ex.Message}");
+                return false;
             }
         }
 
