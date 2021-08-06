@@ -32,8 +32,8 @@ namespace OgameService
         AutoPirateOpen,
         AutoExpeditionOpen,
         PirateCfg,
-        ToW,
-        ToU,
+        GoCross,
+        BackUniverse,
     }
 
     public enum StatusEnum

@@ -22,11 +22,11 @@ namespace feeling
             switch (dialogType)
             {
                 case CefJsDialogType.Alert:
-                    Console.WriteLine("Alert");
+                    NativeLog.Info("Alert");
                     suppressMessage = true;
                     return false;
                 case CefJsDialogType.Confirm:
-                    Console.WriteLine("Confirm");
+                    NativeLog.Info("Confirm");
                     if (originUrl == NativeConst.Homepage)
                     {
                         callback.Continue(true, "");
@@ -35,7 +35,7 @@ namespace feeling
                     }
                     break;
                 case CefJsDialogType.Prompt:
-                    Console.WriteLine("Prompt");
+                    NativeLog.Info("Prompt");
                     break;
                 default:
                     break;

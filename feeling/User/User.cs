@@ -41,7 +41,7 @@ namespace feeling
                 }
                 catch (Exception ex) 
                 {
-                    Console.WriteLine($"ReadUserData catch {ex.Message}");
+                    NativeLog.Error($"ReadUserData catch {ex.Message}");
                     MyUserData = MyUserData??(new UserData());
                 }
             }
@@ -63,7 +63,7 @@ namespace feeling
             }
             catch(Exception ex)
             {
-                Console.WriteLine($"SaveUserData catch {ex.Message}");
+                NativeLog.Error($"SaveUserData catch {ex.Message}");
             }
         }
 

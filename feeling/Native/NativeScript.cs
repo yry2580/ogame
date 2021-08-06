@@ -225,5 +225,19 @@ namespace feeling
             script += $"doc.querySelector(\"form[action='imperium.php'] input[type='submit'][value='查看详情']\").click()";
             return script;
         }
+
+        public static string ToCross()
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"a[href='dwenter.php']\").click()";
+            return script;
+        }
+
+        public static string BackUniverse()
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"a[href*='.cicihappy.com/ogame/frames.php'][href*='http://u']\").click()";
+            return script;
+        }
     }
 }

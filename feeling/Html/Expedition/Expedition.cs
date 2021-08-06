@@ -37,7 +37,7 @@ namespace feeling
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"expedition save catch {ex.Message}");
+                NativeLog.Error($"expedition save catch {ex.Message}");
             }
         }
 
@@ -52,7 +52,7 @@ namespace feeling
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"expedition readCfg catch {ex.Message}");
+                NativeLog.Error($"expedition readCfg catch {ex.Message}");
             }
         }
 

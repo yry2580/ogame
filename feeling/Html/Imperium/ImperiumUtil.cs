@@ -23,7 +23,7 @@ namespace feeling
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"ImperiumUtil save catch {ex.Message}");
+                NativeLog.Error($"ImperiumUtil save catch {ex.Message}");
             }
         }
 
@@ -39,7 +39,7 @@ namespace feeling
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"ImperiumUtil readCfg catch {ex.Message}");
+                NativeLog.Error($"ImperiumUtil readCfg catch {ex.Message}");
                 return false;
             }
         }

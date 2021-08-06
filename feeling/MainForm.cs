@@ -99,7 +99,7 @@ namespace feeling
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"_LookThread {ex.Message}");
+                NativeLog.Error($"_LookThread {ex.Message}");
             }
         }
 
@@ -359,6 +359,8 @@ namespace feeling
                         SetExpeditionButton(false);
                         SetPirateButton(false);
                         btn_tz_start.Enabled = false;
+                        btn_cross.Enabled = false;
+                        btn_universe.Enabled = false;
                         break;
                     case OperStatus.Galaxy:
                         btn_galaxy_start.Enabled = false;
@@ -366,6 +368,8 @@ namespace feeling
                         SetExpeditionButton(false);
                         SetPirateButton(false);
                         btn_tz_start.Enabled = false;
+                        btn_cross.Enabled = false;
+                        btn_universe.Enabled = false;
                         break;
                     case OperStatus.Expedition:
                         btn_galaxy_start.Enabled = false;
@@ -373,6 +377,8 @@ namespace feeling
                         SetExpeditionButton(false, true);
                         SetPirateButton(false);
                         btn_tz_start.Enabled = false;
+                        btn_cross.Enabled = false;
+                        btn_universe.Enabled = false;
                         break;
                     case OperStatus.Pirate:
                         btn_galaxy_start.Enabled = false;
@@ -380,6 +386,8 @@ namespace feeling
                         SetExpeditionButton(false);
                         SetPirateButton(false, true);
                         btn_tz_start.Enabled = false;
+                        btn_cross.Enabled = false;
+                        btn_universe.Enabled = false;
                         break;
                     case OperStatus.None:
                     default:
@@ -388,13 +396,15 @@ namespace feeling
                         SetExpeditionButton(true);
                         SetPirateButton(true);
                         btn_tz_start.Enabled = true;
+                        btn_cross.Enabled = true;
+                        btn_universe.Enabled = true;
                         break;
                 }
 
             }
             catch(Exception ex)
             {
-                Console.WriteLine($"Redraw catch {ex.Message}");
+                NativeLog.Error($"Redraw catch {ex.Message}");
             }
 
 #if !NET45
@@ -521,7 +531,7 @@ namespace feeling
 
         private void Web_OnFrameEnd(object sender, FrameLoadEndEventArgs e)
         {
-            Console.WriteLine($"Web_OnFrameEnd {e.Url}");
+            NativeLog.Debug($"Web_OnFrameEnd {e.Url}");
             NativeController.Instance.HandleWebBrowserFrameEnd(e.Url);
 #if !NET45
             SendData();
@@ -530,7 +540,7 @@ namespace feeling
 
         private void Web_OnFrameStart(object sender, FrameLoadStartEventArgs e)
         {
-            Console.WriteLine("Web_OnFrameStart");
+            NativeLog.Debug("Web_OnFrameStart");
 #if !NET45
             SendData();
 #endif
@@ -609,7 +619,7 @@ namespace feeling
                         break;
                     case CmdEnum.Imperium:
                         NativeController.Instance.CanNotify = false;
-                        await doImperium();
+                        await DoImperium();
                         break;
                     case CmdEnum.Npc:
                         NativeController.Instance.CanNotify = false;
@@ -626,6 +636,14 @@ namespace feeling
                     case CmdEnum.AutoExpeditionOpen:
                         NativeController.Instance.CanNotify = false;
                         await SetAutoExpeditionOpen(data.AutoExpeditionOpen);
+                        break;
+                    case CmdEnum.GoCross:
+                        NativeController.Instance.CanNotify = false;
+                        await GoCross();
+                        break;
+                    case CmdEnum.BackUniverse:
+                        NativeController.Instance.CanNotify = false;
+                        await BackUniverse();
                         break;
                     default:
                         break;
@@ -1242,7 +1260,7 @@ namespace feeling
             }
             catch(Exception ex)
             {
-                Console.WriteLine($"tz_save catch {ex.Message}");
+                NativeLog.Error($"tz_save catch {ex.Message}");
             }
         }
 
@@ -1288,10 +1306,10 @@ namespace feeling
                 await TryLogin();
             }
 
-            await doImperium();
+            await DoImperium();
         }
 
-        private async Task doImperium()
+        private async Task DoImperium()
         {
             try
             {
@@ -1319,7 +1337,7 @@ namespace feeling
                 return;
             }
 
-            await doImperium();
+            await DoImperium();
         }
 
         private async Task SetAutoPirateOpen(bool open)
@@ -1422,6 +1440,68 @@ namespace feeling
             {
 #if !NET45
                 LogUtil.Error($"SetAutoPirateOpen catch {ex.Message}");
+#endif
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private async void btn_cross_Click(object sender, EventArgs e)
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                MessageBox.Show("当前不是空闲状态，不能操作");
+                return;
+            }
+
+            await GoCross();
+        }
+
+        private async Task GoCross()
+        {
+            try
+            {
+                if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
+
+                NativeController.Instance.SwitchStatus(OperStatus.System);
+
+                await NativeController.Instance.GoCross();
+            }
+            catch (Exception ex)
+            {
+#if !NET45
+                LogUtil.Error($"GoCross catch {ex.Message}");
+#endif
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private async void btn_universe_Click(object sender, EventArgs e)
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                MessageBox.Show("当前不是空闲状态，不能操作");
+                return;
+            }
+
+            await BackUniverse();
+        }
+
+        private async Task BackUniverse()
+        {
+            try
+            {
+                if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
+
+                NativeController.Instance.SwitchStatus(OperStatus.System);
+
+                await NativeController.Instance.BackUniverse();
+            }
+            catch (Exception ex)
+            {
+#if !NET45
+                LogUtil.Error($"BackUniverse catch {ex.Message}");
 #endif
             }
 

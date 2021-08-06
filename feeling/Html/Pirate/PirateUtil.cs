@@ -34,7 +34,7 @@ namespace feeling
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"PirateUtil save catch {ex.Message}");
+                NativeLog.Error($"PirateUtil save catch {ex.Message}");
             }
         }
 
@@ -51,14 +51,14 @@ namespace feeling
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"PirateUtil readCfg catch {ex.Message}");
+                NativeLog.Error($"PirateUtil readCfg catch {ex.Message}");
                 return false;
             }
         }
 
         public static void ParseNpc(string source)
         {
-            Console.WriteLine($"ParseNpc");
+            NativeLog.Info($"ParseNpc");
             if (!HtmlUtil.ParseNpc(source, out List<string> result, mParser)) return;
             if (null == result) return;
 

@@ -98,6 +98,7 @@ namespace feeling
             this.w_galaxy_universe = new System.Windows.Forms.Label();
             this.label4 = new System.Windows.Forms.Label();
             this.w_imperium = new System.Windows.Forms.TabPage();
+            this.btn_tz_start = new System.Windows.Forms.Button();
             this.btn_tz_save = new System.Windows.Forms.Button();
             this.w_tz_tips = new System.Windows.Forms.Label();
             this.lb_tz_interval = new System.Windows.Forms.Label();
@@ -123,7 +124,8 @@ namespace feeling
             this.label5 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.btn_tz_start = new System.Windows.Forms.Button();
+            this.btn_cross = new System.Windows.Forms.Button();
+            this.btn_universe = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.w_split_container)).BeginInit();
             this.w_split_container.Panel2.SuspendLayout();
             this.w_split_container.SuspendLayout();
@@ -149,8 +151,8 @@ namespace feeling
             this.w_split_container.Panel2.Controls.Add(this.w_tab);
             this.w_split_container.Panel2.Controls.Add(this.w_user_box);
             this.w_split_container.Panel2MinSize = 180;
-            this.w_split_container.Size = new System.Drawing.Size(1213, 861);
-            this.w_split_container.SplitterDistance = 666;
+            this.w_split_container.Size = new System.Drawing.Size(1213, 918);
+            this.w_split_container.SplitterDistance = 723;
             this.w_split_container.TabIndex = 0;
             // 
             // w_tab
@@ -887,6 +889,16 @@ namespace feeling
             this.w_imperium.Text = "统治";
             this.w_imperium.UseVisualStyleBackColor = true;
             // 
+            // btn_tz_start
+            // 
+            this.btn_tz_start.Location = new System.Drawing.Point(10, 66);
+            this.btn_tz_start.Name = "btn_tz_start";
+            this.btn_tz_start.Size = new System.Drawing.Size(60, 22);
+            this.btn_tz_start.TabIndex = 64;
+            this.btn_tz_start.Text = "开始";
+            this.btn_tz_start.UseVisualStyleBackColor = true;
+            this.btn_tz_start.Click += new System.EventHandler(this.btn_tz_start_Click);
+            // 
             // btn_tz_save
             // 
             this.btn_tz_save.Location = new System.Drawing.Point(79, 66);
@@ -1048,6 +1060,8 @@ namespace feeling
             // 
             // w_user_box
             // 
+            this.w_user_box.Controls.Add(this.btn_universe);
+            this.w_user_box.Controls.Add(this.btn_cross);
             this.w_user_box.Controls.Add(this.w_user_account);
             this.w_user_box.Controls.Add(this.btn_user_logout);
             this.w_user_box.Controls.Add(this.btn_user_login);
@@ -1074,7 +1088,7 @@ namespace feeling
             // 
             // btn_user_logout
             // 
-            this.btn_user_logout.Location = new System.Drawing.Point(129, 142);
+            this.btn_user_logout.Location = new System.Drawing.Point(53, 146);
             this.btn_user_logout.Name = "btn_user_logout";
             this.btn_user_logout.Size = new System.Drawing.Size(59, 23);
             this.btn_user_logout.TabIndex = 17;
@@ -1084,7 +1098,7 @@ namespace feeling
             // 
             // btn_user_login
             // 
-            this.btn_user_login.Location = new System.Drawing.Point(8, 142);
+            this.btn_user_login.Location = new System.Drawing.Point(53, 117);
             this.btn_user_login.Name = "btn_user_login";
             this.btn_user_login.Size = new System.Drawing.Size(56, 23);
             this.btn_user_login.TabIndex = 16;
@@ -1139,21 +1153,31 @@ namespace feeling
             this.label1.TabIndex = 10;
             this.label1.Text = "账 号:";
             // 
-            // btn_tz_start
+            // btn_cross
             // 
-            this.btn_tz_start.Location = new System.Drawing.Point(10, 66);
-            this.btn_tz_start.Name = "btn_tz_start";
-            this.btn_tz_start.Size = new System.Drawing.Size(60, 22);
-            this.btn_tz_start.TabIndex = 64;
-            this.btn_tz_start.Text = "开始";
-            this.btn_tz_start.UseVisualStyleBackColor = true;
-            this.btn_tz_start.Click += new System.EventHandler(this.btn_tz_start_Click);
+            this.btn_cross.Location = new System.Drawing.Point(129, 117);
+            this.btn_cross.Name = "btn_cross";
+            this.btn_cross.Size = new System.Drawing.Size(56, 23);
+            this.btn_cross.TabIndex = 19;
+            this.btn_cross.Text = "多 维";
+            this.btn_cross.UseVisualStyleBackColor = true;
+            this.btn_cross.Click += new System.EventHandler(this.btn_cross_Click);
+            // 
+            // btn_universe
+            // 
+            this.btn_universe.Location = new System.Drawing.Point(129, 146);
+            this.btn_universe.Name = "btn_universe";
+            this.btn_universe.Size = new System.Drawing.Size(56, 23);
+            this.btn_universe.TabIndex = 20;
+            this.btn_universe.Text = "本宇宙";
+            this.btn_universe.UseVisualStyleBackColor = true;
+            this.btn_universe.Click += new System.EventHandler(this.btn_universe_Click);
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1213, 861);
+            this.ClientSize = new System.Drawing.Size(1213, 918);
             this.Controls.Add(this.w_split_container);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";
@@ -1278,5 +1302,7 @@ namespace feeling
         private System.Windows.Forms.CheckBox cbox_tz_auto;
         private System.Windows.Forms.Button btn_tz_save;
         private System.Windows.Forms.Button btn_tz_start;
+        private System.Windows.Forms.Button btn_universe;
+        private System.Windows.Forms.Button btn_cross;
     }
 }
