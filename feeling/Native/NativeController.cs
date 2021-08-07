@@ -81,7 +81,7 @@ namespace feeling
                     {
                         var source = await GetFrameSourceAsync();
 
-                        mPlanet.Parse(source);
+                        mPlanet.Parse(source, MyAddress);
                         PlanetEvent?.Invoke();
                     }
                 }
@@ -766,7 +766,7 @@ namespace feeling
                         FrameRunJs(NativeScript.ToGalaxy());
                         await Task.Delay(1500);
                         source = await GetFrameSourceAsync();
-                        PirateUtil.ParseNpc(source);
+                        PirateUtil.ParseNpc(source, MyAddress);
                         NpcChangeEvent?.Invoke();
                         await Task.Delay(500);
                     }

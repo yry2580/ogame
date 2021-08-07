@@ -93,9 +93,7 @@ namespace feeling
                 doAutoExpedtion();
                 doAutoPirate();
                 doAutoImperium();
-#if !NET45
                 SendData();
-#endif
             }
             catch (Exception ex)
             {
@@ -341,9 +339,7 @@ namespace feeling
                     mLastContent = sDesc;
                 }
 
-#if !NET45
                 SendData();
-#endif
             }));
         }
 
@@ -409,9 +405,7 @@ namespace feeling
                 NativeLog.Error($"Redraw catch {ex.Message}");
             }
 
-#if !NET45
-                SendData();
-#endif
+            SendData();
         }
 
         protected void RedrawPlanet()
@@ -460,6 +454,10 @@ namespace feeling
             w_pirate2.SetPlanets(lists);
             w_pirate3.SetPlanets(lists);
             w_pirate4.SetPlanets(lists);
+
+            RevertCfg();
+            PirateCfg();
+            SendData();
         }
 
         private void RedrawOperTips(OperStatus operStatus, string tips)
@@ -481,9 +479,8 @@ namespace feeling
             {
                 mLastContent = content;
             }
-#if !NET45
-                SendData();
-#endif
+
+            SendData();
         }
 
         public void SetUserButton(bool enabled)
@@ -535,17 +532,13 @@ namespace feeling
         {
             NativeLog.Debug($"Web_OnFrameEnd {e.Url}");
             NativeController.Instance.HandleWebBrowserFrameEnd(e.Url);
-#if !NET45
             SendData();
-#endif
         }
 
         private void Web_OnFrameStart(object sender, FrameLoadStartEventArgs e)
         {
             NativeLog.Debug("Web_OnFrameStart");
-#if !NET45
             SendData();
-#endif
 
 #if DEBUG
             // mWebBrowser.GetBrowser().ShowDevTools();
@@ -664,9 +657,10 @@ namespace feeling
         }
 #endif
 
-#if !NET45
+
         private void SendData(CmdEnum cmd = CmdEnum.Data)
         {
+#if !NET45
             var operStatus = (int)NativeController.Instance.MyOperStatus;
             var status = (StatusEnum)operStatus;
 
@@ -711,16 +705,18 @@ namespace feeling
                 AutoExpeditionOpen = mAutoExpedition,
                 PirateCfgIndex = rbtn_cfg1.Checked ? 1 : 0,
                 Universe = universe,
+                ExpeditionCfgIndex = rbtn_ex_cfg1.Checked ? 1 : 0,
+                NpcUniverse = PirateUtil.Universe,
+                PlanetUniverse = NativeController.Instance.MyPlanet.Universe,
             };
 
             mClient?.SendData(gameData);
-        }
 #endif
+        }
+
         private void OnServerConnected()
         {
-#if !NET45
             SendData(CmdEnum.Auth);
-#endif
         }
 
         private void btn_galaxy_open_Click(object sender, EventArgs e)

@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace feeling
@@ -17,6 +18,7 @@ namespace feeling
 
         public static List<string> NpcList = new List<string>();
         public static bool HasNpcData => NpcList.Count > 0;
+        public static string Universe = "";
 
         protected static string GetFilePath(int idx = 0)
         {
@@ -56,11 +58,17 @@ namespace feeling
             }
         }
 
-        public static void ParseNpc(string source)
+        public static void ParseNpc(string source, string address = "")
         {
             NativeLog.Info($"ParseNpc");
             if (!HtmlUtil.ParseNpc(source, out List<string> result, mParser)) return;
             if (null == result) return;
+
+            var mat = Regex.Match(address, $@"://(?<universe>\S*).cicihappy.com");
+            if (mat.Success)
+            {
+                Universe = mat.Groups["universe"].Value;
+            }
 
             NpcList = result;
         }

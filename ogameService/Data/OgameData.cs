@@ -23,6 +23,8 @@ namespace OgameService
         public int PirateCfgIndex = 0;
         public string Universe = "";
         public int ExpeditionCfgIndex = 0;
+        public string NpcUniverse = "";
+        public string PlanetUniverse = "";
 
         public static byte[] ToBytes(OgameData data)
         {
