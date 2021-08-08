@@ -336,7 +336,7 @@ namespace feeling
 
                 if (sDesc.Length > 0)
                 {
-                    mLastContent = sDesc;
+                    mLastContent = $"{DateTime.Now:G}|{sDesc}";
                 }
 
                 SendData();
@@ -463,6 +463,11 @@ namespace feeling
         private void RedrawOperTips(OperStatus operStatus, string tips)
         {
             var content = tips.Trim();
+            if (content.Length > 0)
+            {
+                content = $"{DateTime.Now:G}|{content}";
+            }
+
             switch (operStatus)
             {
                 case OperStatus.Expedition:
@@ -1009,13 +1014,13 @@ namespace feeling
 
             if (!cbox_tx_auto.Checked || !mAutoExpedition)
             {
-                lb_tx_info.Text = $"{DateTime.Now:G}|没有设置自动探险；时间差{Math.Ceiling(val)}分钟";
+                lb_tx_info.Text = $"{DateTime.Now:G}|自动探险-关，时间差{Math.Ceiling(val)}分钟";
                 return;
             }
 
             if (delta.TotalMinutes < 120)
             {
-                lb_tx_info.Text = $"{DateTime.Now:G}|大概还差{Math.Ceiling(val)}分钟可自动探险";
+                lb_tx_info.Text = $"{DateTime.Now:G}|自动探险-开，{Math.Ceiling(val)}分钟";
                 return;
             }
 
@@ -1132,13 +1137,13 @@ namespace feeling
 
             if (!cbox_hd_auto.Checked || !mAutoPirate)
             {
-                lb_hd_info.Text = $"{DateTime.Now:G}|没有设置自动海盗；自动时间差{Math.Ceiling(val)}分钟";
+                lb_hd_info.Text = $"{DateTime.Now:G}|自动海盗-关，时间差{Math.Ceiling(val)}分钟";
                 return;
             }
 
             if (delta.TotalMinutes < mPirateInterval)
             {
-                lb_hd_info.Text = $"{DateTime.Now:G}|大概还差{Math.Ceiling(val)}分钟可自动海盗";
+                lb_hd_info.Text = $"{DateTime.Now:G}|自动海盗-开，时间差{Math.Ceiling(val)}分钟";
                 return;
             }
 
@@ -1296,19 +1301,19 @@ namespace feeling
 
             if (!cbox_tz_auto.Checked || !mAutoImperium)
             {
-                lb_tz_info.Text = $"{DateTime.Now:G}|没有自动统治；时间差{Math.Ceiling(val)}分钟";
+                lb_tz_info.Text = $"{DateTime.Now:G}|自动统治-关，时间差{Math.Ceiling(val)}分钟";
                 return;
             }
 
             if (mAutoPirate)
             {
-                lb_tz_info.Text = $"{DateTime.Now:G}|已自动海盗；时间差{Math.Ceiling(val)}分钟";
+                lb_tz_info.Text = $"{DateTime.Now:G}|已自动海盗，时间差{Math.Ceiling(val)}分钟";
                 return;
             }
 
             if (delta.TotalMinutes < mImperiumInterval)
             {
-                lb_tz_info.Text = $"{DateTime.Now:G}|大概还差{Math.Ceiling(val)}分钟可自动统治";
+                lb_tz_info.Text = $"{DateTime.Now:G}|自动统治-开，时间差{Math.Ceiling(val)}分钟";
                 return;
             }
 
@@ -1356,10 +1361,10 @@ namespace feeling
         {
             try
             {
-                mLastContent = "设置自动海盗";
+                mLastContent = $"{DateTime.Now:G}|设置自动海盗";
                 if (OperStatus.None != NativeController.Instance.MyOperStatus)
                 {
-                    mLastContent = "当前不是空闲状态，不能设置";
+                    mLastContent = $"{DateTime.Now:G}|当前不是空闲状态，不能设置";
                     return;
                 }
 
@@ -1371,7 +1376,7 @@ namespace feeling
                     await Task.Delay(100);
                 }
 
-                mLastContent = "设置自动海盗完成";
+                mLastContent = $"{DateTime.Now:G}|设置自动海盗完成";
             }
             catch (Exception ex)
             {
@@ -1387,10 +1392,10 @@ namespace feeling
         {
             try
             {
-                mLastContent = $"读取海盗配置（{idx + 1}）";
+                mLastContent = $"{DateTime.Now:G}|读取海盗配置（{idx + 1}）";
                 if (OperStatus.None != NativeController.Instance.MyOperStatus)
                 {
-                    mLastContent = "当前不是空闲状态，不能读取";
+                    mLastContent = $"{DateTime.Now:G}|当前不是空闲状态，不能读取";
                     return;
                 }
 
@@ -1411,11 +1416,11 @@ namespace feeling
                 var ret = PirateCfg();
                 if (ret)
                 {
-                    mLastContent = $"读取海盗配置（{idx + 1}）完成"; ;
+                    mLastContent = $"{DateTime.Now:G}|读取海盗配置（{idx + 1}）完成"; ;
                 }
                 else
                 {
-                    mLastContent = $"读取海盗配置（{idx + 1}）失败"; ;
+                    mLastContent = $"{DateTime.Now:G}|读取海盗配置（{idx + 1}）失败"; ;
                 }
             }
             catch (Exception ex)
@@ -1432,10 +1437,10 @@ namespace feeling
         {
             try
             {
-                mLastContent = "设置自动探险";
+                mLastContent = $"{DateTime.Now:G}|设置自动探险";
                 if (OperStatus.None != NativeController.Instance.MyOperStatus)
                 {
-                    mLastContent = "当前不是空闲状态，不能设置";
+                    mLastContent = $"{DateTime.Now:G}|当前不是空闲状态，不能设置";
                     return;
                 }
 
@@ -1446,7 +1451,7 @@ namespace feeling
                     cbox_tx_auto.Checked = open;
                     await Task.Delay(100);
                 }
-                mLastContent = "设置自动探险完成";
+                mLastContent = $"{DateTime.Now:G}|设置自动探险完成";
             }
             catch (Exception ex)
             {
@@ -1462,10 +1467,10 @@ namespace feeling
         {
             try
             {
-                mLastContent = $"读取探险配置（{idx + 1}）";
+                mLastContent = $"{DateTime.Now:G}|读取探险配置（{idx + 1}）";
                 if (OperStatus.None != NativeController.Instance.MyOperStatus)
                 {
-                    mLastContent = "当前不是空闲状态，不能读取";
+                    mLastContent = $"{DateTime.Now:G}|当前不是空闲状态，不能读取";
                     return;
                 }
 
@@ -1486,11 +1491,11 @@ namespace feeling
                 var ret = RevertCfg();
                 if (ret)
                 {
-                    mLastContent = $"读取探险配置（{idx + 1}）完成"; ;
+                    mLastContent = $"{DateTime.Now:G}|读取探险配置（{idx + 1}）完成"; ;
                 }
                 else
                 {
-                    mLastContent = $"读取探险配置（{idx + 1}）失败"; ;
+                    mLastContent = $"{DateTime.Now:G}|读取探险配置（{idx + 1}）失败"; ;
                 }
             }
             catch (Exception ex)
