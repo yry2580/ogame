@@ -736,6 +736,64 @@ namespace OgameService
             return false;
         }
 
+        public bool OperAutoLoginOpen(string id, string key, bool open)
+        {
+            LogUtil.Warn($"OperAutoLoginOpen {id}");
+            try
+            {
+                if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+                mCellDict.TryGetValue(key, out OgCell result);
+                // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+                if (null == result || null == result.MySession)
+                {
+                    LogUtil.Warn($"OperAutoLoginOpen 没取到对应cell");
+                    return false;
+                }
+
+                OgameData data = new OgameData();
+                data.Cmd = CmdEnum.AutoLoginOpen;
+                data.AutoLoginOpen = open;
+
+                mServer.SendTo(result.MySession, OgameData.ToBytes(data));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Error($"OperAutoLoginOpen {key} catch {ex.Message}");
+            }
+            return false;
+        }
+
+        public bool OperAutoImperiumOpen(string id, string key, bool open)
+        {
+            LogUtil.Warn($"OperAutoImperiumOpen {id}");
+            try
+            {
+                if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+                mCellDict.TryGetValue(key, out OgCell result);
+                // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+                if (null == result || null == result.MySession)
+                {
+                    LogUtil.Warn($"OperAutoImperiumOpen 没取到对应cell");
+                    return false;
+                }
+
+                OgameData data = new OgameData();
+                data.Cmd = CmdEnum.AutoImperiumOpen;
+                data.AutoImperiumOpen = open;
+
+                mServer.SendTo(result.MySession, OgameData.ToBytes(data));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Error($"OperAutoImperiumOpen {key} catch {ex.Message}");
+            }
+            return false;
+        }
+
         public void ShowAllCell()
         {
             LogUtil.Warn("=============== ShowAllCell =====================");

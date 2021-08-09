@@ -28,13 +28,10 @@ namespace feeling
 
         bool mAutoExpedition = false;
         bool mAutoPirate = false;
-        bool mAutoPirateLogin = false;
         int mPirateInterval = 120; // 分
 
         bool mAutoImperium = false;
         int mImperiumInterval = 240; // 分
-        bool mAutoImperiumLogin = false;
-
 
 #if !NET45
         OgClient mClient;
@@ -124,6 +121,7 @@ namespace feeling
             // 默认值
             lb_hd_interval.Text = mPirateInterval.ToString();
             rbtn_cfg0.Checked = true;
+            cbox_auto_login.Checked = NativeController.User.AutoLogin;
 
             InitExpedition();
             RedrawAccount();
@@ -142,7 +140,6 @@ namespace feeling
                 return;
             }
 
-            mAutoImperiumLogin = imperiumCfg.AutoLogin;
             mImperiumInterval = imperiumCfg.Interval;
             mAutoImperium = imperiumCfg.Open;
             
@@ -235,7 +232,6 @@ namespace feeling
             }
 
             var interval = pMissionCfg.Interval;
-            mAutoPirateLogin = pMissionCfg.AutoLogin;
             mPirateInterval = interval < 120 ? 120 : interval;
             lb_hd_interval.Text = mPirateInterval.ToString();
 
@@ -359,6 +355,7 @@ namespace feeling
                         btn_tz_start.Enabled = false;
                         btn_cross.Enabled = false;
                         btn_universe.Enabled = false;
+                        cbox_auto_login.Enabled = false;
                         break;
                     case OperStatus.Galaxy:
                         btn_galaxy_start.Enabled = false;
@@ -368,6 +365,7 @@ namespace feeling
                         btn_tz_start.Enabled = false;
                         btn_cross.Enabled = false;
                         btn_universe.Enabled = false;
+                        cbox_auto_login.Enabled = false;
                         break;
                     case OperStatus.Expedition:
                         btn_galaxy_start.Enabled = false;
@@ -377,6 +375,7 @@ namespace feeling
                         btn_tz_start.Enabled = false;
                         btn_cross.Enabled = false;
                         btn_universe.Enabled = false;
+                        cbox_auto_login.Enabled = false;
                         break;
                     case OperStatus.Pirate:
                         btn_galaxy_start.Enabled = false;
@@ -386,6 +385,7 @@ namespace feeling
                         btn_tz_start.Enabled = false;
                         btn_cross.Enabled = false;
                         btn_universe.Enabled = false;
+                        cbox_auto_login.Enabled = false;
                         break;
                     case OperStatus.None:
                     default:
@@ -396,6 +396,7 @@ namespace feeling
                         btn_tz_start.Enabled = true;
                         btn_cross.Enabled = true;
                         btn_universe.Enabled = true;
+                        cbox_auto_login.Enabled = true;
                         break;
                 }
 
@@ -493,6 +494,7 @@ namespace feeling
             w_user_account.Enabled = enabled;
             btn_user_login.Enabled = enabled;
             btn_user_logout.Enabled = enabled;
+            cbox_auto_login.Enabled = enabled;
         }
 
         public void SetPirateButton(bool enabled, bool canStop = false)
@@ -649,6 +651,14 @@ namespace feeling
                         NativeController.Instance.CanNotify = false;
                         await SetExpeditionCfg(data.ExpeditionCfgIndex);
                         break;
+                    case CmdEnum.AutoLoginOpen:
+                        NativeController.Instance.CanNotify = false;
+                        await SetAutoLoginOpen(data.AutoLoginOpen);
+                        break;
+                    case CmdEnum.AutoImperiumOpen:
+                        NativeController.Instance.CanNotify = false;
+                        await SetAutoImperiumOpen(data.AutoImperiumOpen);
+                        break;
                     default:
                         break;
                 }
@@ -713,6 +723,8 @@ namespace feeling
                 ExpeditionCfgIndex = rbtn_ex_cfg1.Checked ? 1 : 0,
                 NpcUniverse = PirateUtil.Universe,
                 PlanetUniverse = NativeController.Instance.MyPlanet.Universe,
+                AutoLoginOpen = NativeController.User.AutoLogin,
+                AutoImperiumOpen = mAutoImperium,
             };
 
             mClient?.SendData(gameData);
@@ -984,17 +996,17 @@ namespace feeling
             mAutoExpedition = cbox_tx_auto.Checked;
         }
 
-        private void doExpedtion()
+        private void doExpedtion(bool autoLogin = false)
         {
             if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
 
             var exMission = GetExMission();
             
-            NativeController.Instance.StartExpedition(exMission);
+            NativeController.Instance.StartExpedition(exMission, autoLogin);
             Redraw();
         }
 
-        private void doAutoExpedtion()
+        private async void doAutoExpedtion()
         {
             if (OperStatus.Expedition == NativeController.Instance.MyOperStatus)
             {
@@ -1024,7 +1036,15 @@ namespace feeling
                 return;
             }
 
-            doExpedtion();
+            var autoLogin = NativeController.User.AutoLogin;
+            if (autoLogin)
+            {
+                NativeController.Instance.CanNotify = false;
+                await TryLogin();
+                await AdjustUniverse();
+            }
+
+            doExpedtion(autoLogin);
         }
 
         private PirateMission GetPirateMission()
@@ -1087,7 +1107,6 @@ namespace feeling
             {
                 var pMission = GetPirateMission();
                 pMission.Interval = mPirateInterval;
-                pMission.AutoLogin = mAutoPirateLogin;
                 PirateUtil.Save(pMission, idx);
             }
         }
@@ -1147,13 +1166,15 @@ namespace feeling
                 return;
             }
 
-            if (mAutoPirateLogin)
+            var autoLogin = NativeController.User.AutoLogin;
+            if (autoLogin)
             {
                 NativeController.Instance.CanNotify = false;
                 await TryLogin();
+                await AdjustUniverse();
             }
 
-            doPirate(true, mAutoPirateLogin);
+            doPirate(true, autoLogin);
         }
 
         private void cbox_hd_auto_CheckedChanged(object sender, EventArgs e)
@@ -1267,7 +1288,6 @@ namespace feeling
             try
             {
                 var cfg = new Imperium {
-                    AutoLogin = mAutoImperiumLogin,
                     Interval = mImperiumInterval,
                     Open = mAutoImperium,
                 };
@@ -1317,16 +1337,18 @@ namespace feeling
                 return;
             }
 
-            if (mAutoImperiumLogin)
+            var autoLogin = NativeController.User.AutoLogin;
+            if (autoLogin)
             {
                 NativeController.Instance.CanNotify = false;
                 await TryLogin();
+                await AdjustUniverse();
             }
 
-            await DoImperium();
+            await DoImperium(autoLogin);
         }
 
-        private async Task DoImperium()
+        private async Task DoImperium(bool autoLogin = false)
         {
             try
             {
@@ -1334,7 +1356,7 @@ namespace feeling
 
                 NativeController.Instance.SwitchStatus(OperStatus.System);
 
-                await NativeController.Instance.StartImperium();
+                await NativeController.Instance.StartImperium(autoLogin);
             }
             catch (Exception ex)
             {
@@ -1564,6 +1586,113 @@ namespace feeling
             {
 #if !NET45
                 LogUtil.Error($"BackUniverse catch {ex.Message}");
+#endif
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private void cbox_auto_login_CheckedChanged(object sender, EventArgs e)
+        {
+            var autoLogin = cbox_auto_login.Checked;
+            NativeController.User.SetAutoLogin(autoLogin);
+        }
+
+        private async Task AdjustUniverse()
+        {
+            try
+            {
+                if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
+
+                var address = mWebBrowser.Address;
+                var npcUniverse = PirateUtil.Universe;
+
+                // 如果是多维
+                if (npcUniverse == "w1")
+                {
+                    // 如果当前就是多维地址
+                    if (address.Contains("w1.cicihappy.com/ogame/frames.php"))
+                    {
+                        return;
+                    }
+
+                    // 跳转多维
+                    await GoCross();
+                }
+                else
+                {
+                    // 如果当前在多维
+                    if (address.Contains("w1.cicihappy.com/ogame/frames.php"))
+                    {
+                        // 返回
+                        await BackUniverse();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+#if !NET45
+                LogUtil.Error($"AdjustUniverse catch {ex.Message}");
+#endif
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private async Task SetAutoLoginOpen(bool open)
+        {
+            try
+            {
+                mLastContent = $"{DateTime.Now:G}|设置自动登录";
+                if (OperStatus.None != NativeController.Instance.MyOperStatus)
+                {
+                    mLastContent = $"{DateTime.Now:G}|当前不是空闲状态，不能设置";
+                    return;
+                }
+
+                NativeController.Instance.SwitchStatus(OperStatus.System);
+
+                if (cbox_auto_login.Checked != open)
+                {
+                    cbox_auto_login.Checked = open;
+                    await Task.Delay(100);
+                }
+                mLastContent = $"{DateTime.Now:G}|设置自动登录完成";
+            }
+            catch (Exception ex)
+            {
+#if !NET45
+                LogUtil.Error($"SetAutoLoginOpen catch {ex.Message}");
+#endif
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private async Task SetAutoImperiumOpen(bool open)
+        {
+            try
+            {
+                mLastContent = $"{DateTime.Now:G}|设置自动统治";
+                if (OperStatus.None != NativeController.Instance.MyOperStatus)
+                {
+                    mLastContent = $"{DateTime.Now:G}|当前不是空闲状态，不能设置";
+                    return;
+                }
+
+                NativeController.Instance.SwitchStatus(OperStatus.System);
+
+                if (cbox_tz_auto.Checked != open)
+                {
+                    cbox_tz_auto.Checked = open;
+                    await Task.Delay(100);
+                }
+                mLastContent = $"{DateTime.Now:G}|设置自动统治完成";
+            }
+            catch (Exception ex)
+            {
+#if !NET45
+                LogUtil.Error($"SetAutoImperiumOpen catch {ex.Message}");
 #endif
             }
 

@@ -18,14 +18,14 @@ namespace feeling
     public delegate void DelegateOperTips(OperStatus operStatus, string tips);
     public delegate void DelegateNpcChange();
 
-    class NativeController: Singleton<NativeController>
+    class NativeController : Singleton<NativeController>
     {
         public OperStatus MyOperStatus = OperStatus.None;
         public volatile bool IsWorking = false;
         public volatile bool IsPirateWorking = false;
         public volatile bool IsExpeditionWorking = false;
 
-        public string MyAddress = "";
+        public volatile string MyAddress = "";
         public DelegateStatusChange StatusChangeEvent;
         public DelegateScanGalaxy ScanGalaxyEvent;
         public DelegatePlanet PlanetEvent;
@@ -68,7 +68,6 @@ namespace feeling
                 ScanPlanet();
                 ScanNpc();
             }
-
         }
 
         public void ScanPlanet()
@@ -282,8 +281,6 @@ namespace feeling
 
         public async Task LoginAsync(string account, string psw, int universe)
         {
-            // Reload();
-
             var source = "";
             if (account.Length <= 0 || psw.Length <= 0 || universe <= 0 || universe > 24)
             {
@@ -297,16 +294,25 @@ namespace feeling
 
             OperTipsEvent.Invoke(OperStatus.System, $"开始登录");
 
-            MyWebBrowser.Load(NativeConst.Homepage);
-            Thread.Sleep(2000);
-            source = await MyWebBrowser.GetSourceAsync();
+            // 
+            Reload();
+            source = await GetFrameSourceAsync();
+            bool needLogin = false;
 
+            // 当前还在游戏页面
             if (HtmlUtil.IsGameUrl(MyAddress))
             {
-                try
+                if (source.Contains("退出成功") && source.Contains("重新登录"))
                 {
+                    needLogin = true;
+                }
+                else if (HtmlUtil.HasTutorial(source))
+                {
+                    FrameRunJs(NativeScript.TutorialConfirm());
+                    await Task.Delay(1500);
                     source = await GetFrameSourceAsync();
-                    if (HtmlUtil.IsInGame(source))
+
+                    if (HtmlUtil.IsGameUrl(MyAddress) && HtmlUtil.IsInGame(source))
                     {
                         if (CanNotify)
                         {
@@ -315,24 +321,42 @@ namespace feeling
                         OperTipsEvent.Invoke(OperStatus.System, $"已经是登录状态");
                         return;
                     }
-                }
-                catch(Exception)
-                {
-                }
 
-                await DoLoginAsync(account, psw, universe);
-            } else
+                    needLogin = true;
+                }
+                else
+                {
+                    if (HtmlUtil.IsGameUrl(MyAddress) && HtmlUtil.IsInGame(source))
+                    {
+                        if (CanNotify)
+                        {
+                            MessageBox.Show("已经是登录状态");
+                        }
+                        OperTipsEvent.Invoke(OperStatus.System, $"已经是登录状态");
+                        return;
+                    }
+                    needLogin = true;
+                }
+            }
+            else
             {
-                await DoLoginAsync(account, psw, universe);
+                needLogin = true;
             }
 
+            if (!needLogin)
+            {
+                OperTipsEvent.Invoke(OperStatus.System, $"不需要重新登录");
+                return;
+            }
+
+            await DoLoginAsync(account, psw, universe);
             OperTipsEvent.Invoke(OperStatus.System, $"登录输入完成");
+            
             try
             {
-
-                await Task.Delay(1000);
+                await Task.Delay(2000);
+                source = await GetFrameSourceAsync();
                 await GoHome(1000);
-
                 if (HtmlUtil.IsGameUrl(MyAddress))
                 {
                     source = await GetFrameSourceAsync();
@@ -355,7 +379,7 @@ namespace feeling
             if (!HtmlUtil.IsHomeUrl(MyAddress))
             {
                 MyWebBrowser.Load(NativeConst.Homepage);
-                await Task.Delay(2000);
+                await Task.Delay(3000);
             }
 
             await MyWebBrowser.GetSourceAsync();
@@ -390,6 +414,9 @@ namespace feeling
             {
                 OperTipsEvent.Invoke(OperStatus.System, $"退出登录");
 
+                Reload();
+                var source = await GetFrameSourceAsync();
+
                 if (!HtmlUtil.IsGameUrl(MyAddress))
                 {
                     if (CanNotify)
@@ -410,9 +437,7 @@ namespace feeling
                     return;
                 }
 
-                Reload();
-
-                var source = await GetFrameSourceAsync();
+                source = await GetFrameSourceAsync();
                 if (!HtmlUtil.HasLogoutBtn(source))
                 {
                     await GoHome();
@@ -449,14 +474,14 @@ namespace feeling
             Thread.Sleep(delay);
         }
 
-        internal void StartExpedition(ExMission exMission)
+        internal void StartExpedition(ExMission exMission, bool autoLogin = false)
         {
             SwitchStatus(OperStatus.Expedition);
             IsExpeditionWorking = true;
             OperTipsEvent.Invoke(OperStatus.Expedition, $"开始探险");
             Task.Run(() =>
             {
-                DoExpedition(exMission);
+                DoExpedition(exMission, autoLogin);
             });
         }
 
@@ -498,7 +523,7 @@ namespace feeling
             IsExpeditionWorking = false;
         }
 
-        protected async void DoExpedition(ExMission exMission)
+        protected async void DoExpedition(ExMission exMission, bool autoLogin = false)
         {
             int index = 0;
             int _count = 0;
@@ -728,14 +753,30 @@ namespace feeling
 
             OperTipsEvent.Invoke(OperStatus.Expedition, $"探险派遣结束{_count}/{exMission.List.Count}");
 
+            // autoLogin
+            var autoLogout = false;
+
             // 如果存在派遣成功的
             if (_count >= 0 || success)
             {
                 LastExeditionTime = DateTime.Now;
+                if (IsExpeditionWorking && autoLogin)
+                {
+                    autoLogout = CanAutoLogout();
+                }
             }
 
             IsExpeditionWorking = false;
-            SwitchStatus(OperStatus.None);
+            if (autoLogout)
+            {
+                SwitchStatus(OperStatus.System);
+                await LogoutAsync();
+                SwitchStatus(OperStatus.None);
+            }
+            else
+            {
+                SwitchStatus(OperStatus.None);
+            }
         }
         #endregion
 
@@ -1054,10 +1095,10 @@ namespace feeling
             {
                 LastPirateTime = DateTime.Now;
 
-                if (IsPirateWorking && IsAutoPirate)
+                if (IsPirateWorking && autoLogin)
                 {
                     checkNpc = CheckRefreshNpc(pMission);
-                    autoLogout = autoLogin ? true : false;
+                    autoLogout = CanAutoLogout();
                 }
             }
 
@@ -1153,7 +1194,7 @@ namespace feeling
         #endregion
 
         #region 统治
-        public async Task StartImperium()
+        public async Task StartImperium(bool autoLogin = false)
         {
             try
             {
@@ -1195,6 +1236,17 @@ namespace feeling
                 source = await GetFrameSourceAsync();
 
                 Reload();
+
+                var autoLogut = false;
+                if (autoLogin)
+                {
+                    autoLogut = CanAutoLogout();
+                }
+
+                if (autoLogut)
+                {
+                    await LogoutAsync();
+                }
             }
             catch (Exception ex)
             {
@@ -1243,6 +1295,7 @@ namespace feeling
                 source = await GetFrameSourceAsync();
                 if (source.Contains("id=\"fleetdelaybox\""))
                 {
+                    mPlanet.Reset();
                     FrameRunJs(NativeScript.ToCross());
                     await Task.Delay(2500);
                     source = await GetFrameSourceAsync();
@@ -1294,6 +1347,7 @@ namespace feeling
                 source = await GetFrameSourceAsync();
                 if (source.Contains("id=\"fleetdelaybox\""))
                 {
+                    mPlanet.Reset();
                     FrameRunJs(NativeScript.BackUniverse());
                     await Task.Delay(2500);
                     source = await GetFrameSourceAsync();
@@ -1328,7 +1382,7 @@ namespace feeling
             await Task.Delay(delay);
         }
 
-        public async Task<string> GetFrameSourceAsync()
+        public async Task<string> GetFrameSourceAsync(int retry = 3)
         {
             int n = 0;
             string source;
@@ -1336,7 +1390,7 @@ namespace feeling
             {
                 try
                 {
-                    source = await GetHauptframe().GetSourceAsync();
+                    source = await GetHauptframe()?.GetSourceAsync();
                 }
                 catch (Exception ex)
                 {
@@ -1350,8 +1404,51 @@ namespace feeling
 
                 await Task.Delay(1000);
                 n++;
-            } while (n < 3);
+            } while (n < retry);
             return source;
+        }
+
+        public bool CanAutoLogout()
+        {
+            var now = DateTime.Now;
+            TimeSpan delta;
+            double val = 0;
+            double min = 0;
+            bool hasAuto = false;
+
+            if (!User.AutoLogin) return false;
+
+            if (IsAutoExpedition)
+            {
+                hasAuto = true;
+                delta = now - LastExeditionTime;
+                val = 120 - delta.TotalMinutes;
+                val = val < 0 ? 0 : val;
+                min = val;
+            }
+
+            var pMissionCfg = PirateUtil.MyPirateMission;
+            if (IsAutoPirate && null != pMissionCfg)
+            {
+                hasAuto = true;
+                delta = now - LastPirateTime;
+                val = pMissionCfg.Interval - delta.TotalMinutes;
+                val = val < 0 ? 0 : val;
+            }
+
+            var imperium = ImperiumUtil.MyImperium;
+            if (IsAutoImperium && null != imperium)
+            {
+                hasAuto = true;
+                delta = now - LastImperiumTime;
+                val = imperium.Interval - delta.TotalMinutes;
+                val = val < 0 ? 0 : val;
+            }
+
+            if (!hasAuto) return false;
+            min = Math.Min(val, min);
+
+            return min > 20;
         }
     }
 }

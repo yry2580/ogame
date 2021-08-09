@@ -9,7 +9,6 @@ namespace feeling
     class Imperium
     {
         public int Interval = 240; // 分钟
-        public bool AutoLogin = false;
         public bool Open = false;
     }
 }

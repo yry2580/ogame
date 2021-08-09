@@ -25,6 +25,8 @@ namespace OgameService
         public int ExpeditionCfgIndex = 0;
         public string NpcUniverse = "";
         public string PlanetUniverse = "";
+        public bool AutoLoginOpen = false;
+        public bool AutoImperiumOpen = false;
 
         public static byte[] ToBytes(OgameData data)
         {

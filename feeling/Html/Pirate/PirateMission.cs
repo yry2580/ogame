@@ -11,7 +11,6 @@ namespace feeling
         public List<Pirate> List = new List<Pirate>();
         public int MissionCount => mMissions.Count;
         public int Interval = 120; // 分钟
-        public bool AutoLogin = false;
 
         Pos mPos = new Pos();
         List<Mission> mMissions = new List<Mission>();

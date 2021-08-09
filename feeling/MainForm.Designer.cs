@@ -128,6 +128,7 @@ namespace feeling
             this.label5 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
+            this.cbox_auto_login = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.w_split_container)).BeginInit();
             this.w_split_container.Panel2.SuspendLayout();
             this.w_split_container.SuspendLayout();
@@ -1086,6 +1087,7 @@ namespace feeling
             // 
             // w_user_box
             // 
+            this.w_user_box.Controls.Add(this.cbox_auto_login);
             this.w_user_box.Controls.Add(this.btn_universe);
             this.w_user_box.Controls.Add(this.btn_cross);
             this.w_user_box.Controls.Add(this.w_user_account);
@@ -1115,7 +1117,7 @@ namespace feeling
             // 
             // btn_cross
             // 
-            this.btn_cross.Location = new System.Drawing.Point(129, 117);
+            this.btn_cross.Location = new System.Drawing.Point(129, 119);
             this.btn_cross.Name = "btn_cross";
             this.btn_cross.Size = new System.Drawing.Size(56, 23);
             this.btn_cross.TabIndex = 19;
@@ -1126,7 +1128,7 @@ namespace feeling
             // w_user_account
             // 
             this.w_user_account.FormattingEnabled = true;
-            this.w_user_account.Location = new System.Drawing.Point(53, 25);
+            this.w_user_account.Location = new System.Drawing.Point(53, 18);
             this.w_user_account.Name = "w_user_account";
             this.w_user_account.Size = new System.Drawing.Size(135, 20);
             this.w_user_account.TabIndex = 18;
@@ -1134,7 +1136,7 @@ namespace feeling
             // 
             // btn_user_logout
             // 
-            this.btn_user_logout.Location = new System.Drawing.Point(53, 146);
+            this.btn_user_logout.Location = new System.Drawing.Point(67, 146);
             this.btn_user_logout.Name = "btn_user_logout";
             this.btn_user_logout.Size = new System.Drawing.Size(59, 23);
             this.btn_user_logout.TabIndex = 17;
@@ -1144,7 +1146,7 @@ namespace feeling
             // 
             // btn_user_login
             // 
-            this.btn_user_login.Location = new System.Drawing.Point(53, 117);
+            this.btn_user_login.Location = new System.Drawing.Point(8, 146);
             this.btn_user_login.Name = "btn_user_login";
             this.btn_user_login.Size = new System.Drawing.Size(56, 23);
             this.btn_user_login.TabIndex = 16;
@@ -1154,7 +1156,7 @@ namespace feeling
             // 
             // w_user_universe
             // 
-            this.w_user_universe.Location = new System.Drawing.Point(53, 85);
+            this.w_user_universe.Location = new System.Drawing.Point(53, 74);
             this.w_user_universe.MaxLength = 2;
             this.w_user_universe.Name = "w_user_universe";
             this.w_user_universe.Size = new System.Drawing.Size(26, 21);
@@ -1164,7 +1166,7 @@ namespace feeling
             // 
             // w_user_password
             // 
-            this.w_user_password.Location = new System.Drawing.Point(53, 54);
+            this.w_user_password.Location = new System.Drawing.Point(53, 45);
             this.w_user_password.MaxLength = 20;
             this.w_user_password.Name = "w_user_password";
             this.w_user_password.Size = new System.Drawing.Size(135, 21);
@@ -1175,7 +1177,7 @@ namespace feeling
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(6, 57);
+            this.label5.Location = new System.Drawing.Point(6, 48);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(47, 12);
             this.label5.TabIndex = 12;
@@ -1184,7 +1186,7 @@ namespace feeling
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(6, 88);
+            this.label3.Location = new System.Drawing.Point(6, 77);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(47, 12);
             this.label3.TabIndex = 11;
@@ -1193,11 +1195,22 @@ namespace feeling
             // label1
             // 
             this.label1.AutoSize = true;
-            this.label1.Location = new System.Drawing.Point(6, 28);
+            this.label1.Location = new System.Drawing.Point(6, 21);
             this.label1.Name = "label1";
             this.label1.Size = new System.Drawing.Size(41, 12);
             this.label1.TabIndex = 10;
             this.label1.Text = "账 号:";
+            // 
+            // cbox_auto_login
+            // 
+            this.cbox_auto_login.AutoSize = true;
+            this.cbox_auto_login.Location = new System.Drawing.Point(8, 101);
+            this.cbox_auto_login.Name = "cbox_auto_login";
+            this.cbox_auto_login.Size = new System.Drawing.Size(180, 16);
+            this.cbox_auto_login.TabIndex = 46;
+            this.cbox_auto_login.Text = "自动登录（用于自动海盗等）";
+            this.cbox_auto_login.UseVisualStyleBackColor = true;
+            this.cbox_auto_login.CheckedChanged += new System.EventHandler(this.cbox_auto_login_CheckedChanged);
             // 
             // MainForm
             // 
@@ -1332,5 +1345,6 @@ namespace feeling
         private System.Windows.Forms.Button btn_cross;
         private System.Windows.Forms.RadioButton rbtn_ex_cfg1;
         private System.Windows.Forms.RadioButton rbtn_ex_cfg0;
+        private System.Windows.Forms.CheckBox cbox_auto_login;
     }
 }

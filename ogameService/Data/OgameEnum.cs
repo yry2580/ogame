@@ -35,6 +35,8 @@ namespace OgameService
         GoCross,
         BackUniverse,
         ExpeditionCfg,
+        AutoLoginOpen,
+        AutoImperiumOpen,
     }
 
     public enum StatusEnum
