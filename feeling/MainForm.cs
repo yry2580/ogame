@@ -1383,7 +1383,8 @@ namespace feeling
         {
             try
             {
-                mLastContent = $"{DateTime.Now:G}|设置自动海盗";
+                var msg = open ? "开" : "关";
+                mLastContent = $"{DateTime.Now:G}|设置自动海盗({msg})";
                 if (OperStatus.None != NativeController.Instance.MyOperStatus)
                 {
                     mLastContent = $"{DateTime.Now:G}|当前不是空闲状态，不能设置";
@@ -1398,7 +1399,7 @@ namespace feeling
                     await Task.Delay(100);
                 }
 
-                mLastContent = $"{DateTime.Now:G}|设置自动海盗完成";
+                mLastContent = $"{DateTime.Now:G}|设置自动海盗({msg})完成";
             }
             catch (Exception ex)
             {
@@ -1459,7 +1460,8 @@ namespace feeling
         {
             try
             {
-                mLastContent = $"{DateTime.Now:G}|设置自动探险";
+                var msg = open ? "开" : "关";
+                mLastContent = $"{DateTime.Now:G}|设置自动探险({msg})";
                 if (OperStatus.None != NativeController.Instance.MyOperStatus)
                 {
                     mLastContent = $"{DateTime.Now:G}|当前不是空闲状态，不能设置";
@@ -1473,7 +1475,7 @@ namespace feeling
                     cbox_tx_auto.Checked = open;
                     await Task.Delay(100);
                 }
-                mLastContent = $"{DateTime.Now:G}|设置自动探险完成";
+                mLastContent = $"{DateTime.Now:G}|设置自动探险({msg})完成";
             }
             catch (Exception ex)
             {
@@ -1643,7 +1645,8 @@ namespace feeling
         {
             try
             {
-                mLastContent = $"{DateTime.Now:G}|设置自动登录";
+                var msg = open ? "开" : "关";
+                mLastContent = $"{DateTime.Now:G}|设置自动登录({msg})";
                 if (OperStatus.None != NativeController.Instance.MyOperStatus)
                 {
                     mLastContent = $"{DateTime.Now:G}|当前不是空闲状态，不能设置";
@@ -1657,7 +1660,7 @@ namespace feeling
                     cbox_auto_login.Checked = open;
                     await Task.Delay(100);
                 }
-                mLastContent = $"{DateTime.Now:G}|设置自动登录完成";
+                mLastContent = $"{DateTime.Now:G}|设置自动登录({msg})完成";
             }
             catch (Exception ex)
             {
@@ -1673,7 +1676,8 @@ namespace feeling
         {
             try
             {
-                mLastContent = $"{DateTime.Now:G}|设置自动统治";
+                var msg = open ? "开" : "关";
+                mLastContent = $"{DateTime.Now:G}|设置自动统治({msg})";
                 if (OperStatus.None != NativeController.Instance.MyOperStatus)
                 {
                     mLastContent = $"{DateTime.Now:G}|当前不是空闲状态，不能设置";
@@ -1687,7 +1691,7 @@ namespace feeling
                     cbox_tz_auto.Checked = open;
                     await Task.Delay(100);
                 }
-                mLastContent = $"{DateTime.Now:G}|设置自动统治完成";
+                mLastContent = $"{DateTime.Now:G}|设置自动统治({msg})完成";
             }
             catch (Exception ex)
             {
