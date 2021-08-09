@@ -933,6 +933,7 @@ namespace feeling
                     if (lastErr)
                     {
                         Reload();
+                        NativeLog.Info($"重载");
                     }
 
                     source = await GetFrameSourceAsync();
@@ -946,8 +947,8 @@ namespace feeling
 
                     // 切换舰队页面
                     GoFleetPage();
+                    NativeLog.Info($"切换舰队");
                     source = await GetFrameSourceAsync();
-
                     if (index <= 1 && HtmlUtil.IsWechatCodePage(source))
                     {
                         NativeLog.Info($"在微信验证页");
