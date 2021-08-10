@@ -73,23 +73,23 @@ namespace feeling
         {
             do
             {
-                Invoke(new Action(() =>
+                Invoke(new Action(async () =>
                 {
-                    _LookThread();
+                    await _LookThread();
                 }));
                 Thread.Sleep(1000 * 60);
             } while (true);
         }
 
-        private void _LookThread()
+        private async Task _LookThread()
         {
             try
             {
                 if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
 
-                doAutoExpedtion();
-                doAutoPirate();
-                doAutoImperium();
+                await doAutoExpedtion();
+                await doAutoPirate();
+                await doAutoImperium();
                 SendData();
             }
             catch (Exception ex)
@@ -205,7 +205,7 @@ namespace feeling
             // 读取配置
             if (!PirateUtil.ReadCfg(idx)) return false;
 
-            var pMissionCfg = PirateUtil.MyPirateMission;
+            var pMissionCfg = PirateUtil.MyMission;
 
             if (null == pMissionCfg) return false;
 
@@ -956,7 +956,7 @@ namespace feeling
                 MessageBox.Show("探险任务配置无效，请检测后再开始");
                 return;
             }
-            
+
             doExpedtion();
         }
 
@@ -1006,27 +1006,21 @@ namespace feeling
             Redraw();
         }
 
-        private async void doAutoExpedtion()
+        private async Task doAutoExpedtion()
         {
+            var delta = DateTime.Now - NativeController.Instance.LastExeditionTime;
+            var val = 120 - delta.TotalMinutes;
+            val = val < 0 ? 0 : val;
+
             if (OperStatus.Expedition == NativeController.Instance.MyOperStatus)
             {
                 lb_tx_info.Text = $"{DateTime.Now:G}|正在探险状态";
                 return;
             }
 
-            if (OperStatus.None != NativeController.Instance.MyOperStatus)
-            {
-                lb_tx_info.Text = $"{DateTime.Now:G}|其他操作正忙";
-                return;
-            }
-
-            var delta = DateTime.Now - NativeController.Instance.LastExeditionTime;
-            var val = 120 - delta.TotalMinutes;
-            val = val < 0 ? 0 : val;
-
             if (!cbox_tx_auto.Checked || !mAutoExpedition)
             {
-                lb_tx_info.Text = $"{DateTime.Now:G}|自动探险-关，时间差{Math.Ceiling(val)}分钟";
+                lb_tx_info.Text = $"{DateTime.Now:G}|自动探险-关，{Math.Ceiling(val)}分钟";
                 return;
             }
 
@@ -1036,12 +1030,24 @@ namespace feeling
                 return;
             }
 
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                lb_tx_info.Text = $"{DateTime.Now:G}|其他操作正忙";
+                return;
+            }
+
             var autoLogin = NativeController.User.AutoLogin;
             if (autoLogin)
             {
                 NativeController.Instance.CanNotify = false;
                 await TryLogin();
                 await AdjustUniverse();
+
+                var exMission = GetExMission();
+                if (exMission.List.Count <= 0 || NativeController.Instance.MyPlanet.List.Count <= 0)
+                {
+                    await NativeController.Instance.DoRefreshNpc(true);
+                }
             }
 
             doExpedtion(autoLogin);
@@ -1136,17 +1142,11 @@ namespace feeling
             Redraw();
         }
 
-        private async void doAutoPirate()
+        private async Task doAutoPirate()
         {
             if (OperStatus.Pirate == NativeController.Instance.MyOperStatus)
             {
                 lb_hd_info.Text = $"{DateTime.Now:G}|正在海盗状态";
-                return;
-            }
-            
-            if (OperStatus.None != NativeController.Instance.MyOperStatus)
-            {
-                lb_hd_info.Text = $"{DateTime.Now:G}|其他操作正忙";
                 return;
             }
 
@@ -1156,13 +1156,19 @@ namespace feeling
 
             if (!cbox_hd_auto.Checked || !mAutoPirate)
             {
-                lb_hd_info.Text = $"{DateTime.Now:G}|自动海盗-关，时间差{Math.Ceiling(val)}分钟";
+                lb_hd_info.Text = $"{DateTime.Now:G}|自动海盗-关，{Math.Ceiling(val)}分钟";
                 return;
             }
 
             if (delta.TotalMinutes < mPirateInterval)
             {
-                lb_hd_info.Text = $"{DateTime.Now:G}|自动海盗-开，时间差{Math.Ceiling(val)}分钟";
+                lb_hd_info.Text = $"{DateTime.Now:G}|自动海盗-开，{Math.Ceiling(val)}分钟";
+                return;
+            }
+
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                lb_hd_info.Text = $"{DateTime.Now:G}|其他操作正忙";
                 return;
             }
 
@@ -1172,6 +1178,12 @@ namespace feeling
                 NativeController.Instance.CanNotify = false;
                 await TryLogin();
                 await AdjustUniverse();
+
+                var pMission = GetPirateMission();
+                if (pMission.List.Count <= 0 || NativeController.Instance.MyPlanet.List.Count <= 0)
+                {
+                    await NativeController.Instance.DoRefreshNpc(true);
+                }
             }
 
             doPirate(true, autoLogin);
@@ -1307,33 +1319,33 @@ namespace feeling
             NativeController.Instance.IsAutoImperium = mAutoImperium;
         }
 
-        private async void doAutoImperium()
+        private async Task doAutoImperium()
         {
-            if (OperStatus.None != NativeController.Instance.MyOperStatus)
-            {
-                lb_tz_info.Text = $"{DateTime.Now:G}|其他操作正忙";
-                return;
-            }
-
             var delta = DateTime.Now - NativeController.Instance.LastImperiumTime;
             var val = mImperiumInterval - delta.TotalMinutes;
             val = val < 0 ? 0 : val;
 
             if (!cbox_tz_auto.Checked || !mAutoImperium)
             {
-                lb_tz_info.Text = $"{DateTime.Now:G}|自动统治-关，时间差{Math.Ceiling(val)}分钟";
+                lb_tz_info.Text = $"{DateTime.Now:G}|自动统治-关，{Math.Ceiling(val)}分钟";
                 return;
             }
 
             if (mAutoPirate)
             {
-                lb_tz_info.Text = $"{DateTime.Now:G}|已自动海盗，时间差{Math.Ceiling(val)}分钟";
+                lb_tz_info.Text = $"{DateTime.Now:G}|已自动海盗，{Math.Ceiling(val)}分钟";
                 return;
             }
 
             if (delta.TotalMinutes < mImperiumInterval)
             {
-                lb_tz_info.Text = $"{DateTime.Now:G}|自动统治-开，时间差{Math.Ceiling(val)}分钟";
+                lb_tz_info.Text = $"{DateTime.Now:G}|自动统治-开，{Math.Ceiling(val)}分钟";
+                return;
+            }
+
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                lb_tz_info.Text = $"{DateTime.Now:G}|其他操作正忙";
                 return;
             }
 
@@ -1396,7 +1408,7 @@ namespace feeling
                 if (cbox_hd_auto.Checked != open)
                 {
                     cbox_hd_auto.Checked = open;
-                    await Task.Delay(100);
+                    await Task.Delay(200);
                 }
 
                 mLastContent = $"{DateTime.Now:G}|设置自动海盗({msg})完成";
@@ -1473,7 +1485,7 @@ namespace feeling
                 if (cbox_tx_auto.Checked != open)
                 {
                     cbox_tx_auto.Checked = open;
-                    await Task.Delay(100);
+                    await Task.Delay(200);
                 }
                 mLastContent = $"{DateTime.Now:G}|设置自动探险({msg})完成";
             }
@@ -1658,7 +1670,7 @@ namespace feeling
                 if (cbox_auto_login.Checked != open)
                 {
                     cbox_auto_login.Checked = open;
-                    await Task.Delay(100);
+                    await Task.Delay(200);
                 }
                 mLastContent = $"{DateTime.Now:G}|设置自动登录({msg})完成";
             }
@@ -1689,7 +1701,7 @@ namespace feeling
                 if (cbox_tz_auto.Checked != open)
                 {
                     cbox_tz_auto.Checked = open;
-                    await Task.Delay(100);
+                    await Task.Delay(200);
                 }
                 mLastContent = $"{DateTime.Now:G}|设置自动统治({msg})完成";
             }

@@ -12,7 +12,8 @@ namespace feeling
     class PirateUtil
     {
         // static string mCfgFile = NativeConst.CurrentDirectory + "pirate_mission.cfg";
-        public static PirateMission MyPirateMission;
+        public static PirateMission MyMission;
+        public static PirateMission MyCrossMission;
 
         static OgameParser mParser = new OgameParser();
 
@@ -30,7 +31,7 @@ namespace feeling
         {
             try
             {
-                MyPirateMission = pMission;
+                MyMission = pMission;
                 string text = JsonConvert.SerializeObject(pMission, Formatting.Indented);
                 File.WriteAllText(GetFilePath(idx), text);
             }
@@ -48,7 +49,7 @@ namespace feeling
             try
             {
                 var text = File.ReadAllText(filePath);
-                MyPirateMission = JsonConvert.DeserializeObject<PirateMission>(text);
+                MyMission = JsonConvert.DeserializeObject<PirateMission>(text);
                 return true;
             }
             catch (Exception ex)
@@ -75,6 +76,7 @@ namespace feeling
 
         public static void ResetNpc()
         {
+            Universe = "";
             NpcList.Clear();
         }
     }

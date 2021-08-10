@@ -31,6 +31,7 @@ namespace feeling
 
         public void Reset()
         {
+            Universe = "";
             List.Clear();
         }
 

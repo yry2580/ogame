@@ -790,36 +790,42 @@ namespace feeling
             SwitchStatus(OperStatus.System);
             Task.Run(async () =>
             {
-                try
-                {
-                    OperTipsEvent.Invoke(OperStatus.System, $"刷球");
-                    if (!isAuto)
-                    {
-                        mPlanet.Reset();
-                    }
-                    PirateUtil.ResetNpc();
-                    Reload();
-                    await GoHome(1500);
-
-                    if (HtmlUtil.IsGameUrl(MyAddress))
-                    {
-                        var source = await GetFrameSourceAsync();
-                        FrameRunJs(NativeScript.ToGalaxy());
-                        await Task.Delay(1500);
-                        source = await GetFrameSourceAsync();
-                        PirateUtil.ParseNpc(source, MyAddress);
-                        NpcChangeEvent?.Invoke();
-                        await Task.Delay(500);
-                    }
-                }
-                catch(Exception ex)
-                {
-                    NativeLog.Error($"RefreshNpc catch {ex.Message}");
-                }
-
-                OperTipsEvent.Invoke(OperStatus.System, $"刷球完成");
-                SwitchStatus(OperStatus.None);
+                await DoRefreshNpc(isAuto);
             });
+        }
+
+        internal async Task DoRefreshNpc(bool isAuto = false)
+        {
+            try
+            {
+                SwitchStatus(OperStatus.System);
+                OperTipsEvent.Invoke(OperStatus.System, $"刷球");
+                if (!isAuto)
+                {
+                    mPlanet.Reset();
+                }
+                PirateUtil.ResetNpc();
+                Reload();
+                await GoHome(1500);
+
+                if (HtmlUtil.IsGameUrl(MyAddress))
+                {
+                    var source = await GetFrameSourceAsync();
+                    FrameRunJs(NativeScript.ToGalaxy());
+                    await Task.Delay(1500);
+                    source = await GetFrameSourceAsync();
+                    PirateUtil.ParseNpc(source, MyAddress);
+                    NpcChangeEvent?.Invoke();
+                    await Task.Delay(500);
+                }
+            }
+            catch (Exception ex)
+            {
+                NativeLog.Error($"DoRefreshNpc catch {ex.Message}");
+            }
+
+            OperTipsEvent.Invoke(OperStatus.System, $"刷球完成");
+            SwitchStatus(OperStatus.None);
         }
 
         internal void StartPirate(PirateMission pMission, bool isAuto = false, bool autoLogin = false)
@@ -1129,7 +1135,7 @@ namespace feeling
             if (null == pMission) return false;
             if (pMission.MissionCount <= 0) return false;
 
-            var pMissionCfg = PirateUtil.MyPirateMission;
+            var pMissionCfg = PirateUtil.MyMission;
             if (null == pMissionCfg || pMissionCfg.MissionCount <= 0) return false;
 
             return pMissionCfg.MissionCount - pMission.MissionCount >= 8;
@@ -1428,7 +1434,7 @@ namespace feeling
                 min = val;
             }
 
-            var pMissionCfg = PirateUtil.MyPirateMission;
+            var pMissionCfg = PirateUtil.MyMission;
             if (IsAutoPirate && null != pMissionCfg)
             {
                 hasAuto = true;
