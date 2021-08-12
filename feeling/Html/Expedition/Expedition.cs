@@ -13,6 +13,25 @@ namespace feeling
     {
         // static string missionCfgFile = NativeConst.CfgDirectory + "ex_mission.cfg";
         public static ExMission MyExMissionCfg;
+        public static ExMission MyExMissionCfg1;
+
+        public static void Initialize()
+        {
+            // 读取配置
+            ReadCfg(0);
+            ReadCfg(1);
+
+            if (null == MyExMissionCfg)
+            {
+                Save(new ExMission(), 0);
+            }
+
+            if (null == MyExMissionCfg1)
+            {
+                Save(new ExMission(), 1);
+            }
+        }
+
         public static List<ShipType> ShipOptions = new List<ShipType> {
             ShipType.SC,
             ShipType.LC,
@@ -36,7 +55,15 @@ namespace feeling
         {
             try
             {
-                MyExMissionCfg = exMission;
+                if (idx == 1)
+                {
+                    MyExMissionCfg1 = exMission;
+                }
+                else
+                {
+                    MyExMissionCfg = exMission;
+                }
+
                 string text = JsonConvert.SerializeObject(exMission, Formatting.Indented);
                 File.WriteAllText(GetFilePath(idx), text);
             }
@@ -54,7 +81,17 @@ namespace feeling
             try
             {
                 var text = File.ReadAllText(filePath);
-                MyExMissionCfg = JsonConvert.DeserializeObject<ExMission>(text);
+                var exMission = JsonConvert.DeserializeObject<ExMission>(text);
+
+                if (idx == 1)
+                {
+                    MyExMissionCfg1 = exMission;
+                }
+                else
+                {
+                    MyExMissionCfg = exMission;
+                }
+
                 return true;
             }
             catch (Exception ex)

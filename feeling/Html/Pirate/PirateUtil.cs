@@ -13,13 +13,30 @@ namespace feeling
     {
         // static string mCfgFile = NativeConst.CurrentDirectory + "pirate_mission.cfg";
         public static PirateMission MyMission;
-        public static PirateMission MyCrossMission;
+        public static PirateMission MyMission1;
 
         static OgameParser mParser = new OgameParser();
 
         public static List<string> NpcList = new List<string>();
         public static bool HasNpcData => NpcList.Count > 0;
         public static string Universe = "";
+
+        public static void Initialize()
+        {
+            // 读取配置
+            ReadCfg(0);
+            ReadCfg(1);
+
+            if (null == MyMission)
+            {
+                Save(new PirateMission(), 0);
+            }
+
+            if (null == MyMission1)
+            {
+                Save(new PirateMission(), 1);
+            }
+        }
 
         protected static string GetFilePath(int idx = 0)
         {
@@ -31,7 +48,17 @@ namespace feeling
         {
             try
             {
-                MyMission = pMission;
+                pMission.IsCross = Universe == "w1";
+                
+                if (idx == 1)
+                {
+                    MyMission1 = pMission;
+                }
+                else
+                {
+                    MyMission = pMission;
+                }
+
                 string text = JsonConvert.SerializeObject(pMission, Formatting.Indented);
                 File.WriteAllText(GetFilePath(idx), text);
             }
@@ -49,7 +76,15 @@ namespace feeling
             try
             {
                 var text = File.ReadAllText(filePath);
-                MyMission = JsonConvert.DeserializeObject<PirateMission>(text);
+                var mission = JsonConvert.DeserializeObject<PirateMission>(text);
+                if (idx == 1)
+                {
+                    MyMission1 = mission;
+                }
+                else
+                {
+                    MyMission = mission;
+                }
                 return true;
             }
             catch (Exception ex)

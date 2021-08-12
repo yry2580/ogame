@@ -14,19 +14,27 @@ namespace OgameService
         public StatusEnum Status = StatusEnum.None;
         public string Id = "";
         public string Content = "";
-        public string PirateAutoMsg = "";
         public string SessionKey = "";
-        public string ExpeditionAutoMsg = "";
-        public string FleetContent = "";
-        public bool AutoPirateOpen = false;
-        public bool AutoExpeditionOpen = false;
-        public int PirateCfgIndex = 0;
+
         public string Universe = "";
-        public int ExpeditionCfgIndex = 0;
         public string NpcUniverse = "";
         public string PlanetUniverse = "";
+
+        public string FleetContent = "";
+        public int PirateCfgIndex = 0;
+        public int ExpeditionCfgIndex = 0;
+
         public bool AutoLoginOpen = false;
+        public bool AutoPirateOpen = false;
+        public bool AutoPirateOpen1 = false;
+        public bool AutoExpeditionOpen = false;
+        public bool AutoExpeditionOpen1 = false;
         public bool AutoImperiumOpen = false;
+
+        public string PirateAutoMsg = "";
+        public string PirateAutoMsg1 = "";
+        public string ExpeditionAutoMsg = "";
+        public string ExpeditionAutoMsg1 = "";
 
         public static byte[] ToBytes(OgameData data)
         {

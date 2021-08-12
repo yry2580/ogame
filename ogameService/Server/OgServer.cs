@@ -564,7 +564,7 @@ namespace OgameService
             return false;
         }
 
-        public bool OperAutoPirateOpen(string id, string key, bool open)
+        public bool OperAutoPirateOpen(string id, string key, bool open, int index)
         {
             LogUtil.Warn($"OperAutoPirateOpen {id}");
             try
@@ -580,9 +580,17 @@ namespace OgameService
                 }
 
                 OgameData data = new OgameData();
-                data.Cmd = CmdEnum.AutoPirateOpen;
-                data.AutoPirateOpen = open;
 
+                if (index == 1)
+                {
+                    data.Cmd = CmdEnum.AutoPirateOpen1;
+                    data.AutoPirateOpen1 = open;
+                } else
+                {
+                    data.Cmd = CmdEnum.AutoPirateOpen;
+                    data.AutoPirateOpen = open;
+                }
+                
                 mServer.SendTo(result.MySession, OgameData.ToBytes(data));
                 return true;
             }
@@ -622,7 +630,7 @@ namespace OgameService
             return false;
         }
 
-        public bool OperAutoExpeditionOpen(string id, string key, bool open)
+        public bool OperAutoExpeditionOpen(string id, string key, bool open, int index)
         {
             LogUtil.Warn($"OperAutoExpeditionOpen {id}");
             try
@@ -638,8 +646,16 @@ namespace OgameService
                 }
 
                 OgameData data = new OgameData();
-                data.Cmd = CmdEnum.AutoExpeditionOpen;
-                data.AutoExpeditionOpen = open;
+                if (index == 1)
+                {
+                    data.Cmd = CmdEnum.AutoExpeditionOpen1;
+                    data.AutoExpeditionOpen1 = open;
+                }
+                else
+                {
+                    data.Cmd = CmdEnum.AutoExpeditionOpen;
+                    data.AutoExpeditionOpen = open;
+                }
 
                 mServer.SendTo(result.MySession, OgameData.ToBytes(data));
                 return true;

@@ -48,10 +48,14 @@ namespace feeling
 
         // auto
         public bool IsAutoExpedition = false;
+        public bool IsAutoExpedition1 = false;
         public DateTime LastExeditionTime = DateTime.Now;
+        public DateTime LastExeditionTime1 = DateTime.Now;
 
         public bool IsAutoPirate = false;
+        public bool IsAutoPirate1 = false;
         public DateTime LastPirateTime = DateTime.Now;
+        public DateTime LastPirateTime1 = DateTime.Now;
 
         public bool CanNotify = true;
 
@@ -474,14 +478,14 @@ namespace feeling
             Thread.Sleep(delay);
         }
 
-        internal void StartExpedition(ExMission exMission, bool autoLogin = false)
+        internal void StartExpedition(ExMission exMission, int index = 0, bool autoLogin = false)
         {
             SwitchStatus(OperStatus.Expedition);
             IsExpeditionWorking = true;
             OperTipsEvent.Invoke(OperStatus.Expedition, $"开始探险");
             Task.Run(() =>
             {
-                DoExpedition(exMission, autoLogin);
+                DoExpedition(exMission, index, autoLogin);
             });
         }
 
@@ -523,7 +527,7 @@ namespace feeling
             IsExpeditionWorking = false;
         }
 
-        protected async void DoExpedition(ExMission exMission, bool autoLogin = false)
+        protected async void DoExpedition(ExMission exMission, int cfgIndex = 0, bool autoLogin = false)
         {
             int index = 0;
             int _count = 0;
@@ -552,8 +556,8 @@ namespace feeling
                 if (exMission.List.Count <= 0)
                 {
                     OperTipsEvent.Invoke(OperStatus.Expedition, $"没有探险任务");
-                
-                    LastExeditionTime = DateTime.Now;
+
+                    SetLastExpeditionTime(cfgIndex);
                     IsExpeditionWorking = false;
                     SwitchStatus(OperStatus.None);
                     return;
@@ -571,7 +575,7 @@ namespace feeling
                         if (!HtmlUtil.IsInGame(source))
                         {
                             OperTipsEvent.Invoke(OperStatus.Expedition, $"探险结束，没有登录");
-                            LastExeditionTime = DateTime.Now;
+                            SetLastExpeditionTime(cfgIndex);
                             IsExpeditionWorking = false;
                             SwitchStatus(OperStatus.None);
                             return;
@@ -581,7 +585,7 @@ namespace feeling
                 else
                 {
                     OperTipsEvent.Invoke(OperStatus.Expedition, $"探险结束，没有登录");
-                    LastExeditionTime = DateTime.Now;
+                    SetLastExpeditionTime(cfgIndex);
                     IsExpeditionWorking = false;
                     SwitchStatus(OperStatus.None);
                     return;
@@ -759,7 +763,8 @@ namespace feeling
             // 如果存在派遣成功的
             if (_count >= 0 || success)
             {
-                LastExeditionTime = DateTime.Now;
+                SetLastExpeditionTime(cfgIndex);
+
                 if (IsExpeditionWorking && autoLogin)
                 {
                     autoLogout = CanAutoLogout();
@@ -778,6 +783,19 @@ namespace feeling
                 SwitchStatus(OperStatus.None);
             }
         }
+
+        private void SetLastExpeditionTime(int index)
+        { 
+            if (index == 1)
+            {
+                LastExeditionTime1 = DateTime.Now;
+            }
+            else
+            {
+                LastExeditionTime = DateTime.Now;
+            }
+        }
+
         #endregion
 
         #region npc 海盗
@@ -828,14 +846,14 @@ namespace feeling
             SwitchStatus(OperStatus.None);
         }
 
-        internal void StartPirate(PirateMission pMission, bool isAuto = false, bool autoLogin = false)
+        internal void StartPirate(PirateMission pMission, int cfgIndex = 0, bool autoLogin = false)
         {
             SwitchStatus(OperStatus.Pirate);
             IsPirateWorking = true;
 
             Task.Run(() =>
             {
-                DoPirate(pMission, isAuto, autoLogin);
+                DoPirate(pMission, cfgIndex, autoLogin);
             });
         }
 
@@ -845,7 +863,7 @@ namespace feeling
             IsPirateWorking = false;
         }
 
-        protected async void DoPirate(PirateMission pMission, bool isAuto = false, bool autoLogin = false)
+        protected async void DoPirate(PirateMission pMission, int cfgIndex = 0, bool autoLogin = false)
         {
             int index = 0;
             int _count = 0;
@@ -873,7 +891,7 @@ namespace feeling
                 if (pMission.MissionCount <= 0)
                 {
                     OperTipsEvent.Invoke(OperStatus.Pirate, $"没有海盗任务");
-                    LastPirateTime = DateTime.Now;
+                    SetLastPirateTime(cfgIndex);
                     IsPirateWorking = false;
                     SwitchStatus(OperStatus.None);
                     return;
@@ -892,7 +910,7 @@ namespace feeling
                         if (!HtmlUtil.IsInGame(source))
                         {
                             OperTipsEvent.Invoke(OperStatus.Expedition, $"海盗结束，没有登录");
-                            LastExeditionTime = DateTime.Now;
+                            SetLastPirateTime(cfgIndex);
                             IsExpeditionWorking = false;
                             SwitchStatus(OperStatus.None);
                             return;
@@ -901,7 +919,7 @@ namespace feeling
                 }  else
                 {
                     OperTipsEvent.Invoke(OperStatus.Expedition, $"海盗结束，没有登录");
-                    LastExeditionTime = DateTime.Now;
+                    SetLastPirateTime(cfgIndex);
                     IsExpeditionWorking = false;
                     SwitchStatus(OperStatus.None);
                     return;
@@ -914,7 +932,7 @@ namespace feeling
                     NativeLog.Info($"PirateMission index{index}");
                     if (index >= pMission.MissionCount)
                     {
-                        if (!IsAutoPirate && CanNotify)
+                        if (!autoLogin && CanNotify)
                         {
                             MessageBox.Show($"海盗任务派出结束，请检测是否成功{_count}/{pMission.MissionCount}");
                         }
@@ -992,7 +1010,7 @@ namespace feeling
 
                     if (fq.Count >= fq.MaxCount)
                     {
-                        if (!IsAutoPirate && CanNotify)
+                        if (!autoLogin && CanNotify)
                         {
                             MessageBox.Show("航道已满");
                         }
@@ -1100,11 +1118,11 @@ namespace feeling
             // 如果存在派遣成功的
             if (_count >= 0 || success)
             {
-                LastPirateTime = DateTime.Now;
+                SetLastPirateTime(cfgIndex);
 
                 if (IsPirateWorking && autoLogin)
                 {
-                    checkNpc = CheckRefreshNpc(pMission);
+                    // checkNpc = CheckRefreshNpc(pMission);
                     autoLogout = CanAutoLogout();
                 }
             }
@@ -1127,6 +1145,18 @@ namespace feeling
                 SwitchStatus(OperStatus.System);
                 await LogoutAsync();
                 SwitchStatus(OperStatus.None);
+            }
+        }
+
+        private void SetLastPirateTime(int index = 0)
+        {
+            if (index == 1)
+            {
+                LastPirateTime1 = DateTime.Now;
+            }
+            else
+            {
+                LastPirateTime = DateTime.Now;
             }
         }
 
@@ -1434,12 +1464,30 @@ namespace feeling
                 min = val;
             }
 
+            if (IsAutoExpedition1)
+            {
+                hasAuto = true;
+                delta = now - LastExeditionTime1;
+                val = 120 - delta.TotalMinutes;
+                val = val < 0 ? 0 : val;
+                min = val;
+            }
+
             var pMissionCfg = PirateUtil.MyMission;
             if (IsAutoPirate && null != pMissionCfg)
             {
                 hasAuto = true;
                 delta = now - LastPirateTime;
                 val = pMissionCfg.Interval - delta.TotalMinutes;
+                val = val < 0 ? 0 : val;
+            }
+
+            var pMissionCfg1 = PirateUtil.MyMission1;
+            if (IsAutoPirate1 && null != pMissionCfg1)
+            {
+                hasAuto = true;
+                delta = now - LastPirateTime1;
+                val = pMissionCfg1.Interval - delta.TotalMinutes;
                 val = val < 0 ? 0 : val;
             }
 

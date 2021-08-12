@@ -33,6 +33,8 @@ namespace feeling
             this.w_split_container = new System.Windows.Forms.SplitContainer();
             this.w_tab = new System.Windows.Forms.TabControl();
             this.tab_tanxian = new System.Windows.Forms.TabPage();
+            this.cbox_tx_auto1 = new System.Windows.Forms.CheckBox();
+            this.cbox_ex_cfg_cross = new System.Windows.Forms.CheckBox();
             this.rbtn_ex_cfg1 = new System.Windows.Forms.RadioButton();
             this.rbtn_ex_cfg0 = new System.Windows.Forms.RadioButton();
             this.btn_tx_planet = new System.Windows.Forms.Button();
@@ -68,12 +70,17 @@ namespace feeling
             this.tx0_ship0_cb = new System.Windows.Forms.ComboBox();
             this.tx0_ship0 = new System.Windows.Forms.TextBox();
             this.tab_haidao = new System.Windows.Forms.TabPage();
+            this.cbox_hd_cfg_cross = new System.Windows.Forms.CheckBox();
+            this.lb_hd_interval1 = new System.Windows.Forms.Label();
+            this.btn_hd_interval1 = new System.Windows.Forms.Button();
+            this.w_hd_inverval1 = new System.Windows.Forms.TextBox();
+            this.label14 = new System.Windows.Forms.Label();
+            this.cbox_hd_auto1 = new System.Windows.Forms.CheckBox();
             this.rbtn_cfg1 = new System.Windows.Forms.RadioButton();
             this.rbtn_cfg0 = new System.Windows.Forms.RadioButton();
             this.btn_hd_stop = new System.Windows.Forms.Button();
             this.w_hd_tips = new System.Windows.Forms.Label();
             this.lb_hd_interval = new System.Windows.Forms.Label();
-            this.label13 = new System.Windows.Forms.Label();
             this.btn_hd_interval = new System.Windows.Forms.Button();
             this.w_hd_inverval = new System.Windows.Forms.TextBox();
             this.label12 = new System.Windows.Forms.Label();
@@ -111,6 +118,10 @@ namespace feeling
             this.label21 = new System.Windows.Forms.Label();
             this.cbox_tz_auto = new System.Windows.Forms.CheckBox();
             this.w_info = new System.Windows.Forms.TabPage();
+            this.lb_tx_info1 = new System.Windows.Forms.Label();
+            this.label22 = new System.Windows.Forms.Label();
+            this.lb_hd_info1 = new System.Windows.Forms.Label();
+            this.label18 = new System.Windows.Forms.Label();
             this.lb_tz_info = new System.Windows.Forms.Label();
             this.label17 = new System.Windows.Forms.Label();
             this.lb_hd_info = new System.Windows.Forms.Label();
@@ -118,6 +129,7 @@ namespace feeling
             this.lb_tx_info = new System.Windows.Forms.Label();
             this.label15 = new System.Windows.Forms.Label();
             this.w_user_box = new System.Windows.Forms.GroupBox();
+            this.cbox_auto_login = new System.Windows.Forms.CheckBox();
             this.btn_universe = new System.Windows.Forms.Button();
             this.btn_cross = new System.Windows.Forms.Button();
             this.w_user_account = new System.Windows.Forms.ComboBox();
@@ -128,7 +140,6 @@ namespace feeling
             this.label5 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.cbox_auto_login = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.w_split_container)).BeginInit();
             this.w_split_container.Panel2.SuspendLayout();
             this.w_split_container.SuspendLayout();
@@ -174,6 +185,8 @@ namespace feeling
             // 
             // tab_tanxian
             // 
+            this.tab_tanxian.Controls.Add(this.cbox_tx_auto1);
+            this.tab_tanxian.Controls.Add(this.cbox_ex_cfg_cross);
             this.tab_tanxian.Controls.Add(this.rbtn_ex_cfg1);
             this.tab_tanxian.Controls.Add(this.rbtn_ex_cfg0);
             this.tab_tanxian.Controls.Add(this.btn_tx_planet);
@@ -216,27 +229,51 @@ namespace feeling
             this.tab_tanxian.Text = "探险";
             this.tab_tanxian.UseVisualStyleBackColor = true;
             // 
+            // cbox_tx_auto1
+            // 
+            this.cbox_tx_auto1.AutoSize = true;
+            this.cbox_tx_auto1.Location = new System.Drawing.Point(241, 128);
+            this.cbox_tx_auto1.Name = "cbox_tx_auto1";
+            this.cbox_tx_auto1.Size = new System.Drawing.Size(54, 16);
+            this.cbox_tx_auto1.TabIndex = 61;
+            this.cbox_tx_auto1.Text = "自动2";
+            this.cbox_tx_auto1.UseVisualStyleBackColor = true;
+            this.cbox_tx_auto1.CheckedChanged += new System.EventHandler(this.cbox_tx_auto1_CheckedChanged);
+            // 
+            // cbox_ex_cfg_cross
+            // 
+            this.cbox_ex_cfg_cross.AutoSize = true;
+            this.cbox_ex_cfg_cross.Enabled = false;
+            this.cbox_ex_cfg_cross.Location = new System.Drawing.Point(9, 50);
+            this.cbox_ex_cfg_cross.Name = "cbox_ex_cfg_cross";
+            this.cbox_ex_cfg_cross.Size = new System.Drawing.Size(48, 16);
+            this.cbox_ex_cfg_cross.TabIndex = 60;
+            this.cbox_ex_cfg_cross.Text = "多维";
+            this.cbox_ex_cfg_cross.UseVisualStyleBackColor = true;
+            // 
             // rbtn_ex_cfg1
             // 
             this.rbtn_ex_cfg1.AutoSize = true;
-            this.rbtn_ex_cfg1.Location = new System.Drawing.Point(8, 38);
+            this.rbtn_ex_cfg1.Location = new System.Drawing.Point(8, 29);
             this.rbtn_ex_cfg1.Name = "rbtn_ex_cfg1";
             this.rbtn_ex_cfg1.Size = new System.Drawing.Size(53, 16);
             this.rbtn_ex_cfg1.TabIndex = 59;
             this.rbtn_ex_cfg1.Text = "配置2";
             this.rbtn_ex_cfg1.UseVisualStyleBackColor = true;
+            this.rbtn_ex_cfg1.CheckedChanged += new System.EventHandler(this.rbtn_ex_cfg_CheckedChanged);
             // 
             // rbtn_ex_cfg0
             // 
             this.rbtn_ex_cfg0.AutoSize = true;
             this.rbtn_ex_cfg0.Checked = true;
-            this.rbtn_ex_cfg0.Location = new System.Drawing.Point(8, 13);
+            this.rbtn_ex_cfg0.Location = new System.Drawing.Point(8, 7);
             this.rbtn_ex_cfg0.Name = "rbtn_ex_cfg0";
             this.rbtn_ex_cfg0.Size = new System.Drawing.Size(53, 16);
             this.rbtn_ex_cfg0.TabIndex = 58;
             this.rbtn_ex_cfg0.TabStop = true;
             this.rbtn_ex_cfg0.Text = "配置1";
             this.rbtn_ex_cfg0.UseVisualStyleBackColor = true;
+            this.rbtn_ex_cfg0.CheckedChanged += new System.EventHandler(this.rbtn_ex_cfg_CheckedChanged);
             // 
             // btn_tx_planet
             // 
@@ -282,15 +319,15 @@ namespace feeling
             this.cbox_tx_auto.AutoSize = true;
             this.cbox_tx_auto.Location = new System.Drawing.Point(181, 128);
             this.cbox_tx_auto.Name = "cbox_tx_auto";
-            this.cbox_tx_auto.Size = new System.Drawing.Size(114, 16);
+            this.cbox_tx_auto.Size = new System.Drawing.Size(54, 16);
             this.cbox_tx_auto.TabIndex = 45;
-            this.cbox_tx_auto.Text = "自动(间隔2小时)";
+            this.cbox_tx_auto.Text = "自动1";
             this.cbox_tx_auto.UseVisualStyleBackColor = true;
-            this.cbox_tx_auto.CheckedChanged += new System.EventHandler(this.xbox_auto_CheckedChanged);
+            this.cbox_tx_auto.CheckedChanged += new System.EventHandler(this.cbox_tx_auto_CheckedChanged);
             // 
             // btn_tx_revert
             // 
-            this.btn_tx_revert.Location = new System.Drawing.Point(8, 66);
+            this.btn_tx_revert.Location = new System.Drawing.Point(8, 71);
             this.btn_tx_revert.Name = "btn_tx_revert";
             this.btn_tx_revert.Size = new System.Drawing.Size(50, 22);
             this.btn_tx_revert.TabIndex = 44;
@@ -300,7 +337,7 @@ namespace feeling
             // 
             // btn_tx_save
             // 
-            this.btn_tx_save.Location = new System.Drawing.Point(8, 94);
+            this.btn_tx_save.Location = new System.Drawing.Point(8, 98);
             this.btn_tx_save.Name = "btn_tx_save";
             this.btn_tx_save.Size = new System.Drawing.Size(50, 22);
             this.btn_tx_save.TabIndex = 43;
@@ -544,12 +581,17 @@ namespace feeling
             // 
             // tab_haidao
             // 
+            this.tab_haidao.Controls.Add(this.cbox_hd_cfg_cross);
+            this.tab_haidao.Controls.Add(this.lb_hd_interval1);
+            this.tab_haidao.Controls.Add(this.btn_hd_interval1);
+            this.tab_haidao.Controls.Add(this.w_hd_inverval1);
+            this.tab_haidao.Controls.Add(this.label14);
+            this.tab_haidao.Controls.Add(this.cbox_hd_auto1);
             this.tab_haidao.Controls.Add(this.rbtn_cfg1);
             this.tab_haidao.Controls.Add(this.rbtn_cfg0);
             this.tab_haidao.Controls.Add(this.btn_hd_stop);
             this.tab_haidao.Controls.Add(this.w_hd_tips);
             this.tab_haidao.Controls.Add(this.lb_hd_interval);
-            this.tab_haidao.Controls.Add(this.label13);
             this.tab_haidao.Controls.Add(this.btn_hd_interval);
             this.tab_haidao.Controls.Add(this.w_hd_inverval);
             this.tab_haidao.Controls.Add(this.label12);
@@ -572,33 +614,93 @@ namespace feeling
             this.tab_haidao.Text = "海盗";
             this.tab_haidao.UseVisualStyleBackColor = true;
             // 
+            // cbox_hd_cfg_cross
+            // 
+            this.cbox_hd_cfg_cross.AutoSize = true;
+            this.cbox_hd_cfg_cross.Enabled = false;
+            this.cbox_hd_cfg_cross.Location = new System.Drawing.Point(173, 35);
+            this.cbox_hd_cfg_cross.Name = "cbox_hd_cfg_cross";
+            this.cbox_hd_cfg_cross.Size = new System.Drawing.Size(48, 16);
+            this.cbox_hd_cfg_cross.TabIndex = 64;
+            this.cbox_hd_cfg_cross.Text = "多维";
+            this.cbox_hd_cfg_cross.UseVisualStyleBackColor = true;
+            // 
+            // lb_hd_interval1
+            // 
+            this.lb_hd_interval1.AutoSize = true;
+            this.lb_hd_interval1.Location = new System.Drawing.Point(72, 102);
+            this.lb_hd_interval1.Name = "lb_hd_interval1";
+            this.lb_hd_interval1.Size = new System.Drawing.Size(23, 12);
+            this.lb_hd_interval1.TabIndex = 63;
+            this.lb_hd_interval1.Text = "120";
+            // 
+            // btn_hd_interval1
+            // 
+            this.btn_hd_interval1.Location = new System.Drawing.Point(109, 98);
+            this.btn_hd_interval1.Name = "btn_hd_interval1";
+            this.btn_hd_interval1.Size = new System.Drawing.Size(50, 22);
+            this.btn_hd_interval1.TabIndex = 62;
+            this.btn_hd_interval1.Text = "设置";
+            this.btn_hd_interval1.UseVisualStyleBackColor = true;
+            this.btn_hd_interval1.Click += new System.EventHandler(this.btn_hd_interval1_Click);
+            // 
+            // w_hd_inverval1
+            // 
+            this.w_hd_inverval1.Location = new System.Drawing.Point(165, 99);
+            this.w_hd_inverval1.Name = "w_hd_inverval1";
+            this.w_hd_inverval1.Size = new System.Drawing.Size(62, 21);
+            this.w_hd_inverval1.TabIndex = 61;
+            this.w_hd_inverval1.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.w_count_KeyPress);
+            // 
+            // label14
+            // 
+            this.label14.AutoSize = true;
+            this.label14.Location = new System.Drawing.Point(6, 102);
+            this.label14.Name = "label14";
+            this.label14.Size = new System.Drawing.Size(71, 12);
+            this.label14.TabIndex = 60;
+            this.label14.Text = "自动2间隔：";
+            // 
+            // cbox_hd_auto1
+            // 
+            this.cbox_hd_auto1.AutoSize = true;
+            this.cbox_hd_auto1.Location = new System.Drawing.Point(85, 59);
+            this.cbox_hd_auto1.Name = "cbox_hd_auto1";
+            this.cbox_hd_auto1.Size = new System.Drawing.Size(54, 16);
+            this.cbox_hd_auto1.TabIndex = 59;
+            this.cbox_hd_auto1.Text = "自动2";
+            this.cbox_hd_auto1.UseVisualStyleBackColor = true;
+            this.cbox_hd_auto1.CheckedChanged += new System.EventHandler(this.cbox_hd_auto1_CheckedChanged);
+            // 
             // rbtn_cfg1
             // 
             this.rbtn_cfg1.AutoSize = true;
-            this.rbtn_cfg1.Location = new System.Drawing.Point(177, 7);
+            this.rbtn_cfg1.Location = new System.Drawing.Point(173, 8);
             this.rbtn_cfg1.Name = "rbtn_cfg1";
             this.rbtn_cfg1.Size = new System.Drawing.Size(53, 16);
             this.rbtn_cfg1.TabIndex = 57;
             this.rbtn_cfg1.Text = "配置2";
             this.rbtn_cfg1.UseVisualStyleBackColor = true;
+            this.rbtn_cfg1.CheckedChanged += new System.EventHandler(this.rbtn_cfg_CheckedChanged);
             // 
             // rbtn_cfg0
             // 
             this.rbtn_cfg0.AutoSize = true;
             this.rbtn_cfg0.Checked = true;
-            this.rbtn_cfg0.Location = new System.Drawing.Point(127, 7);
+            this.rbtn_cfg0.Location = new System.Drawing.Point(117, 8);
             this.rbtn_cfg0.Name = "rbtn_cfg0";
             this.rbtn_cfg0.Size = new System.Drawing.Size(53, 16);
             this.rbtn_cfg0.TabIndex = 56;
             this.rbtn_cfg0.TabStop = true;
             this.rbtn_cfg0.Text = "配置1";
             this.rbtn_cfg0.UseVisualStyleBackColor = true;
+            this.rbtn_cfg0.CheckedChanged += new System.EventHandler(this.rbtn_cfg_CheckedChanged);
             // 
             // btn_hd_stop
             // 
-            this.btn_hd_stop.Location = new System.Drawing.Point(66, 35);
+            this.btn_hd_stop.Location = new System.Drawing.Point(53, 31);
             this.btn_hd_stop.Name = "btn_hd_stop";
-            this.btn_hd_stop.Size = new System.Drawing.Size(60, 22);
+            this.btn_hd_stop.Size = new System.Drawing.Size(50, 22);
             this.btn_hd_stop.TabIndex = 55;
             this.btn_hd_stop.Text = "停止";
             this.btn_hd_stop.UseVisualStyleBackColor = true;
@@ -614,26 +716,17 @@ namespace feeling
             // lb_hd_interval
             // 
             this.lb_hd_interval.AutoSize = true;
-            this.lb_hd_interval.Location = new System.Drawing.Point(155, 78);
+            this.lb_hd_interval.Location = new System.Drawing.Point(72, 80);
             this.lb_hd_interval.Name = "lb_hd_interval";
             this.lb_hd_interval.Size = new System.Drawing.Size(23, 12);
             this.lb_hd_interval.TabIndex = 53;
             this.lb_hd_interval.Text = "120";
             // 
-            // label13
-            // 
-            this.label13.AutoSize = true;
-            this.label13.Location = new System.Drawing.Point(72, 78);
-            this.label13.Name = "label13";
-            this.label13.Size = new System.Drawing.Size(77, 12);
-            this.label13.TabIndex = 52;
-            this.label13.Text = "间隔（分）：";
-            // 
             // btn_hd_interval
             // 
-            this.btn_hd_interval.Location = new System.Drawing.Point(155, 95);
+            this.btn_hd_interval.Location = new System.Drawing.Point(109, 76);
             this.btn_hd_interval.Name = "btn_hd_interval";
-            this.btn_hd_interval.Size = new System.Drawing.Size(60, 22);
+            this.btn_hd_interval.Size = new System.Drawing.Size(50, 22);
             this.btn_hd_interval.TabIndex = 51;
             this.btn_hd_interval.Text = "设置";
             this.btn_hd_interval.UseVisualStyleBackColor = true;
@@ -641,20 +734,20 @@ namespace feeling
             // 
             // w_hd_inverval
             // 
-            this.w_hd_inverval.Location = new System.Drawing.Point(77, 96);
+            this.w_hd_inverval.Location = new System.Drawing.Point(165, 77);
             this.w_hd_inverval.Name = "w_hd_inverval";
-            this.w_hd_inverval.Size = new System.Drawing.Size(72, 21);
+            this.w_hd_inverval.Size = new System.Drawing.Size(62, 21);
             this.w_hd_inverval.TabIndex = 50;
             this.w_hd_inverval.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.w_count_KeyPress);
             // 
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(6, 99);
+            this.label12.Location = new System.Drawing.Point(6, 80);
             this.label12.Name = "label12";
-            this.label12.Size = new System.Drawing.Size(65, 12);
+            this.label12.Size = new System.Drawing.Size(71, 12);
             this.label12.TabIndex = 49;
-            this.label12.Text = "设置间隔：";
+            this.label12.Text = "自动1间隔：";
             // 
             // label11
             // 
@@ -670,28 +763,28 @@ namespace feeling
             // 
             this.btn_hd_refresh.Location = new System.Drawing.Point(0, 4);
             this.btn_hd_refresh.Name = "btn_hd_refresh";
-            this.btn_hd_refresh.Size = new System.Drawing.Size(60, 22);
+            this.btn_hd_refresh.Size = new System.Drawing.Size(50, 22);
             this.btn_hd_refresh.TabIndex = 47;
-            this.btn_hd_refresh.Text = "刷NPC";
+            this.btn_hd_refresh.Text = "刷球";
             this.btn_hd_refresh.UseVisualStyleBackColor = true;
             this.btn_hd_refresh.Click += new System.EventHandler(this.btn_hd_refresh_Click);
             // 
             // cbox_hd_auto
             // 
             this.cbox_hd_auto.AutoSize = true;
-            this.cbox_hd_auto.Location = new System.Drawing.Point(8, 77);
+            this.cbox_hd_auto.Location = new System.Drawing.Point(8, 60);
             this.cbox_hd_auto.Name = "cbox_hd_auto";
-            this.cbox_hd_auto.Size = new System.Drawing.Size(48, 16);
+            this.cbox_hd_auto.Size = new System.Drawing.Size(54, 16);
             this.cbox_hd_auto.TabIndex = 46;
-            this.cbox_hd_auto.Text = "自动";
+            this.cbox_hd_auto.Text = "自动1";
             this.cbox_hd_auto.UseVisualStyleBackColor = true;
             this.cbox_hd_auto.CheckedChanged += new System.EventHandler(this.cbox_hd_auto_CheckedChanged);
             // 
             // btn_hd_revert
             // 
-            this.btn_hd_revert.Location = new System.Drawing.Point(66, 4);
+            this.btn_hd_revert.Location = new System.Drawing.Point(53, 4);
             this.btn_hd_revert.Name = "btn_hd_revert";
-            this.btn_hd_revert.Size = new System.Drawing.Size(60, 22);
+            this.btn_hd_revert.Size = new System.Drawing.Size(50, 22);
             this.btn_hd_revert.TabIndex = 12;
             this.btn_hd_revert.Text = "读配置";
             this.btn_hd_revert.UseVisualStyleBackColor = true;
@@ -699,9 +792,9 @@ namespace feeling
             // 
             // btn_hd_save
             // 
-            this.btn_hd_save.Location = new System.Drawing.Point(132, 35);
+            this.btn_hd_save.Location = new System.Drawing.Point(106, 31);
             this.btn_hd_save.Name = "btn_hd_save";
-            this.btn_hd_save.Size = new System.Drawing.Size(60, 22);
+            this.btn_hd_save.Size = new System.Drawing.Size(50, 22);
             this.btn_hd_save.TabIndex = 11;
             this.btn_hd_save.Text = "保存";
             this.btn_hd_save.UseVisualStyleBackColor = true;
@@ -709,9 +802,9 @@ namespace feeling
             // 
             // btn_hd_start
             // 
-            this.btn_hd_start.Location = new System.Drawing.Point(0, 35);
+            this.btn_hd_start.Location = new System.Drawing.Point(0, 31);
             this.btn_hd_start.Name = "btn_hd_start";
-            this.btn_hd_start.Size = new System.Drawing.Size(60, 22);
+            this.btn_hd_start.Size = new System.Drawing.Size(50, 22);
             this.btn_hd_start.TabIndex = 10;
             this.btn_hd_start.Text = "开始";
             this.btn_hd_start.UseVisualStyleBackColor = true;
@@ -1014,6 +1107,10 @@ namespace feeling
             // 
             // w_info
             // 
+            this.w_info.Controls.Add(this.lb_tx_info1);
+            this.w_info.Controls.Add(this.label22);
+            this.w_info.Controls.Add(this.lb_hd_info1);
+            this.w_info.Controls.Add(this.label18);
             this.w_info.Controls.Add(this.lb_tz_info);
             this.w_info.Controls.Add(this.label17);
             this.w_info.Controls.Add(this.lb_hd_info);
@@ -1028,10 +1125,48 @@ namespace feeling
             this.w_info.Text = "信息";
             this.w_info.UseVisualStyleBackColor = true;
             // 
+            // lb_tx_info1
+            // 
+            this.lb_tx_info1.AutoSize = true;
+            this.lb_tx_info1.Location = new System.Drawing.Point(77, 30);
+            this.lb_tx_info1.Name = "lb_tx_info1";
+            this.lb_tx_info1.Size = new System.Drawing.Size(17, 12);
+            this.lb_tx_info1.TabIndex = 64;
+            this.lb_tx_info1.Text = "无";
+            // 
+            // label22
+            // 
+            this.label22.AutoSize = true;
+            this.label22.ForeColor = System.Drawing.Color.Red;
+            this.label22.Location = new System.Drawing.Point(6, 30);
+            this.label22.Name = "label22";
+            this.label22.Size = new System.Drawing.Size(71, 12);
+            this.label22.TabIndex = 63;
+            this.label22.Text = "自动探险2：";
+            // 
+            // lb_hd_info1
+            // 
+            this.lb_hd_info1.AutoSize = true;
+            this.lb_hd_info1.Location = new System.Drawing.Point(77, 71);
+            this.lb_hd_info1.Name = "lb_hd_info1";
+            this.lb_hd_info1.Size = new System.Drawing.Size(17, 12);
+            this.lb_hd_info1.TabIndex = 62;
+            this.lb_hd_info1.Text = "无";
+            // 
+            // label18
+            // 
+            this.label18.AutoSize = true;
+            this.label18.ForeColor = System.Drawing.Color.Red;
+            this.label18.Location = new System.Drawing.Point(6, 71);
+            this.label18.Name = "label18";
+            this.label18.Size = new System.Drawing.Size(71, 12);
+            this.label18.TabIndex = 61;
+            this.label18.Text = "自动海盗2：";
+            // 
             // lb_tz_info
             // 
             this.lb_tz_info.AutoSize = true;
-            this.lb_tz_info.Location = new System.Drawing.Point(77, 53);
+            this.lb_tz_info.Location = new System.Drawing.Point(77, 92);
             this.lb_tz_info.Name = "lb_tz_info";
             this.lb_tz_info.Size = new System.Drawing.Size(17, 12);
             this.lb_tz_info.TabIndex = 60;
@@ -1041,7 +1176,7 @@ namespace feeling
             // 
             this.label17.AutoSize = true;
             this.label17.ForeColor = System.Drawing.Color.Red;
-            this.label17.Location = new System.Drawing.Point(6, 53);
+            this.label17.Location = new System.Drawing.Point(6, 92);
             this.label17.Name = "label17";
             this.label17.Size = new System.Drawing.Size(65, 12);
             this.label17.TabIndex = 59;
@@ -1050,7 +1185,7 @@ namespace feeling
             // lb_hd_info
             // 
             this.lb_hd_info.AutoSize = true;
-            this.lb_hd_info.Location = new System.Drawing.Point(77, 32);
+            this.lb_hd_info.Location = new System.Drawing.Point(77, 51);
             this.lb_hd_info.Name = "lb_hd_info";
             this.lb_hd_info.Size = new System.Drawing.Size(17, 12);
             this.lb_hd_info.TabIndex = 58;
@@ -1060,11 +1195,11 @@ namespace feeling
             // 
             this.label16.AutoSize = true;
             this.label16.ForeColor = System.Drawing.Color.Red;
-            this.label16.Location = new System.Drawing.Point(6, 32);
+            this.label16.Location = new System.Drawing.Point(6, 51);
             this.label16.Name = "label16";
-            this.label16.Size = new System.Drawing.Size(65, 12);
+            this.label16.Size = new System.Drawing.Size(71, 12);
             this.label16.TabIndex = 57;
-            this.label16.Text = "自动海盗：";
+            this.label16.Text = "自动海盗1：";
             // 
             // lb_tx_info
             // 
@@ -1081,9 +1216,9 @@ namespace feeling
             this.label15.ForeColor = System.Drawing.Color.Red;
             this.label15.Location = new System.Drawing.Point(6, 11);
             this.label15.Name = "label15";
-            this.label15.Size = new System.Drawing.Size(65, 12);
+            this.label15.Size = new System.Drawing.Size(71, 12);
             this.label15.TabIndex = 55;
-            this.label15.Text = "自动探险：";
+            this.label15.Text = "自动探险1：";
             // 
             // w_user_box
             // 
@@ -1104,6 +1239,17 @@ namespace feeling
             this.w_user_box.TabIndex = 1;
             this.w_user_box.TabStop = false;
             this.w_user_box.Text = "用户";
+            // 
+            // cbox_auto_login
+            // 
+            this.cbox_auto_login.AutoSize = true;
+            this.cbox_auto_login.Location = new System.Drawing.Point(8, 101);
+            this.cbox_auto_login.Name = "cbox_auto_login";
+            this.cbox_auto_login.Size = new System.Drawing.Size(180, 16);
+            this.cbox_auto_login.TabIndex = 46;
+            this.cbox_auto_login.Text = "自动登录（用于自动海盗等）";
+            this.cbox_auto_login.UseVisualStyleBackColor = true;
+            this.cbox_auto_login.CheckedChanged += new System.EventHandler(this.cbox_auto_login_CheckedChanged);
             // 
             // btn_universe
             // 
@@ -1200,17 +1346,6 @@ namespace feeling
             this.label1.Size = new System.Drawing.Size(41, 12);
             this.label1.TabIndex = 10;
             this.label1.Text = "账 号:";
-            // 
-            // cbox_auto_login
-            // 
-            this.cbox_auto_login.AutoSize = true;
-            this.cbox_auto_login.Location = new System.Drawing.Point(8, 101);
-            this.cbox_auto_login.Name = "cbox_auto_login";
-            this.cbox_auto_login.Size = new System.Drawing.Size(180, 16);
-            this.cbox_auto_login.TabIndex = 46;
-            this.cbox_auto_login.Text = "自动登录（用于自动海盗等）";
-            this.cbox_auto_login.UseVisualStyleBackColor = true;
-            this.cbox_auto_login.CheckedChanged += new System.EventHandler(this.cbox_auto_login_CheckedChanged);
             // 
             // MainForm
             // 
@@ -1315,7 +1450,6 @@ namespace feeling
         private System.Windows.Forms.Label label12;
         private System.Windows.Forms.TextBox w_hd_inverval;
         private System.Windows.Forms.Button btn_hd_interval;
-        private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label lb_hd_interval;
         private System.Windows.Forms.Label w_hd_tips;
         private System.Windows.Forms.Button btn_tx_stop;
@@ -1346,5 +1480,17 @@ namespace feeling
         private System.Windows.Forms.RadioButton rbtn_ex_cfg1;
         private System.Windows.Forms.RadioButton rbtn_ex_cfg0;
         private System.Windows.Forms.CheckBox cbox_auto_login;
+        private System.Windows.Forms.Label lb_hd_interval1;
+        private System.Windows.Forms.Button btn_hd_interval1;
+        private System.Windows.Forms.TextBox w_hd_inverval1;
+        private System.Windows.Forms.Label label14;
+        private System.Windows.Forms.CheckBox cbox_hd_auto1;
+        private System.Windows.Forms.Label lb_hd_info1;
+        private System.Windows.Forms.Label label18;
+        private System.Windows.Forms.CheckBox cbox_hd_cfg_cross;
+        private System.Windows.Forms.CheckBox cbox_ex_cfg_cross;
+        private System.Windows.Forms.CheckBox cbox_tx_auto1;
+        private System.Windows.Forms.Label lb_tx_info1;
+        private System.Windows.Forms.Label label22;
     }
 }

@@ -37,6 +37,8 @@ namespace OgameService
         ExpeditionCfg,
         AutoLoginOpen,
         AutoImperiumOpen,
+        AutoPirateOpen1,
+        AutoExpeditionOpen1,
     }
 
     public enum StatusEnum
