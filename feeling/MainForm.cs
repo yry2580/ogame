@@ -1143,6 +1143,8 @@ namespace feeling
                 return;
             }
 
+            label.Text = $"{DateTime.Now:G}|自动探险{index + 1}开始";
+
             mIsBusy = true;
             NativeController.Instance.CanNotify = false;
 
@@ -1331,6 +1333,8 @@ namespace feeling
                 label.Text = $"{DateTime.Now:G}|其他操作正忙";
                 return;
             }
+
+            label.Text = $"{DateTime.Now:G}|自动海盗{index + 1}开始";
 
             mIsBusy = true;
             var autoLogin = NativeController.User.AutoLogin;
