@@ -618,7 +618,7 @@ namespace feeling
         private void onHeartbeat()
         {
             Invoke(new Action(() => {
-                SendData(CmdEnum.Hello);
+                SendData(CmdEnum.Hello.ToString());
             }));
         }
 
@@ -723,17 +723,27 @@ namespace feeling
             }
             catch (Exception ex)
             {
-                LogUtil.Error($"feeling OnServerReceived catch {ex.Message}");
+                NativeLog.Error($"feeling OnServerReceived catch {ex.Message}");
             }
 
             SendData();
         }
 #endif
 
-
-        private void SendData(CmdEnum cmd = CmdEnum.Data)
+        private void SendData(string cmd = "Data")
         {
 #if !NET45
+            CmdEnum cmdEnum;
+
+            try
+            {
+                cmdEnum = (CmdEnum)Enum.Parse(typeof(CmdEnum), cmd);
+            }
+            catch(Exception)
+            {
+                cmdEnum = CmdEnum.Data;
+            }
+
             var operStatus = (int)NativeController.Instance.MyOperStatus;
             var status = (StatusEnum)operStatus;
 
@@ -768,7 +778,7 @@ namespace feeling
 
             var gameData = new OgameData
             {
-                Cmd = cmd,
+                Cmd = cmdEnum,
                 Status = status,
                 Content = mLastContent,
                 Universe = universe,
@@ -796,10 +806,12 @@ namespace feeling
 #endif
         }
 
+#if !NET45
         private void OnServerConnected()
         {
-            SendData(CmdEnum.Auth);
+            SendData(CmdEnum.Auth.ToString());
         }
+#endif
 
         private void btn_galaxy_open_Click(object sender, EventArgs e)
         {
@@ -878,9 +890,7 @@ namespace feeling
             }
             catch(Exception ex)
             {
-#if !NET45
-                LogUtil.Error($"TryLogin catch {ex.Message}");
-#endif
+                NativeLog.Error($"TryLogin catch {ex.Message}");
             }
 
             SetUserButton(true);
@@ -908,9 +918,7 @@ namespace feeling
             }
             catch (Exception ex)
             {
-#if !NET45
-                LogUtil.Error($"TryGetAuth catch {ex.Message}");
-#endif
+                NativeLog.Error($"TryGetAuth catch {ex.Message}");
             }
 
             SetUserButton(true);
@@ -931,9 +939,7 @@ namespace feeling
             }
             catch (Exception ex)
             {
-#if !NET45
-                LogUtil.Error($"TryAuthCode catch {ex.Message}");
-#endif
+                NativeLog.Error($"TryAuthCode catch {ex.Message}");
             }
 
             SetUserButton(true);
@@ -959,9 +965,7 @@ namespace feeling
             }
             catch(Exception ex)
             {
-#if !NET45
-                LogUtil.Error($"TryLogout catch {ex.Message}");
-#endif
+                NativeLog.Error($"TryLogout catch {ex.Message}");
             }
             SetUserButton(true);
             NativeController.Instance.SwitchStatus(OperStatus.None);
@@ -1582,9 +1586,7 @@ namespace feeling
             }
             catch (Exception ex)
             {
-#if !NET45
-                LogUtil.Error($"doImperium catch {ex.Message}");
-#endif
+                NativeLog.Error($"doImperium catch {ex.Message}");
             }
 
             NativeController.Instance.SwitchStatus(OperStatus.None);
@@ -1625,9 +1627,7 @@ namespace feeling
             }
             catch (Exception ex)
             {
-#if !NET45
-                LogUtil.Error($"SetAutoPirateOpen catch {ex.Message}");
-#endif
+                NativeLog.Error($"SetAutoPirateOpen catch {ex.Message}");
             }
 
             NativeController.Instance.SwitchStatus(OperStatus.None);
@@ -1657,9 +1657,7 @@ namespace feeling
             }
             catch (Exception ex)
             {
-#if !NET45
-                LogUtil.Error($"SetAutoPirateOpen1 catch {ex.Message}");
-#endif
+                NativeLog.Error($"SetAutoPirateOpen1 catch {ex.Message}");
             }
 
             NativeController.Instance.SwitchStatus(OperStatus.None);
@@ -1702,9 +1700,7 @@ namespace feeling
             }
             catch (Exception ex)
             {
-#if !NET45
-                LogUtil.Error($"SetPirateCfg catch {ex.Message}");
-#endif
+                NativeLog.Error($"SetPirateCfg catch {ex.Message}");
             }
 
             NativeController.Instance.SwitchStatus(OperStatus.None);
@@ -1733,9 +1729,7 @@ namespace feeling
             }
             catch (Exception ex)
             {
-#if !NET45
-                LogUtil.Error($"SetAutoPirateOpen catch {ex.Message}");
-#endif
+                NativeLog.Error($"SetAutoPirateOpen catch {ex.Message}");
             }
 
             NativeController.Instance.SwitchStatus(OperStatus.None);
@@ -1764,9 +1758,7 @@ namespace feeling
             }
             catch (Exception ex)
             {
-#if !NET45
-                LogUtil.Error($"SetAutoExpeditionOpen1 catch {ex.Message}");
-#endif
+                NativeLog.Error($"SetAutoExpeditionOpen1 catch {ex.Message}");
             }
 
             NativeController.Instance.SwitchStatus(OperStatus.None);
@@ -1809,9 +1801,7 @@ namespace feeling
             }
             catch (Exception ex)
             {
-#if !NET45
-                LogUtil.Error($"SetExpeditionCfg catch {ex.Message}");
-#endif
+                NativeLog.Error($"SetExpeditionCfg catch {ex.Message}");
             }
 
             NativeController.Instance.SwitchStatus(OperStatus.None);
@@ -1840,9 +1830,7 @@ namespace feeling
             }
             catch (Exception ex)
             {
-#if !NET45
-                LogUtil.Error($"GoCross catch {ex.Message}");
-#endif
+                NativeLog.Error($"GoCross catch {ex.Message}");
             }
 
             NativeController.Instance.SwitchStatus(OperStatus.None);
@@ -1871,9 +1859,7 @@ namespace feeling
             }
             catch (Exception ex)
             {
-#if !NET45
-                LogUtil.Error($"BackUniverse catch {ex.Message}");
-#endif
+                NativeLog.Error($"BackUniverse catch {ex.Message}");
             }
 
             NativeController.Instance.SwitchStatus(OperStatus.None);
@@ -1918,9 +1904,7 @@ namespace feeling
             }
             catch (Exception ex)
             {
-#if !NET45
-                LogUtil.Error($"AdjustUniverse catch {ex.Message}");
-#endif
+                NativeLog.Error($"AdjustUniverse catch {ex.Message}");
             }
 
             NativeController.Instance.SwitchStatus(OperStatus.None);
@@ -1949,9 +1933,7 @@ namespace feeling
             }
             catch (Exception ex)
             {
-#if !NET45
-                LogUtil.Error($"SetAutoLoginOpen catch {ex.Message}");
-#endif
+                NativeLog.Error($"SetAutoLoginOpen catch {ex.Message}");
             }
 
             NativeController.Instance.SwitchStatus(OperStatus.None);
@@ -1980,9 +1962,7 @@ namespace feeling
             }
             catch (Exception ex)
             {
-#if !NET45
-                LogUtil.Error($"SetAutoImperiumOpen catch {ex.Message}");
-#endif
+                NativeLog.Error($"SetAutoImperiumOpen catch {ex.Message}");
             }
 
             NativeController.Instance.SwitchStatus(OperStatus.None);

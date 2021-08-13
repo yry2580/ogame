@@ -113,6 +113,7 @@
     <Compile Include="Module\Ship.cs" />
     <Compile Include="Native\NativeConst.cs" />
     <Compile Include="Native\NativeController.cs" />
+    <Compile Include="Native\NativeLog.cs" />
     <Compile Include="Native\NativeScript.cs" />
     <Compile Include="Controls\PirateControl.cs">
       <SubType>UserControl</SubType>
