@@ -2036,7 +2036,6 @@ namespace feeling
                 return;
             }
 
-            NativeController.Instance.SwitchStatus(OperStatus.System);
             var ret = MessageBox.Show($"确定一键所选自动开始吗", "提示", MessageBoxButtons.YesNo);
             if (ret != DialogResult.Yes)
             {
