@@ -23,7 +23,7 @@ namespace feeling
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"XlsxToCsv \n old: {fileName} \n new: {newFileName}) \n catch: {ex.Message}");
+                NativeLog.Error($"XlsxToCsv \n old: {fileName} \n new: {newFileName}) \n catch: {ex.Message}");
                 return false;
             }
         }
@@ -43,7 +43,7 @@ namespace feeling
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"XlsxToCsv \n old: {fileName} \n new: {newFileName}) \n catch: {ex.Message}");
+                NativeLog.Error($"XlsxToCsv \n old: {fileName} \n new: {newFileName}) \n catch: {ex.Message}");
                 return false;
             }
         }

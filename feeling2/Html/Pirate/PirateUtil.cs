@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace feeling
@@ -11,30 +12,59 @@ namespace feeling
     class PirateUtil
     {
         // static string mCfgFile = NativeConst.CurrentDirectory + "pirate_mission.cfg";
-        public static PirateMission MyPirateMission;
+        public static PirateMission MyMission;
+        public static PirateMission MyMission1;
 
         static OgameParser mParser = new OgameParser();
 
         public static List<string> NpcList = new List<string>();
         public static bool HasNpcData => NpcList.Count > 0;
+        public static string Universe = "";
+
+        public static void Initialize()
+        {
+            // 读取配置
+            ReadCfg(0);
+            ReadCfg(1);
+
+            if (null == MyMission)
+            {
+                Save(new PirateMission(), 0);
+            }
+
+            if (null == MyMission1)
+            {
+                Save(new PirateMission(), 1);
+            }
+        }
 
         protected static string GetFilePath(int idx = 0)
         {
             string flag = idx <= 0 ? "" : idx.ToString();
-            return $"{NativeConst.CurrentDirectory}pirate_mission{flag}.cfg";
+            return $"{NativeConst.CfgDirectory}pirate_mission{flag}.cfg";
         }
 
         public static void Save(PirateMission pMission, int idx = 0)
         {
             try
             {
-                MyPirateMission = pMission;
+                pMission.IsCross = Universe == "w1";
+                
+                if (idx == 1)
+                {
+                    MyMission1 = pMission;
+                }
+                else
+                {
+                    MyMission = pMission;
+                }
+
                 string text = JsonConvert.SerializeObject(pMission, Formatting.Indented);
                 File.WriteAllText(GetFilePath(idx), text);
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"PirateUtil save catch {ex.Message}");
+                NativeLog.Error($"PirateUtil save catch {ex.Message}");
             }
         }
 
@@ -46,27 +76,42 @@ namespace feeling
             try
             {
                 var text = File.ReadAllText(filePath);
-                MyPirateMission = JsonConvert.DeserializeObject<PirateMission>(text);
+                var mission = JsonConvert.DeserializeObject<PirateMission>(text);
+                if (idx == 1)
+                {
+                    MyMission1 = mission;
+                }
+                else
+                {
+                    MyMission = mission;
+                }
                 return true;
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"PirateUtil readCfg catch {ex.Message}");
+                NativeLog.Error($"PirateUtil readCfg catch {ex.Message}");
                 return false;
             }
         }
 
-        public static void ParseNpc(string source)
+        public static void ParseNpc(string source, string address = "")
         {
-            Console.WriteLine($"ParseNpc");
+            NativeLog.Info($"ParseNpc");
             if (!HtmlUtil.ParseNpc(source, out List<string> result, mParser)) return;
             if (null == result) return;
+
+            var mat = Regex.Match(address, $@"://(?<universe>\S*).cicihappy.com");
+            if (mat.Success)
+            {
+                Universe = mat.Groups["universe"].Value;
+            }
 
             NpcList = result;
         }
 
         public static void ResetNpc()
         {
+            Universe = "";
             NpcList.Clear();
         }
     }

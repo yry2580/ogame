@@ -68,7 +68,7 @@ namespace feeling
 
             if (source.IndexOf("id=\"header_top\"") < 0) return false;
 
-            parser = parser??new OgameParser();
+            parser = parser ?? new OgameParser();
             parser.LoadHtml(source);
 
 #if !NET45
@@ -100,7 +100,7 @@ namespace feeling
         public static bool HasTutorial(string source, OgameParser parser = null)
         {
             if (string.IsNullOrWhiteSpace(source)) return false;
-            parser = parser??new OgameParser();
+            parser = parser ?? new OgameParser();
             parser.LoadHtml(source);
 #if !NET45
             var node = parser.QuerySelector("#tutorial .tutorial_buttons a");
@@ -113,7 +113,7 @@ namespace feeling
         public static bool HasFleetSuccess(string source, OgameParser parser = null)
         {
             if (string.IsNullOrWhiteSpace(source)) return false;
-            parser = parser??new OgameParser();
+            parser = parser ?? new OgameParser();
             parser.LoadHtml(source);
 #if !NET45
             var node = parser.QuerySelector(".success");
@@ -140,7 +140,7 @@ namespace feeling
             var trList = parser.QuerySelectorAll("center table tr").ToList();
             var idx = trList.FindIndex(e => e.Id == "fleetdelaybox");
             var tr = trList[idx + 1];
-            var  TextContent = tr.TextContent;
+            var TextContent = tr.TextContent;
 #else
             var node = parser?.QuerySelector("//*[@id='fleetdelaybox']");
             if (null == node) return false;
@@ -226,7 +226,7 @@ namespace feeling
         {
 #if !NET45
             if (string.IsNullOrWhiteSpace(source)) return false;
-            parser = parser??new OgameParser();
+            parser = parser ?? new OgameParser();
             parser.LoadHtml(source);
             var list = parser?.QuerySelectorAll("#galaxypage tbody tr");
             if (null == list) return false;
@@ -310,7 +310,7 @@ namespace feeling
             if (string.IsNullOrEmpty(source)) return false;
 
             if (source.IndexOf("id=\"galaxy_form\"") < 0) return false;
-            parser = parser??new OgameParser();
+            parser = parser ?? new OgameParser();
             parser.LoadHtml(source);
 #if !NET45
             var list = parser.QuerySelectorAll("#galaxy_form table select[name='npczuobiao'] option");
@@ -353,18 +353,15 @@ namespace feeling
 
         public static bool IsWechatCodePage(string source)
         {
-            Console.WriteLine($"1111");
             if (string.IsNullOrWhiteSpace(source)) return false;
             var parser = new OgameParser();
             parser.LoadHtml(source);
-            Console.WriteLine($"2222");
 #if !NET45
             var node = parser.QuerySelector("form[action='weixincode.php']");
 #else
             var node = parser.QuerySelector("//form[@action='weixincode.php']");
 #endif
             if (null != node) return true;
-            Console.WriteLine($"3333");
 
             return false;
         }
@@ -408,6 +405,42 @@ namespace feeling
             var node = parser.QuerySelector("//form[@action='imperium.php']//input[@value='查看详情']");
 #endif
 
+            return null != node;
+        }
+
+        public static int AttackConfirmType(string source)
+        {
+            if (string.IsNullOrWhiteSpace(source)) return 0;
+            var parser = new OgameParser();
+            parser.LoadHtml(source);
+#if !NET45
+            var node = parser.QuerySelector("#tjsubmit input[value='继续']");
+            if (null != node) return 1;
+            node = parser.QuerySelector("#tjsubmit input[type='submit']");
+            if (null != node) return 2;
+            node = parser.QuerySelector("#tjsubmit input[name='submit1']");
+            if (null != node) return 3;
+#else
+            var node = parser.QuerySelector("//*[@id='tjsubmit']//input[@value='继续']");
+            if (null != node) return 1;
+            node = parser.QuerySelector("//*[@id='tjsubmit']//input[@type='submit']");
+            if (null != node) return 2;
+            node = parser.QuerySelector("//*[@id='tjsubmit']//input[@name='submit1']");
+            if (null != node) return 3;
+#endif
+            return 0;
+        }
+
+        public static bool IsFleetPage(string source)
+        {
+            if (string.IsNullOrWhiteSpace(source)) return false;
+            var parser = new OgameParser();
+            parser.LoadHtml(source);
+#if !NET45
+            var node = parser?.QuerySelector("#fleetdelaybox");
+#else
+            var node = parser.QuerySelector("//*[@id='fleetdelaybox']");
+#endif
             return null != node;
         }
     }

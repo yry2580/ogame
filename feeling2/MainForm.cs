@@ -27,14 +27,16 @@ namespace feeling
         Thread mThread;
 
         bool mAutoExpedition = false;
+        bool mAutoExpedition1 = false;
         bool mAutoPirate = false;
-        bool mAutoPirateLogin = false;
+        bool mAutoPirate1 = false;
         int mPirateInterval = 120; // 分
+        int mPirateInterval1 = 120; // 分
 
         bool mAutoImperium = false;
         int mImperiumInterval = 240; // 分
-        bool mAutoImperiumLogin = false;
 
+        bool mIsBusy = false;
 
 #if !NET45
         OgClient mClient;
@@ -76,30 +78,30 @@ namespace feeling
         {
             do
             {
-                Invoke(new Action(() =>
+                Invoke(new Action(async () =>
                 {
-                    _LookThread();
+                    await _LookThread();
                 }));
                 Thread.Sleep(1000 * 60);
             } while (true);
         }
 
-        private void _LookThread()
+        private async Task _LookThread()
         {
             try
             {
                 if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
 
-                doAutoExpedtion();
-                doAutoPirate();
-                doAutoImperium();
-#if !NET45
+                await doAutoExpedtion();
+                await doAutoPirate();
+                await doAutoExpedtion(1);
+                await doAutoPirate(1);
+                await doAutoImperium();
                 SendData();
-#endif
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"_LookThread {ex.Message}");
+                NativeLog.Error($"_LookThread {ex.Message}");
             }
         }
 
@@ -123,13 +125,24 @@ namespace feeling
             w_user_password.Text = NativeController.User.Password;
             w_user_universe.Text = NativeController.User.Universe.ToString();
 
-            // 默认值
-            lb_hd_interval.Text = mPirateInterval.ToString();
-            rbtn_cfg0.Checked = true;
+            cbox_auto_login.Checked = NativeController.User.AutoLogin;
 
             InitExpedition();
             RedrawAccount();
             InitImperium();
+            InitPirate();
+        }
+
+        protected void InitPirate()
+        {
+            // 默认值
+            lb_hd_interval.Text = mPirateInterval.ToString();
+            lb_hd_interval1.Text = mPirateInterval1.ToString();
+            rbtn_cfg0.Checked = true;
+
+            PirateUtil.Initialize();
+
+            PirateCfg();
         }
 
         protected void InitImperium()
@@ -144,7 +157,6 @@ namespace feeling
                 return;
             }
 
-            mAutoImperiumLogin = imperiumCfg.AutoLogin;
             mImperiumInterval = imperiumCfg.Interval;
             mAutoImperium = imperiumCfg.Open;
             
@@ -154,6 +166,8 @@ namespace feeling
 
         protected void InitExpedition()
         {
+            Expedition.Initialize();
+
             var exShipOptions = Expedition.GetShipOptions();
 
             tx0_ship0_cb.Items.Clear();
@@ -207,17 +221,21 @@ namespace feeling
         {
             var idx = rbtn_cfg1.Checked ? 1 : 0;
 
+/*          
             // 读取配置
             if (!PirateUtil.ReadCfg(idx)) return false;
+*/
+            var pMissionCfg = PirateUtil.MyMission;
+            var pMissionCfg1 = PirateUtil.MyMission1;
 
-            var pMissionCfg = PirateUtil.MyPirateMission;
+            // if (null == pMissionCfg) return false;
 
-            if (null == pMissionCfg) return false;
+            var missionCfg = idx == 1 ? pMissionCfg1 : pMissionCfg;
 
             var planetList = NativeController.Instance.MyPlanet.List;
             var npcList = PirateUtil.NpcList;
 
-            var list = pMissionCfg.List;
+            var list = missionCfg.List;
 
             for (int i = 0; i < 5; i++)
             {
@@ -236,36 +254,45 @@ namespace feeling
                 control.MyOptions = pirate.Options;
             }
 
+            cbox_hd_cfg_cross.Checked = missionCfg.IsCross;
+
             var interval = pMissionCfg.Interval;
-            mAutoPirateLogin = pMissionCfg.AutoLogin;
             mPirateInterval = interval < 120 ? 120 : interval;
             lb_hd_interval.Text = mPirateInterval.ToString();
 
+            interval = pMissionCfg1.Interval;
+            mPirateInterval1 = interval < 120 ? 120 : interval;
+            lb_hd_interval1.Text = mPirateInterval1.ToString();
+            
             return true;
         }
 
         protected bool RevertCfg()
         {
+            var cfgIdx = rbtn_ex_cfg1.Checked ? 1 : 0;
             // 读取配置
-            Expedition.ReadCfg();
+            // if (!Expedition.ReadCfg(cfgIdx)) return false;
 
             var exMissionCfg = Expedition.MyExMissionCfg;
+            var exMissionCfg1 = Expedition.MyExMissionCfg1;
 
-            if (null == exMissionCfg) return false;
+            var missionCfg = cfgIdx == 1 ? exMissionCfg1 : exMissionCfg;
+
+            // if (null == exMissionCfg) return false;
 
             var planetList = NativeController.Instance.MyPlanet.List;
             var exOptions = Expedition.ShipOptions;
 
             for (var i = 0; i < 4; i++)
             {
-                if (i >= exMissionCfg.List.Count)
+                if (i >= missionCfg.List.Count)
                 {
                     (Controls.Find($"tx{i}_ship0", true)[0] as TextBox).Text = "";
                     (Controls.Find($"tx{i}_ship1", true)[0] as TextBox).Text = "";
                     continue;
                 }
 
-                var mission = exMissionCfg.GetMission(i);
+                var mission = missionCfg.GetMission(i);
                 var idx = planetList.FindIndex(e => e == mission.PlanetName);
                 if (idx != -1)
                 {
@@ -290,6 +317,8 @@ namespace feeling
                     (Controls.Find($"tx{i}_ship1", true)[0] as TextBox).Text = fleet.Count.ToString();
                 }
             }
+
+            cbox_ex_cfg_cross.Checked = missionCfg.IsCross;
 
             return true;
         }
@@ -336,12 +365,10 @@ namespace feeling
 
                 if (sDesc.Length > 0)
                 {
-                    mLastContent = sDesc;
+                    mLastContent = $"{DateTime.Now:G}|{sDesc}";
                 }
 
-#if !NET45
                 SendData();
-#endif
             }));
         }
 
@@ -358,24 +385,44 @@ namespace feeling
                         btn_galaxy_stop.Enabled = false;
                         SetExpeditionButton(false);
                         SetPirateButton(false);
+                        btn_tz_start.Enabled = false;
+                        btn_cross.Enabled = false;
+                        btn_universe.Enabled = false;
+                        cbox_auto_login.Enabled = false;
+                        SetQuickBtn(false);
                         break;
                     case OperStatus.Galaxy:
                         btn_galaxy_start.Enabled = false;
                         btn_galaxy_stop.Enabled = true;
                         SetExpeditionButton(false);
                         SetPirateButton(false);
+                        btn_tz_start.Enabled = false;
+                        btn_cross.Enabled = false;
+                        btn_universe.Enabled = false;
+                        cbox_auto_login.Enabled = false;
+                        SetQuickBtn(false);
                         break;
                     case OperStatus.Expedition:
                         btn_galaxy_start.Enabled = false;
                         btn_galaxy_stop.Enabled = false;
                         SetExpeditionButton(false, true);
                         SetPirateButton(false);
+                        btn_tz_start.Enabled = false;
+                        btn_cross.Enabled = false;
+                        btn_universe.Enabled = false;
+                        cbox_auto_login.Enabled = false;
+                        SetQuickBtn(false);
                         break;
                     case OperStatus.Pirate:
                         btn_galaxy_start.Enabled = false;
                         btn_galaxy_stop.Enabled = false;
                         SetExpeditionButton(false);
                         SetPirateButton(false, true);
+                        btn_tz_start.Enabled = false;
+                        btn_cross.Enabled = false;
+                        btn_universe.Enabled = false;
+                        cbox_auto_login.Enabled = false;
+                        SetQuickBtn(false);
                         break;
                     case OperStatus.None:
                     default:
@@ -383,18 +430,21 @@ namespace feeling
                         btn_galaxy_stop.Enabled = false;
                         SetExpeditionButton(true);
                         SetPirateButton(true);
+                        btn_tz_start.Enabled = true;
+                        btn_cross.Enabled = true;
+                        btn_universe.Enabled = true;
+                        cbox_auto_login.Enabled = true;
+                        SetQuickBtn(true);
                         break;
                 }
 
             }
             catch(Exception ex)
             {
-                Console.WriteLine($"Redraw catch {ex.Message}");
+                NativeLog.Error($"Redraw catch {ex.Message}");
             }
 
-#if !NET45
-                SendData();
-#endif
+            SendData();
         }
 
         protected void RedrawPlanet()
@@ -443,11 +493,20 @@ namespace feeling
             w_pirate2.SetPlanets(lists);
             w_pirate3.SetPlanets(lists);
             w_pirate4.SetPlanets(lists);
+
+            RevertCfg();
+            PirateCfg();
+            SendData();
         }
 
         private void RedrawOperTips(OperStatus operStatus, string tips)
         {
             var content = tips.Trim();
+            if (content.Length > 0)
+            {
+                content = $"{DateTime.Now:G}|{content}";
+            }
+
             switch (operStatus)
             {
                 case OperStatus.Expedition:
@@ -464,9 +523,8 @@ namespace feeling
             {
                 mLastContent = content;
             }
-#if !NET45
-                SendData();
-#endif
+
+            SendData();
         }
 
         public void SetUserButton(bool enabled)
@@ -474,6 +532,7 @@ namespace feeling
             w_user_account.Enabled = enabled;
             btn_user_login.Enabled = enabled;
             btn_user_logout.Enabled = enabled;
+            cbox_auto_login.Enabled = enabled;
         }
 
         public void SetPirateButton(bool enabled, bool canStop = false)
@@ -516,13 +575,16 @@ namespace feeling
 
         private void Web_OnFrameEnd(object sender, FrameLoadEndEventArgs e)
         {
-            Console.WriteLine($"Web_OnFrameEnd {e.Url}");
+            NativeLog.Debug($"Web_OnFrameEnd {e.Url}");
             NativeController.Instance.HandleWebBrowserFrameEnd(e.Url);
+            SendData();
         }
 
         private void Web_OnFrameStart(object sender, FrameLoadStartEventArgs e)
         {
-            Console.WriteLine("Web_OnFrameStart");
+            NativeLog.Debug("Web_OnFrameStart");
+            SendData();
+
 #if DEBUG
             // mWebBrowser.GetBrowser().ShowDevTools();
 #endif
@@ -541,6 +603,7 @@ namespace feeling
             mClient = new OgClient();
             mClient.Connected += OnServerConnected;
             mClient.DataReceived += OnServerReceived;
+            mClient.HeartbeatHandler += onHeartbeat;
 #endif
         }
 
@@ -549,6 +612,13 @@ namespace feeling
         {
             Invoke(new Action(() => {
                 DoServerReceived(data);
+            }));
+        }
+
+        private void onHeartbeat()
+        {
+            Invoke(new Action(() => {
+                SendData(CmdEnum.Hello);
             }));
         }
 
@@ -561,6 +631,9 @@ namespace feeling
                     SendData();
                     return;
                 }
+
+                if (mIsBusy) return;
+
                 switch (data.Cmd)
                 {
                     case CmdEnum.Login:
@@ -589,11 +662,60 @@ namespace feeling
                         break;
                     case CmdEnum.Imperium:
                         NativeController.Instance.CanNotify = false;
-                        await doImperium();
+                        await DoImperium();
                         break;
                     case CmdEnum.Npc:
                         NativeController.Instance.CanNotify = false;
                         doRefreshNpc();
+                        break;
+                    case CmdEnum.AutoPirateOpen:
+                        NativeController.Instance.CanNotify = false;
+                        await SetAutoPirateOpen(data.AutoPirateOpen);
+                        break;
+                    case CmdEnum.AutoPirateOpen1:
+                        NativeController.Instance.CanNotify = false;
+                        await SetAutoPirateOpen1(data.AutoPirateOpen1);
+                        break;
+                    case CmdEnum.PirateCfg:
+                        NativeController.Instance.CanNotify = false;
+                        await SetPirateCfg(data.PirateCfgIndex);
+                        break;
+                    case CmdEnum.AutoExpeditionOpen:
+                        NativeController.Instance.CanNotify = false;
+                        await SetAutoExpeditionOpen(data.AutoExpeditionOpen);
+                        break;
+                    case CmdEnum.AutoExpeditionOpen1:
+                        NativeController.Instance.CanNotify = false;
+                        await SetAutoExpeditionOpen1(data.AutoExpeditionOpen1);
+                        break;
+                    case CmdEnum.GoCross:
+                        NativeController.Instance.CanNotify = false;
+                        await GoCross();
+                        break;
+                    case CmdEnum.BackUniverse:
+                        NativeController.Instance.CanNotify = false;
+                        await BackUniverse();
+                        break;
+                    case CmdEnum.ExpeditionCfg:
+                        NativeController.Instance.CanNotify = false;
+                        await SetExpeditionCfg(data.ExpeditionCfgIndex);
+                        break;
+                    case CmdEnum.AutoLoginOpen:
+                        NativeController.Instance.CanNotify = false;
+                        await SetAutoLoginOpen(data.AutoLoginOpen);
+                        break;
+                    case CmdEnum.AutoImperiumOpen:
+                        NativeController.Instance.CanNotify = false;
+                        await SetAutoImperiumOpen(data.AutoImperiumOpen);
+                        break;
+                    case CmdEnum.QuickAutoCheck:
+                        DoQuickAutoCheck();
+                        break;
+                    case CmdEnum.QuickAutoUncheck:
+                        DoQuickAutoUncheck();
+                        break;
+                    case CmdEnum.QuickAutoStart:
+                        DoQuickAutoStart();
                         break;
                     default:
                         break;
@@ -606,12 +728,12 @@ namespace feeling
 
             SendData();
         }
-
 #endif
 
-#if !NET45
+
         private void SendData(CmdEnum cmd = CmdEnum.Data)
         {
+#if !NET45
             var operStatus = (int)NativeController.Instance.MyOperStatus;
             var status = (StatusEnum)operStatus;
 
@@ -636,24 +758,47 @@ namespace feeling
                 fleetContent = fleetContent.Length > 0 ? $"{fleetContent}|{content}" : content;
             }
 
+            var url = mWebBrowser?.Address ?? "";
+            var mat = Regex.Match(url, $@"://(?<universe>\S*).cicihappy.com");
+            var universe = "";
+            if (mat.Success)
+            {
+                universe = mat.Groups["universe"].Value;
+            }
+
             var gameData = new OgameData
             {
                 Cmd = cmd,
                 Status = status,
                 Content = mLastContent,
-                ExpeditionAutoMsg = lb_tx_info.Text.Trim(),
+                Universe = universe,
+                NpcUniverse = PirateUtil.Universe,
+                PlanetUniverse = NativeController.Instance.MyPlanet.Universe,
+
+                FleetContent = fleetContent,
+                PirateCfgIndex = rbtn_cfg1.Checked ? 1 : 0,
+                ExpeditionCfgIndex = rbtn_ex_cfg1.Checked ? 1 : 0,
+
+                AutoLoginOpen = NativeController.User.AutoLogin,
+                AutoPirateOpen = mAutoPirate,
+                AutoPirateOpen1 = mAutoPirate1,
+                AutoExpeditionOpen = mAutoExpedition,
+                AutoExpeditionOpen1 = mAutoExpedition1,
+                AutoImperiumOpen = mAutoImperium,
+
                 PirateAutoMsg = lb_hd_info.Text.Trim(),
-                FleetContent = fleetContent
+                PirateAutoMsg1 = lb_hd_info1.Text.Trim(),
+                ExpeditionAutoMsg = lb_tx_info.Text.Trim(),
+                ExpeditionAutoMsg1 = lb_tx_info1.Text.Trim(),
             };
 
             mClient?.SendData(gameData);
-        }
 #endif
+        }
+
         private void OnServerConnected()
         {
-#if !NET45
             SendData(CmdEnum.Auth);
-#endif
         }
 
         private void btn_galaxy_open_Click(object sender, EventArgs e)
@@ -876,7 +1021,7 @@ namespace feeling
                 MessageBox.Show("探险任务配置无效，请检测后再开始");
                 return;
             }
-            
+
             doExpedtion();
         }
 
@@ -887,66 +1032,150 @@ namespace feeling
             if (exMission.List.Count <= 0)
             {
                 MessageBox.Show("探险任务配置无效，请检测后再保存");
+                return;
             }
 
-            Expedition.Save(exMission);
+            var idx = rbtn_ex_cfg1.Checked ? 1 : 0;
+            var ret = MessageBox.Show($"确定保存配置 {idx + 1} 吗", "提示", MessageBoxButtons.YesNo);
+            if (ret == DialogResult.Yes)
+            {
+                exMission.IsCross = NativeController.Instance.MyPlanet.Universe == "w1";
+                Expedition.Save(exMission, idx);
+                RevertCfg();
+            }
         }
 
         private void btn_tx_revert_Click(object sender, EventArgs e)
         {
+            var idx = rbtn_ex_cfg1.Checked ? 1 : 0;
+            var ret = MessageBox.Show($"确定读取配置 {idx + 1} 吗", "提示", MessageBoxButtons.YesNo);
+            if (DialogResult.Yes != ret) return;
+
             if (!RevertCfg())
             {
-                MessageBox.Show("读取配置失败");
+                MessageBox.Show($"读取探险配置 {idx + 1} 失败");
             }
         }
 
-        private void xbox_auto_CheckedChanged(object sender, EventArgs e)
+        private void rbtn_ex_cfg_CheckedChanged(object sender, EventArgs e)
+        {
+            var rbtn = sender as RadioButton;
+            if (!rbtn.Checked) return;
+            RevertCfg();
+        }
+
+        private void cbox_tx_auto_CheckedChanged(object sender, EventArgs e)
         {
             NativeController.Instance.IsAutoExpedition = cbox_tx_auto.Checked;
             mAutoExpedition = cbox_tx_auto.Checked;
+            RedrawQuick();
         }
 
-        private void doExpedtion()
+        private void cbox_tx_auto1_CheckedChanged(object sender, EventArgs e)
+        {
+            NativeController.Instance.IsAutoExpedition1 = cbox_tx_auto1.Checked;
+            mAutoExpedition1 = cbox_tx_auto1.Checked;
+            RedrawQuick();
+        }
+
+        private void doExpedtion(bool autoLogin = false)
         {
             if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
 
             var exMission = GetExMission();
             
-            NativeController.Instance.StartExpedition(exMission);
+            NativeController.Instance.StartExpedition(exMission, rbtn_ex_cfg1.Checked ? 1 : 0, autoLogin);
             Redraw();
         }
 
-        private void doAutoExpedtion()
+        private async Task doAutoExpedtion(int index = 0)
         {
-            if (OperStatus.Expedition == NativeController.Instance.MyOperStatus)
+            Label label;
+            TimeSpan delta;
+            double val;
+            bool isClose;
+            
+            if (mIsBusy) return;
+
+            var missionCfg = index == 1 ? Expedition.MyExMissionCfg1 : Expedition.MyExMissionCfg;
+
+            if (index == 1)
             {
-                lb_tx_info.Text = $"{DateTime.Now:G}|正在探险状态";
-                return;
+                delta = DateTime.Now - NativeController.Instance.LastExeditionTime1;
+                isClose = !cbox_tx_auto1.Checked || !mAutoExpedition1;
+                label = lb_tx_info1;
+            }
+            else
+            {
+                delta = DateTime.Now - NativeController.Instance.LastExeditionTime;
+                isClose = !cbox_tx_auto.Checked || !mAutoExpedition;
+                label = lb_tx_info;
             }
 
-            if (OperStatus.None != NativeController.Instance.MyOperStatus)
-            {
-                lb_tx_info.Text = $"{DateTime.Now:G}|其他操作正忙";
-                return;
-            }
-
-            var delta = DateTime.Now - NativeController.Instance.LastExeditionTime;
-            var val = 120 - delta.TotalMinutes;
+            val = 120 - delta.TotalMinutes;
             val = val < 0 ? 0 : val;
 
-            if (!cbox_tx_auto.Checked || !mAutoExpedition)
+            if (OperStatus.Expedition == NativeController.Instance.MyOperStatus)
             {
-                lb_tx_info.Text = $"{DateTime.Now:G}|没有设置自动探险；时间差{Math.Ceiling(val)}分钟";
+                label.Text = $"{DateTime.Now:G}|正在探险状态";
+                return;
+            }
+
+            if (isClose)
+            {
+                label.Text = $"{DateTime.Now:G}|自动探险{index + 1}-关{(missionCfg.IsCross ? "-多维" : "")}，{Math.Ceiling(val)}分钟";
                 return;
             }
 
             if (delta.TotalMinutes < 120)
             {
-                lb_tx_info.Text = $"{DateTime.Now:G}|大概还差{Math.Ceiling(val)}分钟可自动探险";
+                label.Text = $"{DateTime.Now:G}|自动探险{index + 1}-开{(missionCfg.IsCross ? "-多维" : "")}，{Math.Ceiling(val)}分钟";
                 return;
             }
 
-            doExpedtion();
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                label.Text = $"{DateTime.Now:G}|其他操作正忙";
+                return;
+            }
+
+            mIsBusy = true;
+            NativeController.Instance.CanNotify = false;
+
+            var autoLogin = NativeController.User.AutoLogin;
+            if (autoLogin)
+            {
+                await TryLogin();
+            }
+
+            if (index == 1)
+            {
+                rbtn_ex_cfg1.Checked = true;
+            }
+            else
+            {
+                rbtn_ex_cfg0.Checked = true;
+            }
+
+            await Task.Delay(500);
+
+            if (missionCfg.IsCross)
+            {
+                await GoCross();
+            }
+            else
+            {
+                await BackUniverse();
+            }
+
+            var isCross = PirateUtil.Universe == "w1";
+            if (missionCfg.IsCross != isCross || !NativeController.Instance.MyPlanet.HasData)
+            {
+                await NativeController.Instance.DoRefreshNpc(true);
+            }
+
+            mIsBusy = false;
+            doExpedtion(autoLogin);
         }
 
         private PirateMission GetPirateMission()
@@ -992,38 +1221,46 @@ namespace feeling
             doPirate();
         }
 
-        private void doPirate(bool isAuto = false)
+        private void doPirate(bool isAuto = false, bool autoLogin = false)
         {
             if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
 
             var pMission = GetPirateMission();
-            NativeController.Instance.StartPirate(pMission, isAuto);
+            NativeController.Instance.StartPirate(pMission, rbtn_cfg1.Checked ? 1 : 0, autoLogin);
             Redraw();
         }
 
         private void btn_hd_save_Click(object sender, EventArgs e)
         {
             var idx = rbtn_cfg1.Checked ? 1 : 0;
-            var ret = MessageBox.Show($"确定保存配置{idx + 1}吗", "提示", MessageBoxButtons.YesNo);
+            var ret = MessageBox.Show($"确定保存配置 {idx + 1} 吗", "提示", MessageBoxButtons.YesNo);
             if (ret == DialogResult.Yes)
             {
                 var pMission = GetPirateMission();
-                pMission.Interval = mPirateInterval;
-                pMission.AutoLogin = mAutoPirateLogin;
+                pMission.Interval = idx == 1 ? mPirateInterval1 : mPirateInterval;
                 PirateUtil.Save(pMission, idx);
+                PirateCfg();
             }
         }
 
         private void btn_hd_revert_Click(object sender, EventArgs e)
         {
             var idx = rbtn_cfg1.Checked ? 1 : 0;
-            var ret = MessageBox.Show($"确定读取配置{idx + 1}吗", "提示", MessageBoxButtons.YesNo);
+            var ret = MessageBox.Show($"确定读取配置 {idx + 1} 吗", "提示", MessageBoxButtons.YesNo);
             if (DialogResult.Yes != ret) return;
 
             if (!PirateCfg())
             {
-                MessageBox.Show("读取配置还原失败");
+                MessageBox.Show($"读取还原配置配置 {idx + 1} 失败");
             }
+        }
+
+        private void rbtn_cfg_CheckedChanged(object sender, EventArgs e)
+        {
+            var rbtn = sender as RadioButton;
+            if (!rbtn.Checked) return;
+
+            PirateCfg();
         }
 
         private void btn_hd_refresh_Click(object sender, EventArgs e)
@@ -1039,49 +1276,107 @@ namespace feeling
             Redraw();
         }
 
-        private async void doAutoPirate()
+        private async Task doAutoPirate(int index = 0)
         {
+            Label label;
+            bool isClose;
+            TimeSpan delta;
+            double val;
+
+            if (mIsBusy) return;
+
+            var missionCfg = index == 1 ? PirateUtil.MyMission1 : PirateUtil.MyMission;
+
+            if (index == 1)
+            {
+                delta = DateTime.Now - NativeController.Instance.LastPirateTime1;
+                val = mPirateInterval1 - delta.TotalMinutes;
+                val = val < 0 ? 0 : val;
+                label = lb_hd_info1;
+                isClose = !cbox_hd_auto1.Checked || !mAutoPirate1;
+            }
+            else
+            {
+                delta = DateTime.Now - NativeController.Instance.LastPirateTime;
+                val = mPirateInterval - delta.TotalMinutes;
+                val = val < 0 ? 0 : val;
+                label = lb_hd_info;
+                isClose = !cbox_hd_auto.Checked || !mAutoPirate;
+            }
+
             if (OperStatus.Pirate == NativeController.Instance.MyOperStatus)
             {
-                lb_hd_info.Text = $"{DateTime.Now:G}|正在海盗状态";
-                return;
-            }
-            
-            if (OperStatus.None != NativeController.Instance.MyOperStatus)
-            {
-                lb_hd_info.Text = $"{DateTime.Now:G}|其他操作正忙";
+                label.Text = $"{DateTime.Now:G}|正在海盗";
                 return;
             }
 
-            var delta = DateTime.Now - NativeController.Instance.LastPirateTime;
-            var val = mPirateInterval - delta.TotalMinutes;
-            val = val < 0 ? 0 : val;
-
-            if (!cbox_hd_auto.Checked || !mAutoPirate)
+            if (isClose)
             {
-                lb_hd_info.Text = $"{DateTime.Now:G}|没有设置自动海盗；自动时间差{Math.Ceiling(val)}分钟";
+                label.Text = $"{DateTime.Now:G}|自动海盗{index + 1}-关{(missionCfg.IsCross ? "-多维": "")}，{Math.Ceiling(val)}分钟";
                 return;
             }
 
             if (delta.TotalMinutes < mPirateInterval)
             {
-                lb_hd_info.Text = $"{DateTime.Now:G}|大概还差{Math.Ceiling(val)}分钟可自动海盗";
+                label.Text = $"{DateTime.Now:G}|自动海盗{index + 1}-开{(missionCfg.IsCross ? "-多维" : "")}，{Math.Ceiling(val)}分钟";
                 return;
             }
 
-            if (mAutoPirateLogin)
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                label.Text = $"{DateTime.Now:G}|其他操作正忙";
+                return;
+            }
+
+            mIsBusy = true;
+            var autoLogin = NativeController.User.AutoLogin;
+            if (autoLogin)
             {
                 NativeController.Instance.CanNotify = false;
                 await TryLogin();
             }
 
-            doPirate(true);
+            if (index == 1)
+            {
+                rbtn_cfg1.Checked = true;
+            }
+            else
+            {
+                rbtn_cfg0.Checked = true;
+            }
+
+            await Task.Delay(500);
+            if (missionCfg.IsCross)
+            {
+                await GoCross();
+            }
+            else
+            {
+                await BackUniverse();
+            }
+
+            var isCross = PirateUtil.Universe == "w1";
+            if (!PirateUtil.HasNpcData || missionCfg.IsCross != isCross || ! NativeController.Instance.MyPlanet.HasData)
+            {
+                await NativeController.Instance.DoRefreshNpc(true);
+            }
+
+            mIsBusy = false;
+            doPirate(true, autoLogin);
         }
 
         private void cbox_hd_auto_CheckedChanged(object sender, EventArgs e)
         {
             NativeController.Instance.IsAutoPirate = cbox_hd_auto.Checked;
             mAutoPirate = cbox_hd_auto.Checked;
+            RedrawQuick();
+        }
+
+        private void cbox_hd_auto1_CheckedChanged(object sender, EventArgs e)
+        {
+            NativeController.Instance.IsAutoPirate1 = cbox_hd_auto1.Checked;
+            mAutoPirate1 = cbox_hd_auto1.Checked;
+            RedrawQuick();
         }
 
         private void btn_hd_interval_Click(object sender, EventArgs e)
@@ -1102,6 +1397,26 @@ namespace feeling
 
             mPirateInterval = interval;
             lb_hd_interval.Text = mPirateInterval.ToString();
+        }
+
+        private void btn_hd_interval1_Click(object sender, EventArgs e)
+        {
+            var txt = w_hd_inverval1.Text.Trim();
+            if (txt.Length <= 0)
+            {
+                MessageBox.Show("请输入数值");
+                return;
+            }
+
+            var interval = int.Parse(txt);
+            if (interval < 60)
+            {
+                MessageBox.Show("间隔不能小于60分钟");
+                return;
+            }
+
+            mPirateInterval1 = interval;
+            lb_hd_interval1.Text = mPirateInterval1.ToString();
         }
 
         private void btn_hd_stop_Click(object sender, EventArgs e)
@@ -1189,7 +1504,6 @@ namespace feeling
             try
             {
                 var cfg = new Imperium {
-                    AutoLogin = mAutoImperiumLogin,
                     Interval = mImperiumInterval,
                     Open = mAutoImperium,
                 };
@@ -1199,7 +1513,7 @@ namespace feeling
             }
             catch(Exception ex)
             {
-                Console.WriteLine($"tz_save catch {ex.Message}");
+                NativeLog.Error($"tz_save catch {ex.Message}");
             }
         }
 
@@ -1209,46 +1523,54 @@ namespace feeling
             NativeController.Instance.IsAutoImperium = mAutoImperium;
         }
 
-        private async void doAutoImperium()
+        private async Task doAutoImperium()
         {
+            var delta = DateTime.Now - NativeController.Instance.LastImperiumTime;
+            var val = mImperiumInterval - delta.TotalMinutes;
+            val = val < 0 ? 0 : val;
+
+            if (mIsBusy) return;
+
+            if (!cbox_tz_auto.Checked || !mAutoImperium)
+            {
+                lb_tz_info.Text = $"{DateTime.Now:G}|自动统治-关，{Math.Ceiling(val)}分钟";
+                return;
+            }
+
+            if (mAutoPirate)
+            {
+                lb_tz_info.Text = $"{DateTime.Now:G}|已自动海盗，{Math.Ceiling(val)}分钟";
+                return;
+            }
+
+            if (delta.TotalMinutes < mImperiumInterval)
+            {
+                lb_tz_info.Text = $"{DateTime.Now:G}|自动统治-开，{Math.Ceiling(val)}分钟";
+                return;
+            }
+
             if (OperStatus.None != NativeController.Instance.MyOperStatus)
             {
                 lb_tz_info.Text = $"{DateTime.Now:G}|其他操作正忙";
                 return;
             }
 
-            var delta = DateTime.Now - NativeController.Instance.LastImperiumTime;
-            var val = mImperiumInterval - delta.TotalMinutes;
-            val = val < 0 ? 0 : val;
+            mIsBusy = true;
 
-            if (!cbox_tz_auto.Checked || !mAutoImperium)
-            {
-                lb_tz_info.Text = $"{DateTime.Now:G}|没有自动统治；时间差{Math.Ceiling(val)}分钟";
-                return;
-            }
-
-            if (mAutoPirate)
-            {
-                lb_tz_info.Text = $"{DateTime.Now:G}|已自动海盗；时间差{Math.Ceiling(val)}分钟";
-                return;
-            }
-
-            if (delta.TotalMinutes < mImperiumInterval)
-            {
-                lb_tz_info.Text = $"{DateTime.Now:G}|大概还差{Math.Ceiling(val)}分钟可自动统治";
-                return;
-            }
-
-            if (mAutoImperiumLogin)
+            var autoLogin = NativeController.User.AutoLogin;
+            if (autoLogin)
             {
                 NativeController.Instance.CanNotify = false;
                 await TryLogin();
+                await AdjustUniverse();
             }
 
-            await doImperium();
+            mIsBusy = false;
+
+            await DoImperium(autoLogin);
         }
 
-        private async Task doImperium()
+        private async Task DoImperium(bool autoLogin = false)
         {
             try
             {
@@ -1256,7 +1578,7 @@ namespace feeling
 
                 NativeController.Instance.SwitchStatus(OperStatus.System);
 
-                await NativeController.Instance.StartImperium();
+                await NativeController.Instance.StartImperium(autoLogin);
             }
             catch (Exception ex)
             {
@@ -1265,6 +1587,539 @@ namespace feeling
 #endif
             }
 
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private async void btn_tz_start_Click(object sender, EventArgs e)
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                MessageBox.Show("当前不是空闲状态，不能统治");
+                return;
+            }
+
+            await DoImperium();
+        }
+
+        private async Task SetAutoPirateOpen(bool open)
+        {
+            try
+            {
+                var msg = open ? "开" : "关";
+                mLastContent = $"{DateTime.Now:G}|设置自动海盗({msg})";
+                if (OperStatus.None != NativeController.Instance.MyOperStatus)
+                {
+                    mLastContent = $"{DateTime.Now:G}|当前不是空闲状态，不能设置";
+                    return;
+                }
+
+                NativeController.Instance.SwitchStatus(OperStatus.System);
+
+                if (cbox_hd_auto.Checked != open)
+                {
+                    cbox_hd_auto.Checked = open;
+                    await Task.Delay(200);
+                }
+
+                mLastContent = $"{DateTime.Now:G}|设置自动海盗({msg})完成";
+            }
+            catch (Exception ex)
+            {
+#if !NET45
+                LogUtil.Error($"SetAutoPirateOpen catch {ex.Message}");
+#endif
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private async Task SetAutoPirateOpen1(bool open)
+        {
+            try
+            {
+                var msg = open ? "开" : "关";
+                mLastContent = $"{DateTime.Now:G}|设置自动海盗2({msg})";
+                if (OperStatus.None != NativeController.Instance.MyOperStatus)
+                {
+                    mLastContent = $"{DateTime.Now:G}|当前不是空闲状态，不能设置";
+                    return;
+                }
+
+                NativeController.Instance.SwitchStatus(OperStatus.System);
+
+                if (cbox_hd_auto1.Checked != open)
+                {
+                    cbox_hd_auto1.Checked = open;
+                    await Task.Delay(200);
+                }
+
+                mLastContent = $"{DateTime.Now:G}|设置自动海盗2({msg})完成";
+            }
+            catch (Exception ex)
+            {
+#if !NET45
+                LogUtil.Error($"SetAutoPirateOpen1 catch {ex.Message}");
+#endif
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private async Task SetPirateCfg(int idx)
+        {
+            try
+            {
+                mLastContent = $"{DateTime.Now:G}|读取海盗配置（{idx + 1}）";
+                if (OperStatus.None != NativeController.Instance.MyOperStatus)
+                {
+                    mLastContent = $"{DateTime.Now:G}|当前不是空闲状态，不能读取";
+                    return;
+                }
+
+                NativeController.Instance.SwitchStatus(OperStatus.System);
+
+                //
+                // var lastIdx = rbtn_cfg1.Checked ? 1 : 0;
+                if (idx == 1)
+                {
+                    rbtn_cfg1.Checked = true;
+                }
+                else
+                {
+                    rbtn_cfg0.Checked = true;
+                }
+                await Task.Delay(200);
+
+                var ret = PirateCfg();
+                if (ret)
+                {
+                    mLastContent = $"{DateTime.Now:G}|读取海盗配置（{idx + 1}）完成"; ;
+                }
+                else
+                {
+                    mLastContent = $"{DateTime.Now:G}|读取海盗配置（{idx + 1}）失败"; ;
+                }
+            }
+            catch (Exception ex)
+            {
+#if !NET45
+                LogUtil.Error($"SetPirateCfg catch {ex.Message}");
+#endif
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private async Task SetAutoExpeditionOpen(bool open)
+        {
+            try
+            {
+                var msg = open ? "开" : "关";
+                mLastContent = $"{DateTime.Now:G}|设置自动探险({msg})";
+                if (OperStatus.None != NativeController.Instance.MyOperStatus)
+                {
+                    mLastContent = $"{DateTime.Now:G}|当前不是空闲状态，不能设置";
+                    return;
+                }
+
+                NativeController.Instance.SwitchStatus(OperStatus.System);
+
+                if (cbox_tx_auto.Checked != open)
+                {
+                    cbox_tx_auto.Checked = open;
+                    await Task.Delay(200);
+                }
+                mLastContent = $"{DateTime.Now:G}|设置自动探险({msg})完成";
+            }
+            catch (Exception ex)
+            {
+#if !NET45
+                LogUtil.Error($"SetAutoPirateOpen catch {ex.Message}");
+#endif
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private async Task SetAutoExpeditionOpen1(bool open)
+        {
+            try
+            {
+                var msg = open ? "开" : "关";
+                mLastContent = $"{DateTime.Now:G}|设置自动探险2({msg})";
+                if (OperStatus.None != NativeController.Instance.MyOperStatus)
+                {
+                    mLastContent = $"{DateTime.Now:G}|当前不是空闲状态，不能设置";
+                    return;
+                }
+
+                NativeController.Instance.SwitchStatus(OperStatus.System);
+
+                if (cbox_tx_auto1.Checked != open)
+                {
+                    cbox_tx_auto1.Checked = open;
+                    await Task.Delay(200);
+                }
+                mLastContent = $"{DateTime.Now:G}|设置自动探险2({msg})完成";
+            }
+            catch (Exception ex)
+            {
+#if !NET45
+                LogUtil.Error($"SetAutoExpeditionOpen1 catch {ex.Message}");
+#endif
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private async Task SetExpeditionCfg(int idx)
+        {
+            try
+            {
+                mLastContent = $"{DateTime.Now:G}|读取探险配置（{idx + 1}）";
+                if (OperStatus.None != NativeController.Instance.MyOperStatus)
+                {
+                    mLastContent = $"{DateTime.Now:G}|当前不是空闲状态，不能读取";
+                    return;
+                }
+
+                NativeController.Instance.SwitchStatus(OperStatus.System);
+
+                //
+                // var lastIdx = rbtn_cfg1.Checked ? 1 : 0;
+                if (idx == 1)
+                {
+                    rbtn_ex_cfg1.Checked = true;
+                }
+                else
+                {
+                    rbtn_ex_cfg0.Checked = true;
+                }
+                await Task.Delay(200);
+
+                var ret = RevertCfg();
+                if (ret)
+                {
+                    mLastContent = $"{DateTime.Now:G}|读取探险配置（{idx + 1}）完成"; ;
+                }
+                else
+                {
+                    mLastContent = $"{DateTime.Now:G}|读取探险配置（{idx + 1}）失败"; ;
+                }
+            }
+            catch (Exception ex)
+            {
+#if !NET45
+                LogUtil.Error($"SetExpeditionCfg catch {ex.Message}");
+#endif
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private async void btn_cross_Click(object sender, EventArgs e)
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                MessageBox.Show("当前不是空闲状态，不能操作");
+                return;
+            }
+
+            await GoCross();
+        }
+
+        private async Task GoCross()
+        {
+            try
+            {
+                if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
+
+                NativeController.Instance.SwitchStatus(OperStatus.System);
+
+                await NativeController.Instance.GoCross();
+            }
+            catch (Exception ex)
+            {
+#if !NET45
+                LogUtil.Error($"GoCross catch {ex.Message}");
+#endif
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private async void btn_universe_Click(object sender, EventArgs e)
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                MessageBox.Show("当前不是空闲状态，不能操作");
+                return;
+            }
+
+            await BackUniverse();
+        }
+
+        private async Task BackUniverse()
+        {
+            try
+            {
+                if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
+
+                NativeController.Instance.SwitchStatus(OperStatus.System);
+
+                await NativeController.Instance.BackUniverse();
+            }
+            catch (Exception ex)
+            {
+#if !NET45
+                LogUtil.Error($"BackUniverse catch {ex.Message}");
+#endif
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private void cbox_auto_login_CheckedChanged(object sender, EventArgs e)
+        {
+            var autoLogin = cbox_auto_login.Checked;
+            NativeController.User.SetAutoLogin(autoLogin);
+        }
+
+        private async Task AdjustUniverse()
+        {
+            try
+            {
+                if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
+
+                var address = mWebBrowser.Address;
+                var npcUniverse = PirateUtil.Universe;
+
+                // 如果是多维
+                if (npcUniverse == "w1")
+                {
+                    // 如果当前就是多维地址
+                    if (address.Contains("w1.cicihappy.com/ogame/frames.php"))
+                    {
+                        return;
+                    }
+
+                    // 跳转多维
+                    await GoCross();
+                }
+                else
+                {
+                    // 如果当前在多维
+                    if (address.Contains("w1.cicihappy.com/ogame/frames.php"))
+                    {
+                        // 返回
+                        await BackUniverse();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+#if !NET45
+                LogUtil.Error($"AdjustUniverse catch {ex.Message}");
+#endif
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private async Task SetAutoLoginOpen(bool open)
+        {
+            try
+            {
+                var msg = open ? "开" : "关";
+                mLastContent = $"{DateTime.Now:G}|设置自动登录({msg})";
+                if (OperStatus.None != NativeController.Instance.MyOperStatus)
+                {
+                    mLastContent = $"{DateTime.Now:G}|当前不是空闲状态，不能设置";
+                    return;
+                }
+
+                NativeController.Instance.SwitchStatus(OperStatus.System);
+
+                if (cbox_auto_login.Checked != open)
+                {
+                    cbox_auto_login.Checked = open;
+                    await Task.Delay(200);
+                }
+                mLastContent = $"{DateTime.Now:G}|设置自动登录({msg})完成";
+            }
+            catch (Exception ex)
+            {
+#if !NET45
+                LogUtil.Error($"SetAutoLoginOpen catch {ex.Message}");
+#endif
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private async Task SetAutoImperiumOpen(bool open)
+        {
+            try
+            {
+                var msg = open ? "开" : "关";
+                mLastContent = $"{DateTime.Now:G}|设置自动统治({msg})";
+                if (OperStatus.None != NativeController.Instance.MyOperStatus)
+                {
+                    mLastContent = $"{DateTime.Now:G}|当前不是空闲状态，不能设置";
+                    return;
+                }
+
+                NativeController.Instance.SwitchStatus(OperStatus.System);
+
+                if (cbox_tz_auto.Checked != open)
+                {
+                    cbox_tz_auto.Checked = open;
+                    await Task.Delay(200);
+                }
+                mLastContent = $"{DateTime.Now:G}|设置自动统治({msg})完成";
+            }
+            catch (Exception ex)
+            {
+#if !NET45
+                LogUtil.Error($"SetAutoImperiumOpen catch {ex.Message}");
+#endif
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private void RedrawQuick()
+        {
+            string content = "";
+
+            if (mAutoExpedition)
+            {
+                content = "自动探险1";
+            }
+
+            if (mAutoPirate)
+            {
+                if (!string.IsNullOrWhiteSpace(content))
+                {
+                    content += "、";
+                }
+                content += "自动海盗1";
+            }
+
+            if (mAutoExpedition1)
+            {
+                if (!string.IsNullOrWhiteSpace(content))
+                {
+                    content += "、";
+                }
+                content += "自动探险2";
+            }
+
+            if (mAutoPirate1)
+            {
+                if (!string.IsNullOrWhiteSpace(content))
+                {
+                    content += "、";
+                }
+                content += "自动海盗2";
+            }
+
+            content = content.Length > 0 ? content : "无";
+            lb_quick_auto.Text = content;
+        }
+
+        private void SetQuickBtn(bool enable)
+        {
+            btn_quick_auto_uncheck.Enabled = enable;
+            btn_quick_auto_check.Enabled = enable;
+            btn_quick_auto_start.Enabled = enable;
+        }
+
+        private void btn_quick_auto_check_Click(object sender, EventArgs e)
+        {
+            DoQuickAutoCheck();
+            RedrawQuick();
+        }
+
+        private void btn_quick_auto_uncheck_Click(object sender, EventArgs e)
+        {
+            DoQuickAutoUncheck();
+            RedrawQuick();
+        }
+
+        private void btn_quick_auto_start_Click(object sender, EventArgs e)
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                mLastContent = $"{DateTime.Now:G}|一键开始，其他操作正忙";
+                NativeLog.Info("一键开始，其他操作正忙");
+                return;
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.System);
+            var ret = MessageBox.Show($"确定一键所选自动开始吗", "提示", MessageBoxButtons.YesNo);
+            if (ret != DialogResult.Yes)
+            {
+                NativeLog.Info("一键开始确认框取消");
+                return;
+            }
+            DoQuickAutoStart();
+            RedrawQuick();
+        }
+
+        private void DoQuickAutoCheck()
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                mLastContent = $"{DateTime.Now:G}|一键打开自动，其他操作正忙";
+                NativeLog.Info("一键打开自动，其他操作正忙");
+                return;
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.System);
+            mLastContent = $"{DateTime.Now:G}|一键打开自动";
+            NativeLog.Info("一键打开自动");
+            cbox_tx_auto.Checked = true;
+            cbox_hd_auto.Checked = true;
+            cbox_tx_auto1.Checked = true;
+            cbox_hd_auto1.Checked = true;
+            Thread.Sleep(200);
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private void DoQuickAutoUncheck()
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                mLastContent = $"{DateTime.Now:G}|一键关闭自动，其他操作正忙";
+                NativeLog.Info("一键关闭自动，其他操作正忙");
+                return;
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.System);
+            mLastContent = $"{DateTime.Now:G}|一键关闭自动";
+            NativeLog.Info("一键关闭自动");
+            cbox_tx_auto.Checked = false;
+            cbox_hd_auto.Checked = false;
+            cbox_tx_auto1.Checked = false;
+            cbox_hd_auto1.Checked = false;
+            Thread.Sleep(200);
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private void DoQuickAutoStart()
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                mLastContent = $"{DateTime.Now:G}|一键开始，其他操作正忙";
+                NativeLog.Info("一键开始，其他操作正忙");
+                return;
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.System);
+            mLastContent = $"{DateTime.Now:G}|一键所选配置自动开始";
+            NativeLog.Info("一键所选配置自动开始");
+            NativeController.Instance.QuickClearLastTime();
             NativeController.Instance.SwitchStatus(OperStatus.None);
         }
     }

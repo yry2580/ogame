@@ -39,6 +39,9 @@ namespace OgameService
         AutoImperiumOpen,
         AutoPirateOpen1,
         AutoExpeditionOpen1,
+        QuickAutoCheck,
+        QuickAutoUncheck,
+        QuickAutoStart,
     }
 
     public enum StatusEnum

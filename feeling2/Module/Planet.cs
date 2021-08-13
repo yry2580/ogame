@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace feeling
@@ -12,16 +13,25 @@ namespace feeling
         public List<string> List = new List<string>();
 
         public bool HasData => List.Count > 0;
+        public string Universe = "";
 
-        public void Parse(string source)
+        public bool Parse(string source, string address = "")
         {
-            if (!HtmlUtil.ParseOwnerPlanets(source, out List<string> result, mHtmlParser)) return;
-            if (null == result) return;
+            if (!HtmlUtil.ParseOwnerPlanets(source, out List<string> result, mHtmlParser)) return false;
+            if (null == result) return false;
+
+            var mat = Regex.Match(address, $@"://(?<universe>\S*).cicihappy.com");
+            if (mat.Success)
+            {
+                Universe = mat.Groups["universe"].Value;
+            }
             List = result;
+            return true;
         }
 
         public void Reset()
         {
+            Universe = "";
             List.Clear();
         }
 

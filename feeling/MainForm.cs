@@ -141,6 +141,8 @@ namespace feeling
             rbtn_cfg0.Checked = true;
 
             PirateUtil.Initialize();
+
+            PirateCfg();
         }
 
         protected void InitImperium()
@@ -387,6 +389,7 @@ namespace feeling
                         btn_cross.Enabled = false;
                         btn_universe.Enabled = false;
                         cbox_auto_login.Enabled = false;
+                        SetQuickBtn(false);
                         break;
                     case OperStatus.Galaxy:
                         btn_galaxy_start.Enabled = false;
@@ -397,6 +400,7 @@ namespace feeling
                         btn_cross.Enabled = false;
                         btn_universe.Enabled = false;
                         cbox_auto_login.Enabled = false;
+                        SetQuickBtn(false);
                         break;
                     case OperStatus.Expedition:
                         btn_galaxy_start.Enabled = false;
@@ -407,6 +411,7 @@ namespace feeling
                         btn_cross.Enabled = false;
                         btn_universe.Enabled = false;
                         cbox_auto_login.Enabled = false;
+                        SetQuickBtn(false);
                         break;
                     case OperStatus.Pirate:
                         btn_galaxy_start.Enabled = false;
@@ -417,6 +422,7 @@ namespace feeling
                         btn_cross.Enabled = false;
                         btn_universe.Enabled = false;
                         cbox_auto_login.Enabled = false;
+                        SetQuickBtn(false);
                         break;
                     case OperStatus.None:
                     default:
@@ -428,6 +434,7 @@ namespace feeling
                         btn_cross.Enabled = true;
                         btn_universe.Enabled = true;
                         cbox_auto_login.Enabled = true;
+                        SetQuickBtn(true);
                         break;
                 }
 
@@ -700,6 +707,15 @@ namespace feeling
                     case CmdEnum.AutoImperiumOpen:
                         NativeController.Instance.CanNotify = false;
                         await SetAutoImperiumOpen(data.AutoImperiumOpen);
+                        break;
+                    case CmdEnum.QuickAutoCheck:
+                        DoQuickAutoCheck();
+                        break;
+                    case CmdEnum.QuickAutoUncheck:
+                        DoQuickAutoUncheck();
+                        break;
+                    case CmdEnum.QuickAutoStart:
+                        DoQuickAutoStart();
                         break;
                     default:
                         break;
@@ -1052,12 +1068,14 @@ namespace feeling
         {
             NativeController.Instance.IsAutoExpedition = cbox_tx_auto.Checked;
             mAutoExpedition = cbox_tx_auto.Checked;
+            RedrawQuick();
         }
 
         private void cbox_tx_auto1_CheckedChanged(object sender, EventArgs e)
         {
             NativeController.Instance.IsAutoExpedition1 = cbox_tx_auto1.Checked;
             mAutoExpedition1 = cbox_tx_auto1.Checked;
+            RedrawQuick();
         }
 
         private void doExpedtion(bool autoLogin = false)
@@ -1351,12 +1369,14 @@ namespace feeling
         {
             NativeController.Instance.IsAutoPirate = cbox_hd_auto.Checked;
             mAutoPirate = cbox_hd_auto.Checked;
+            RedrawQuick();
         }
 
         private void cbox_hd_auto1_CheckedChanged(object sender, EventArgs e)
         {
             NativeController.Instance.IsAutoPirate1 = cbox_hd_auto1.Checked;
             mAutoPirate1 = cbox_hd_auto1.Checked;
+            RedrawQuick();
         }
 
         private void btn_hd_interval_Click(object sender, EventArgs e)
@@ -1965,6 +1985,141 @@ namespace feeling
 #endif
             }
 
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private void RedrawQuick()
+        {
+            string content = "";
+
+            if (mAutoExpedition)
+            {
+                content = "自动探险1";
+            }
+
+            if (mAutoPirate)
+            {
+                if (!string.IsNullOrWhiteSpace(content))
+                {
+                    content += "、";
+                }
+                content += "自动海盗1";
+            }
+
+            if (mAutoExpedition1)
+            {
+                if (!string.IsNullOrWhiteSpace(content))
+                {
+                    content += "、";
+                }
+                content += "自动探险2";
+            }
+
+            if (mAutoPirate1)
+            {
+                if (!string.IsNullOrWhiteSpace(content))
+                {
+                    content += "、";
+                }
+                content += "自动海盗2";
+            }
+
+            content = content.Length > 0 ? content : "无";
+            lb_quick_auto.Text = content;
+        }
+
+        private void SetQuickBtn(bool enable)
+        {
+            btn_quick_auto_uncheck.Enabled = enable;
+            btn_quick_auto_check.Enabled = enable;
+            btn_quick_auto_start.Enabled = enable;
+        }
+
+        private void btn_quick_auto_check_Click(object sender, EventArgs e)
+        {
+            DoQuickAutoCheck();
+            RedrawQuick();
+        }
+
+        private void btn_quick_auto_uncheck_Click(object sender, EventArgs e)
+        {
+            DoQuickAutoUncheck();
+            RedrawQuick();
+        }
+
+        private void btn_quick_auto_start_Click(object sender, EventArgs e)
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                mLastContent = $"{DateTime.Now:G}|一键开始，其他操作正忙";
+                NativeLog.Info("一键开始，其他操作正忙");
+                return;
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.System);
+            var ret = MessageBox.Show($"确定一键所选自动开始吗", "提示", MessageBoxButtons.YesNo);
+            if (ret != DialogResult.Yes)
+            {
+                NativeLog.Info("一键开始确认框取消");
+                return;
+            }
+            DoQuickAutoStart();
+            RedrawQuick();
+        }
+
+        private void DoQuickAutoCheck()
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                mLastContent = $"{DateTime.Now:G}|一键打开自动，其他操作正忙";
+                NativeLog.Info("一键打开自动，其他操作正忙");
+                return;
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.System);
+            mLastContent = $"{DateTime.Now:G}|一键打开自动";
+            NativeLog.Info("一键打开自动");
+            cbox_tx_auto.Checked = true;
+            cbox_hd_auto.Checked = true;
+            cbox_tx_auto1.Checked = true;
+            cbox_hd_auto1.Checked = true;
+            Thread.Sleep(200);
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private void DoQuickAutoUncheck()
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                mLastContent = $"{DateTime.Now:G}|一键关闭自动，其他操作正忙";
+                NativeLog.Info("一键关闭自动，其他操作正忙");
+                return;
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.System);
+            mLastContent = $"{DateTime.Now:G}|一键关闭自动";
+            NativeLog.Info("一键关闭自动");
+            cbox_tx_auto.Checked = false;
+            cbox_hd_auto.Checked = false;
+            cbox_tx_auto1.Checked = false;
+            cbox_hd_auto1.Checked = false;
+            Thread.Sleep(200);
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private void DoQuickAutoStart()
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                mLastContent = $"{DateTime.Now:G}|一键开始，其他操作正忙";
+                NativeLog.Info("一键开始，其他操作正忙");
+                return;
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.System);
+            mLastContent = $"{DateTime.Now:G}|一键所选配置自动开始";
+            NativeLog.Info("一键所选配置自动开始");
+            NativeController.Instance.QuickClearLastTime();
             NativeController.Instance.SwitchStatus(OperStatus.None);
         }
     }

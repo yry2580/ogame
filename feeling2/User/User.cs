@@ -10,12 +10,13 @@ namespace feeling
 {
     class User
     {
-        string mConfigFile = NativeConst.CurrentDirectory + "UserData.dat";
+        string mConfigFile = NativeConst.CfgDirectory + "UserData.dat";
         UserData MyUserData = null;
 
         public string Account => MyUserData.Account;
         public string Password => MyUserData.Password;
         public int Universe => MyUserData.Universe;
+        public bool AutoLogin => MyUserData.AutoLogin;
 
         public User()
         {
@@ -41,7 +42,7 @@ namespace feeling
                 }
                 catch (Exception ex) 
                 {
-                    Console.WriteLine($"ReadUserData catch {ex.Message}");
+                    NativeLog.Error($"ReadUserData catch {ex.Message}");
                     MyUserData = MyUserData??(new UserData());
                 }
             }
@@ -63,7 +64,7 @@ namespace feeling
             }
             catch(Exception ex)
             {
-                Console.WriteLine($"SaveUserData catch {ex.Message}");
+                NativeLog.Error($"SaveUserData catch {ex.Message}");
             }
         }
 
@@ -82,6 +83,12 @@ namespace feeling
         public string GetPassword(string account)
         {
             return MyUserData.GetPassword(account);
+        }
+
+        public void SetAutoLogin(bool autoLogin = false)
+        {
+            MyUserData.AutoLogin = autoLogin;
+            SaveUserData();
         }
     }
 }

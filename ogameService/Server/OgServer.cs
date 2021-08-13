@@ -810,6 +810,90 @@ namespace OgameService
             return false;
         }
 
+        public bool OperQuickAutoCheck(string id, string key)
+        {
+            LogUtil.Warn($"OperQuickAutoCheck {id}");
+            try
+            {
+                if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+                mCellDict.TryGetValue(key, out OgCell result);
+                // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+                if (null == result || null == result.MySession)
+                {
+                    LogUtil.Warn($"OperQuickAutoCheck 没取到对应cell");
+                    return false;
+                }
+
+                OgameData data = new OgameData();
+                data.Cmd = CmdEnum.QuickAutoCheck;
+
+                mServer.SendTo(result.MySession, OgameData.ToBytes(data));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Error($"OperQuickAutoCheck {key} catch {ex.Message}");
+            }
+            return false;
+        }
+
+        public bool OperQuickAutoUncheck(string id, string key)
+        {
+            LogUtil.Warn($"OperQuickAutoUncheck {id}");
+            try
+            {
+                if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+                mCellDict.TryGetValue(key, out OgCell result);
+                // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+                if (null == result || null == result.MySession)
+                {
+                    LogUtil.Warn($"OperQuickAutoUncheck 没取到对应cell");
+                    return false;
+                }
+
+                OgameData data = new OgameData();
+                data.Cmd = CmdEnum.QuickAutoUncheck;
+
+                mServer.SendTo(result.MySession, OgameData.ToBytes(data));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Error($"OperQuickAutoUncheck {key} catch {ex.Message}");
+            }
+            return false;
+        }
+
+        public bool OperQuickAutoStart(string id, string key)
+        {
+            LogUtil.Warn($"OperQuickAutoStart {id}");
+            try
+            {
+                if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+                mCellDict.TryGetValue(key, out OgCell result);
+                // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+                if (null == result || null == result.MySession)
+                {
+                    LogUtil.Warn($"OperQuickAutoStart 没取到对应cell");
+                    return false;
+                }
+
+                OgameData data = new OgameData();
+                data.Cmd = CmdEnum.QuickAutoStart;
+
+                mServer.SendTo(result.MySession, OgameData.ToBytes(data));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Error($"OperQuickAutoStart {key} catch {ex.Message}");
+            }
+            return false;
+        }
+
         public void ShowAllCell()
         {
             LogUtil.Warn("=============== ShowAllCell =====================");

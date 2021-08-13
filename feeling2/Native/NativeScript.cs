@@ -24,7 +24,7 @@ namespace feeling
         public static string ToHome()
         {
             var script = "doc = window.parent.frames['Hauptframe'].document;";
-            script += "doc.querySelectorAll('#menuTable .menubutton_table a')[0].click();";
+            script += "doc.querySelector(\"#menuTable .menubutton_table a[title='概 况']\").click();";
             return script;
         }
 
@@ -157,10 +157,26 @@ namespace feeling
         /// 攻击确认
         /// </summary>
         /// <returns></returns>
-        public static string SetAttackConfirm()
+        public static string SetAttackConfirm(int type = 0)
         {
             var script = "doc = window.parent.frames['Hauptframe'].document;";
-            script += $"doc.querySelector(\"#tjsubmit input[type=submit]\").click()";
+            if (type == 1)
+            {
+                script += $"doc.querySelector(\"#tjsubmit input[value='继续']\").click()";
+            }
+            else if(type == 2)
+            {
+                script += $"doc.querySelector(\"#tjsubmit input[type='submit']\").click()";
+            }
+            else if(type == 3)
+            {
+                script += $"doc.querySelector(\"#tjsubmit input[name='submit1']\").click()";
+            }
+            else
+            {
+                script += $"doc.querySelector(\"#tjsubmit input\").click()";
+            }
+            
             return script;
         }
 
@@ -207,6 +223,20 @@ namespace feeling
         {
             var script = "doc = window.parent.frames['Hauptframe'].document;";
             script += $"doc.querySelector(\"form[action='imperium.php'] input[type='submit'][value='查看详情']\").click()";
+            return script;
+        }
+
+        public static string ToCross()
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"a[href='dwenter.php']\").click()";
+            return script;
+        }
+
+        public static string BackUniverse()
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"a[href*='.cicihappy.com/ogame/frames.php'][href*='http://u']\").click()";
             return script;
         }
     }

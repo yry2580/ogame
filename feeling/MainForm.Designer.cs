@@ -118,6 +118,11 @@ namespace feeling
             this.label21 = new System.Windows.Forms.Label();
             this.cbox_tz_auto = new System.Windows.Forms.CheckBox();
             this.w_info = new System.Windows.Forms.TabPage();
+            this.lb_quick_auto = new System.Windows.Forms.Label();
+            this.label13 = new System.Windows.Forms.Label();
+            this.btn_quick_auto_start = new System.Windows.Forms.Button();
+            this.btn_quick_auto_uncheck = new System.Windows.Forms.Button();
+            this.btn_quick_auto_check = new System.Windows.Forms.Button();
             this.lb_tx_info1 = new System.Windows.Forms.Label();
             this.label22 = new System.Windows.Forms.Label();
             this.lb_hd_info1 = new System.Windows.Forms.Label();
@@ -1107,6 +1112,11 @@ namespace feeling
             // 
             // w_info
             // 
+            this.w_info.Controls.Add(this.lb_quick_auto);
+            this.w_info.Controls.Add(this.label13);
+            this.w_info.Controls.Add(this.btn_quick_auto_start);
+            this.w_info.Controls.Add(this.btn_quick_auto_uncheck);
+            this.w_info.Controls.Add(this.btn_quick_auto_check);
             this.w_info.Controls.Add(this.lb_tx_info1);
             this.w_info.Controls.Add(this.label22);
             this.w_info.Controls.Add(this.lb_hd_info1);
@@ -1122,8 +1132,57 @@ namespace feeling
             this.w_info.Padding = new System.Windows.Forms.Padding(3);
             this.w_info.Size = new System.Drawing.Size(996, 150);
             this.w_info.TabIndex = 4;
-            this.w_info.Text = "信息";
+            this.w_info.Text = "自动";
             this.w_info.UseVisualStyleBackColor = true;
+            // 
+            // lb_quick_auto
+            // 
+            this.lb_quick_auto.AutoSize = true;
+            this.lb_quick_auto.Location = new System.Drawing.Point(473, 126);
+            this.lb_quick_auto.Name = "lb_quick_auto";
+            this.lb_quick_auto.Size = new System.Drawing.Size(17, 12);
+            this.lb_quick_auto.TabIndex = 69;
+            this.lb_quick_auto.Text = "无";
+            // 
+            // label13
+            // 
+            this.label13.AutoSize = true;
+            this.label13.Location = new System.Drawing.Point(354, 126);
+            this.label13.Name = "label13";
+            this.label13.Size = new System.Drawing.Size(113, 12);
+            this.label13.TabIndex = 68;
+            this.label13.Text = "当前选中自动配置：";
+            // 
+            // btn_quick_auto_start
+            // 
+            this.btn_quick_auto_start.BackColor = System.Drawing.Color.DarkSalmon;
+            this.btn_quick_auto_start.Location = new System.Drawing.Point(224, 121);
+            this.btn_quick_auto_start.Name = "btn_quick_auto_start";
+            this.btn_quick_auto_start.Size = new System.Drawing.Size(124, 23);
+            this.btn_quick_auto_start.TabIndex = 67;
+            this.btn_quick_auto_start.Text = "一键所选自动开始";
+            this.btn_quick_auto_start.UseVisualStyleBackColor = false;
+            this.btn_quick_auto_start.Click += new System.EventHandler(this.btn_quick_auto_start_Click);
+            // 
+            // btn_quick_auto_uncheck
+            // 
+            this.btn_quick_auto_uncheck.Location = new System.Drawing.Point(116, 121);
+            this.btn_quick_auto_uncheck.Name = "btn_quick_auto_uncheck";
+            this.btn_quick_auto_uncheck.Size = new System.Drawing.Size(102, 23);
+            this.btn_quick_auto_uncheck.TabIndex = 66;
+            this.btn_quick_auto_uncheck.Text = "取消关闭自动";
+            this.btn_quick_auto_uncheck.UseVisualStyleBackColor = true;
+            this.btn_quick_auto_uncheck.Click += new System.EventHandler(this.btn_quick_auto_uncheck_Click);
+            // 
+            // btn_quick_auto_check
+            // 
+            this.btn_quick_auto_check.Location = new System.Drawing.Point(8, 121);
+            this.btn_quick_auto_check.Name = "btn_quick_auto_check";
+            this.btn_quick_auto_check.Size = new System.Drawing.Size(102, 23);
+            this.btn_quick_auto_check.TabIndex = 65;
+            this.btn_quick_auto_check.Text = "一键打开自动";
+            this.btn_quick_auto_check.UseVisualStyleBackColor = true;
+            this.btn_quick_auto_check.Click += new System.EventHandler(this.btn_quick_auto_check_Click);
             // 
             // lb_tx_info1
             // 
@@ -1492,5 +1551,10 @@ namespace feeling
         private System.Windows.Forms.CheckBox cbox_tx_auto1;
         private System.Windows.Forms.Label lb_tx_info1;
         private System.Windows.Forms.Label label22;
+        private System.Windows.Forms.Button btn_quick_auto_start;
+        private System.Windows.Forms.Button btn_quick_auto_uncheck;
+        private System.Windows.Forms.Button btn_quick_auto_check;
+        private System.Windows.Forms.Label label13;
+        private System.Windows.Forms.Label lb_quick_auto;
     }
 }

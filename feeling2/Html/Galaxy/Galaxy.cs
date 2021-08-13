@@ -128,7 +128,7 @@ namespace feeling
             }
             catch(Exception ex)
             {
-                Console.WriteLine($"Save galaxy catch {ex.Message}");
+                NativeLog.Error($"Save galaxy catch {ex.Message}");
             }
         }
     }

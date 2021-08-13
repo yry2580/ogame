@@ -18,14 +18,14 @@ namespace feeling
     public delegate void DelegateOperTips(OperStatus operStatus, string tips);
     public delegate void DelegateNpcChange();
 
-    class NativeController: Singleton<NativeController>
+    class NativeController : Singleton<NativeController>
     {
         public OperStatus MyOperStatus = OperStatus.None;
         public volatile bool IsWorking = false;
         public volatile bool IsPirateWorking = false;
         public volatile bool IsExpeditionWorking = false;
 
-        public string MyAddress = "";
+        public volatile string MyAddress = "";
         public DelegateStatusChange StatusChangeEvent;
         public DelegateScanGalaxy ScanGalaxyEvent;
         public DelegatePlanet PlanetEvent;
@@ -48,10 +48,14 @@ namespace feeling
 
         // auto
         public bool IsAutoExpedition = false;
+        public bool IsAutoExpedition1 = false;
         public DateTime LastExeditionTime = DateTime.Now;
+        public DateTime LastExeditionTime1 = DateTime.Now;
 
         public bool IsAutoPirate = false;
+        public bool IsAutoPirate1 = false;
         public DateTime LastPirateTime = DateTime.Now;
+        public DateTime LastPirateTime1 = DateTime.Now;
 
         public bool CanNotify = true;
 
@@ -68,7 +72,6 @@ namespace feeling
                 ScanPlanet();
                 ScanNpc();
             }
-
         }
 
         public void ScanPlanet()
@@ -79,9 +82,9 @@ namespace feeling
                 {
                     if (!mPlanet.HasData)
                     {
-                        var source = await GetHauptframe()?.GetSourceAsync();
+                        var source = await GetFrameSourceAsync();
 
-                        mPlanet.Parse(source);
+                        mPlanet.Parse(source, MyAddress);
                         PlanetEvent?.Invoke();
                     }
                 }
@@ -99,7 +102,7 @@ namespace feeling
                 {
                     if (!PirateUtil.HasNpcData)
                     {
-                        var source = await GetHauptframe()?.GetSourceAsync();
+                        var source = await GetFrameSourceAsync();
                         if (source.Contains("id=\"galaxy_form\""))
                         {
                             PirateUtil.ParseNpc(source);
@@ -125,7 +128,7 @@ namespace feeling
 
         public IFrame GetHauptframe()
         {
-            return MyWebBrowser.GetBrowser().GetFrame("Hauptframe");
+            return MyWebBrowser.GetBrowser()?.GetFrame("Hauptframe");
         }
 
         #region galaxy
@@ -212,7 +215,7 @@ namespace feeling
                     mScanPage = $"{mGalaxy.NextX}:{mGalaxy.NextY}";
                     FireScanGalaxy();
                     await Task.Delay(1500);
-                    var source = await GetHauptframe().GetSourceAsync();
+                    var source = await GetFrameSourceAsync();
                     if (!mGalaxy.AddPage(source))
                     {
                         if (lastError)
@@ -238,7 +241,7 @@ namespace feeling
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Scan galaxy catch {ex.Message}");
+                NativeLog.Error($"Scan galaxy catch {ex.Message}");
             }
 
             _StopScanGalaxy();
@@ -282,8 +285,6 @@ namespace feeling
 
         public async Task LoginAsync(string account, string psw, int universe)
         {
-            // Reload();
-
             var source = "";
             if (account.Length <= 0 || psw.Length <= 0 || universe <= 0 || universe > 24)
             {
@@ -291,51 +292,80 @@ namespace feeling
                 {
                     MessageBox.Show("请输入正确的账号、密码或宇宙");
                 }
-                OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}|请输入正确账号、密码或宇宙");
+                OperTipsEvent.Invoke(OperStatus.System, $"请输入正确账号、密码或宇宙");
                 return;
             }
 
-            OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}开始登录");
+            OperTipsEvent.Invoke(OperStatus.System, $"开始登录");
+            NativeLog.Info("开始登录");
 
-            MyWebBrowser.Load(NativeConst.Homepage);
-            Thread.Sleep(2000);
-            source = await MyWebBrowser.GetSourceAsync();
+            // 
+            Reload();
+            source = await GetFrameSourceAsync();
+            bool needLogin = false;
 
+            // 当前还在游戏页面
             if (HtmlUtil.IsGameUrl(MyAddress))
             {
-                try
+                if (source.Contains("退出成功") && source.Contains("重新登录"))
                 {
-                    source = await GetHauptframe().GetSourceAsync();
-                    if (HtmlUtil.IsInGame(source))
+                    needLogin = true;
+                }
+                else if (HtmlUtil.HasTutorial(source))
+                {
+                    FrameRunJs(NativeScript.TutorialConfirm());
+                    await Task.Delay(1500);
+                    source = await GetFrameSourceAsync();
+
+                    if (HtmlUtil.IsGameUrl(MyAddress) && HtmlUtil.IsInGame(source))
                     {
                         if (CanNotify)
                         {
                             MessageBox.Show("已经是登录状态");
                         }
-                        OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}|已经是登录状态");
+                        OperTipsEvent.Invoke(OperStatus.System, $"已经是登录状态");
                         return;
                     }
-                }
-                catch(Exception)
-                {
-                }
 
-                await DoLoginAsync(account, psw, universe);
-            } else
+                    needLogin = true;
+                }
+                else
+                {
+                    if (HtmlUtil.IsGameUrl(MyAddress) && HtmlUtil.IsInGame(source))
+                    {
+                        if (CanNotify)
+                        {
+                            MessageBox.Show("已经是登录状态");
+                        }
+                        OperTipsEvent.Invoke(OperStatus.System, $"已经是登录状态");
+                        return;
+                    }
+                    needLogin = true;
+                }
+            }
+            else
             {
-                await DoLoginAsync(account, psw, universe);
+                needLogin = true;
             }
 
-            OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}登录输入完成");
+            if (!needLogin)
+            {
+                OperTipsEvent.Invoke(OperStatus.System, $"不需要重新登录");
+                NativeLog.Info("不需要重新登录");
+                return;
+            }
+
+            await DoLoginAsync(account, psw, universe);
+            OperTipsEvent.Invoke(OperStatus.System, $"登录输入完成");
+            NativeLog.Info("登录输入完成");
             try
             {
-
-                await Task.Delay(1000);
+                await Task.Delay(2000);
+                source = await GetFrameSourceAsync();
                 await GoHome(1000);
-
                 if (HtmlUtil.IsGameUrl(MyAddress))
                 {
-                    source = await GetHauptframe()?.GetSourceAsync();
+                    source = await GetFrameSourceAsync();
                     if (HtmlUtil.HasTutorial(source))
                     {
                         FrameRunJs(NativeScript.TutorialConfirm());
@@ -347,7 +377,8 @@ namespace feeling
             {
             }
 
-            OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}登录操作结束");
+            OperTipsEvent.Invoke(OperStatus.System, $"登录操作结束");
+            NativeLog.Info("登录操作结束");
         }
 
         protected async Task DoLoginAsync(string account, string psw, int universe)
@@ -355,7 +386,7 @@ namespace feeling
             if (!HtmlUtil.IsHomeUrl(MyAddress))
             {
                 MyWebBrowser.Load(NativeConst.Homepage);
-                await Task.Delay(2000);
+                await Task.Delay(3000);
             }
 
             await MyWebBrowser.GetSourceAsync();
@@ -388,7 +419,11 @@ namespace feeling
         {
             try
             {
-                OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}退出登录");
+                OperTipsEvent.Invoke(OperStatus.System, $"退出登录");
+                NativeLog.Info("开始退出登录");
+
+                Reload();
+                var source = await GetFrameSourceAsync();
 
                 if (!HtmlUtil.IsGameUrl(MyAddress))
                 {
@@ -396,7 +431,8 @@ namespace feeling
                     {
                         MessageBox.Show("退出失败，可能不在游戏页");
                     }
-                    OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}退出失败，可能不在游戏页");
+                    OperTipsEvent.Invoke(OperStatus.System, $"退出失败，可能不在游戏页");
+                    NativeLog.Info("退出失败，可能不在游戏页");
                     return;
                 }
 
@@ -406,16 +442,17 @@ namespace feeling
                     {
                         MessageBox.Show("当前正在忙，不建议退出");
                     }
-                    OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}当前正在忙，不建议退出");
+                    OperTipsEvent.Invoke(OperStatus.System, $"当前正在忙，不建议退出");
+                    NativeLog.Info("当前正在忙，不建议退出");
                     return;
                 }
 
-                Reload();
-                var source = await GetHauptframe().GetSourceAsync();
+                source = await GetFrameSourceAsync();
                 if (!HtmlUtil.HasLogoutBtn(source))
                 {
                     await GoHome();
                     await Task.Delay(1500);
+                    source = await GetFrameSourceAsync();
                 }
 
                 if (!HtmlUtil.IsInGame(source))
@@ -424,19 +461,22 @@ namespace feeling
                     {
                         MessageBox.Show("退出失败，无退出按钮");
                     }
-                    OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}退出失败，无退出按钮");
+                    OperTipsEvent.Invoke(OperStatus.System, $"退出失败，无退出按钮");
+                    NativeLog.Info("退出失败，无退出按钮");
                     return;
                 }
 
+                NativeLog.Info("退出登录");
                 FrameRunJs(NativeScript.ToLogout());
                 await Task.Delay(500);
             }
-            catch(Exception)
+            catch(Exception ex)
             {
-
+                NativeLog.Error($"LogoutAsync catch {ex.Message}");
             }
 
-            OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}退出操作结束");
+            NativeLog.Info("退出操作结束");
+            OperTipsEvent.Invoke(OperStatus.System, $"退出操作结束");
         }
         #endregion login
 
@@ -447,14 +487,14 @@ namespace feeling
             Thread.Sleep(delay);
         }
 
-        internal void StartExpedition(ExMission exMission)
+        internal void StartExpedition(ExMission exMission, int index = 0, bool autoLogin = false)
         {
             SwitchStatus(OperStatus.Expedition);
             IsExpeditionWorking = true;
-            OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:G}|开始探险");
+            OperTipsEvent.Invoke(OperStatus.Expedition, $"开始探险");
             Task.Run(() =>
             {
-                DoExpedition(exMission);
+                DoExpedition(exMission, index, autoLogin);
             });
         }
 
@@ -468,23 +508,23 @@ namespace feeling
             {
                 try
                 {
-                    OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:G}|刷NPC");
+                    OperTipsEvent.Invoke(OperStatus.Expedition, $"刷NPC");
                     mPlanet.Reset();
                     Reload();
                     await GoHome(1500);
 
                     if (HtmlUtil.IsGameUrl(MyAddress))
                     {
-                        var source = await GetHauptframe().GetSourceAsync();
+                        var source = await GetFrameSourceAsync();
                         await Task.Delay(500);
                     }
                 }
                 catch (Exception ex)
                 {
-                    Console.WriteLine($"RefreshPlanet catch {ex.Message}");
+                    NativeLog.Error($"RefreshPlanet catch {ex.Message}");
                 }
 
-                OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:G}|刷NPC结束");
+                OperTipsEvent.Invoke(OperStatus.Expedition, $"刷NPC结束");
                 SwitchStatus(OperStatus.None);
             });
         }
@@ -496,7 +536,7 @@ namespace feeling
             IsExpeditionWorking = false;
         }
 
-        protected async void DoExpedition(ExMission exMission)
+        protected async void DoExpedition(ExMission exMission, int cfgIndex = 0, bool autoLogin = false)
         {
             int index = 0;
             int _count = 0;
@@ -520,13 +560,13 @@ namespace feeling
             try
             {
                 
-                OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:G}|开始处理探险");
+                OperTipsEvent.Invoke(OperStatus.Expedition, $"开始处理探险");
 
                 if (exMission.List.Count <= 0)
                 {
-                    OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|没有探险任务");
-                
-                    LastExeditionTime = DateTime.Now;
+                    OperTipsEvent.Invoke(OperStatus.Expedition, $"没有探险任务");
+
+                    SetLastExpeditionTime(cfgIndex);
                     IsExpeditionWorking = false;
                     SwitchStatus(OperStatus.None);
                     return;
@@ -535,16 +575,16 @@ namespace feeling
                 Reload();
                 if (HtmlUtil.IsGameUrl(MyAddress))
                 {
-                    source = await GetHauptframe().GetSourceAsync();
+                    source = await GetFrameSourceAsync();
                     if (HtmlUtil.HasTutorial(source))
                     {
                         FrameRunJs(NativeScript.TutorialConfirm());
                         await Task.Delay(1500);
-                        source = await GetHauptframe().GetSourceAsync();
+                        source = await GetFrameSourceAsync();
                         if (!HtmlUtil.IsInGame(source))
                         {
-                            OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|探险结束，没有登录");
-                            LastExeditionTime = DateTime.Now;
+                            OperTipsEvent.Invoke(OperStatus.Expedition, $"探险结束，没有登录");
+                            SetLastExpeditionTime(cfgIndex);
                             IsExpeditionWorking = false;
                             SwitchStatus(OperStatus.None);
                             return;
@@ -553,8 +593,8 @@ namespace feeling
                 }
                 else
                 {
-                    OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|探险结束，没有登录");
-                    LastExeditionTime = DateTime.Now;
+                    OperTipsEvent.Invoke(OperStatus.Expedition, $"探险结束，没有登录");
+                    SetLastExpeditionTime(cfgIndex);
                     IsExpeditionWorking = false;
                     SwitchStatus(OperStatus.None);
                     return;
@@ -564,8 +604,8 @@ namespace feeling
 
                 do
                 {
-                    Console.WriteLine($"ex-mession index{index}");
-                    OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|探险{index+1}");
+                    NativeLog.Info($"ex-mession index{index}");
+                    OperTipsEvent.Invoke(OperStatus.Expedition, $"探险{index+1}");
 
                     if (index >= exMission.List.Count)
                     {
@@ -573,30 +613,30 @@ namespace feeling
                         {
                             MessageBox.Show($"探险派出结束，请检测是否成功{_count}/{exMission.List.Count}");
                         }
-                        OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|探险派出结束{_count}/{exMission.List.Count}");
+                        OperTipsEvent.Invoke(OperStatus.Expedition, $"探险派出结束{_count}/{exMission.List.Count}");
                         success = true;
                         break;
                     }
 
                     if (!IsExpeditionWorking)
                     {
-                        OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|探险结束被停止");
+                        OperTipsEvent.Invoke(OperStatus.Expedition, $"探险结束被停止");
                         success = true;
                         break;
                     }
 
                     var mission = exMission.GetMission(index);
 
-                    Console.WriteLine($"mission {JsonConvert.SerializeObject(mission)}");
+                    NativeLog.Info($"mission {JsonConvert.SerializeObject(mission)}");
 
                     if (lastErr)
                     {
                         Reload();
                     }
-                    source = await GetHauptframe().GetSourceAsync();
+                    source = await GetFrameSourceAsync();
                     if (HtmlUtil.HasTutorial(source, mExpedition.Parser))
                     {
-                        OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|存在错误");
+                        OperTipsEvent.Invoke(OperStatus.Expedition, $"存在错误");
                         FrameRunJs(NativeScript.TutorialConfirm());
                         await Task.Delay(1500);
                     }
@@ -604,13 +644,13 @@ namespace feeling
                     // 切换舰队页面
                     GoFleetPage();
 
-                    source = await GetHauptframe().GetSourceAsync();
+                    source = await GetFrameSourceAsync();
 
                     // 切换触发球
                     int idx = mPlanet.GetPlanetIndex(mission.PlanetName);
                     if (idx < 0)
                     {
-                        OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:G}|没找到探险出发球");
+                        OperTipsEvent.Invoke(OperStatus.Expedition, $"没找到探险出发球");
                         _nextFunc(false);
                         continue;
                     }
@@ -618,11 +658,11 @@ namespace feeling
                     await Task.Delay(1500);
 
                     // 查看舰队队列
-                    source = await GetHauptframe().GetSourceAsync();
+                    source = await GetFrameSourceAsync();
                     if (!HtmlUtil.ParseFleetQueue(source, out FleetQueue fq))
                     {
                         _nextFunc(false);
-                        OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|解析探险队列有误");
+                        OperTipsEvent.Invoke(OperStatus.Expedition, $"解析探险队列有误");
                         continue;
                     }
 
@@ -632,7 +672,7 @@ namespace feeling
                         {
                             MessageBox.Show("探险队列已满");
                         }
-                        OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|探险队列已满");
+                        OperTipsEvent.Invoke(OperStatus.Expedition, $"探险队列已满");
                         success = true;
                         break;
                     }
@@ -643,7 +683,7 @@ namespace feeling
                         {
                             MessageBox.Show("航道已满");
                         }
-                        OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:G}|航道已满");
+                        OperTipsEvent.Invoke(OperStatus.Expedition, $"航道已满");
                         break;
                     }
 
@@ -656,7 +696,7 @@ namespace feeling
                         var count = fleet.Count;
                         if (HtmlUtil.ParseShip(source, shipId, out int total))
                         {
-                            Console.WriteLine($"shipId{shipId} count{count}");
+                            NativeLog.Info($"shipId{shipId} count{count}");
                             if (total >= count)
                             {
                                 FrameRunJs(NativeScript.SetShip(shipId, count));
@@ -671,7 +711,7 @@ namespace feeling
 
                     if (!flag)
                     {
-                        OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|没有足够舰队数");
+                        OperTipsEvent.Invoke(OperStatus.Expedition, $"没有足够舰队数");
                         _nextFunc(true);
                         continue;
                     }
@@ -680,28 +720,30 @@ namespace feeling
                     FrameRunJs(NativeScript.SetShipNext());
                     await Task.Delay(1500);
 
-                    source = await GetHauptframe().GetSourceAsync();
+                    source = await GetFrameSourceAsync();
 
                     // 设置目标点
                     FrameRunJs(NativeScript.SetTarget(mission.X, mission.Y, mission.Z, (int)PlanetType.Star));
                     await Task.Delay(200);
 
-                    source = await GetHauptframe().GetSourceAsync();
+                    source = await GetFrameSourceAsync();
                     // 设置目标继续
                     FrameRunJs(NativeScript.SetTargetNext());
                     await Task.Delay(1500);
 
-                    source = await GetHauptframe().GetSourceAsync();
+                    source = await GetFrameSourceAsync();
+
+                    var confirmType = HtmlUtil.AttackConfirmType(source);
                     // 攻击确认
-                    FrameRunJs(NativeScript.SetAttackConfirm());
+                    FrameRunJs(NativeScript.SetAttackConfirm(confirmType));
                     await Task.Delay(1500);
 
                     // 查看结果
-                    source = await GetHauptframe().GetSourceAsync();
+                    source = await GetFrameSourceAsync();
                     if (HtmlUtil.HasFleetSuccess(source, mExpedition.Parser))
                     {
                         // Console.WriteLine($"HasFleetSuccess");
-                        OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:G}|探险派出成功");
+                        OperTipsEvent.Invoke(OperStatus.Expedition, $"探险派出成功");
                         _nextFunc(true);
                         _count++;
                         continue;
@@ -709,7 +751,7 @@ namespace feeling
 
                     if (HtmlUtil.HasTutorial(source, mExpedition.Parser))
                     {
-                        OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|派遣错误");
+                        OperTipsEvent.Invoke(OperStatus.Expedition, $"派遣错误");
                         FrameRunJs(NativeScript.TutorialConfirm());
                         await Task.Delay(1500);
                     }
@@ -719,20 +761,50 @@ namespace feeling
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"DoExpedition catch {ex.Message}");
+                NativeLog.Error($"DoExpedition catch {ex.Message}");
             }
 
-            OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|探险派遣结束{_count}/{exMission.List.Count}");
+            OperTipsEvent.Invoke(OperStatus.Expedition, $"探险派遣结束{_count}/{exMission.List.Count}");
+
+            // autoLogin
+            var autoLogout = false;
 
             // 如果存在派遣成功的
             if (_count >= 0 || success)
             {
-                LastExeditionTime = DateTime.Now;
+                SetLastExpeditionTime(cfgIndex);
+
+                if (IsExpeditionWorking && autoLogin)
+                {
+                    autoLogout = CanAutoLogout();
+                }
             }
 
             IsExpeditionWorking = false;
-            SwitchStatus(OperStatus.None);
+            if (autoLogout)
+            {
+                SwitchStatus(OperStatus.System);
+                await LogoutAsync();
+                SwitchStatus(OperStatus.None);
+            }
+            else
+            {
+                SwitchStatus(OperStatus.None);
+            }
         }
+
+        private void SetLastExpeditionTime(int index)
+        { 
+            if (index == 1)
+            {
+                LastExeditionTime1 = DateTime.Now;
+            }
+            else
+            {
+                LastExeditionTime = DateTime.Now;
+            }
+        }
+
         #endregion
 
         #region npc 海盗
@@ -745,46 +817,52 @@ namespace feeling
             SwitchStatus(OperStatus.System);
             Task.Run(async () =>
             {
-                try
-                {
-                    OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:MM:dd-HH:mm:ss}|刷球");
-                    if (!isAuto)
-                    {
-                        mPlanet.Reset();
-                    }
-                    PirateUtil.ResetNpc();
-                    Reload();
-                    await GoHome(1500);
-
-                    if (HtmlUtil.IsGameUrl(MyAddress))
-                    {
-                        var source = await GetHauptframe()?.GetSourceAsync();
-                        FrameRunJs(NativeScript.ToGalaxy());
-                        await Task.Delay(1500);
-                        source = await GetHauptframe().GetSourceAsync();
-                        PirateUtil.ParseNpc(source);
-                        NpcChangeEvent?.Invoke();
-                        await Task.Delay(500);
-                    }
-                }
-                catch(Exception ex)
-                {
-                    Console.WriteLine($"RefreshNpc catch {ex.Message}");
-                }
-
-                OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:MM:dd-HH:mm:ss}|刷球完成");
-                SwitchStatus(OperStatus.None);
+                await DoRefreshNpc(isAuto);
             });
         }
 
-        internal void StartPirate(PirateMission pMission, bool isAuto = false)
+        internal async Task DoRefreshNpc(bool isAuto = false)
+        {
+            try
+            {
+                SwitchStatus(OperStatus.System);
+                OperTipsEvent.Invoke(OperStatus.System, $"刷球");
+                if (!isAuto)
+                {
+                    mPlanet.Reset();
+                }
+                PirateUtil.ResetNpc();
+                Reload();
+                await GoHome(1500);
+
+                if (HtmlUtil.IsGameUrl(MyAddress))
+                {
+                    var source = await GetFrameSourceAsync();
+                    FrameRunJs(NativeScript.ToGalaxy());
+                    await Task.Delay(1500);
+                    source = await GetFrameSourceAsync();
+                    PirateUtil.ParseNpc(source, MyAddress);
+                    NpcChangeEvent?.Invoke();
+                    await Task.Delay(500);
+                }
+            }
+            catch (Exception ex)
+            {
+                NativeLog.Error($"DoRefreshNpc catch {ex.Message}");
+            }
+
+            OperTipsEvent.Invoke(OperStatus.System, $"刷球完成");
+            SwitchStatus(OperStatus.None);
+        }
+
+        internal void StartPirate(PirateMission pMission, int cfgIndex = 0, bool autoLogin = false)
         {
             SwitchStatus(OperStatus.Pirate);
             IsPirateWorking = true;
 
             Task.Run(() =>
             {
-                DoPirate(pMission, isAuto);
+                DoPirate(pMission, cfgIndex, autoLogin);
             });
         }
 
@@ -794,7 +872,7 @@ namespace feeling
             IsPirateWorking = false;
         }
 
-        protected async void DoPirate(PirateMission pMission, bool isAuto = false)
+        protected async void DoPirate(PirateMission pMission, int cfgIndex = 0, bool autoLogin = false)
         {
             int index = 0;
             int _count = 0;
@@ -817,12 +895,12 @@ namespace feeling
 
             try
             {
-                OperTipsEvent.Invoke(OperStatus.Pirate, $"{DateTime.Now:MM:dd-HH:mm:ss}|开始海盗");
+                OperTipsEvent.Invoke(OperStatus.Pirate, $"开始海盗");
 
                 if (pMission.MissionCount <= 0)
                 {
-                    OperTipsEvent.Invoke(OperStatus.Pirate, $"{DateTime.Now:MM:dd-HH:mm:ss}|没有海盗任务");
-                    LastPirateTime = DateTime.Now;
+                    OperTipsEvent.Invoke(OperStatus.Pirate, $"没有海盗任务");
+                    SetLastPirateTime(cfgIndex);
                     IsPirateWorking = false;
                     SwitchStatus(OperStatus.None);
                     return;
@@ -832,16 +910,16 @@ namespace feeling
 
                 if (HtmlUtil.IsGameUrl(MyAddress))
                 {
-                    source = await GetHauptframe().GetSourceAsync();
+                    source = await GetFrameSourceAsync();
                     if (HtmlUtil.HasTutorial(source))
                     {
                         FrameRunJs(NativeScript.TutorialConfirm());
                         await Task.Delay(1500);
-                        source = await GetHauptframe().GetSourceAsync();
+                        source = await GetFrameSourceAsync();
                         if (!HtmlUtil.IsInGame(source))
                         {
-                            OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|海盗结束，没有登录");
-                            LastExeditionTime = DateTime.Now;
+                            OperTipsEvent.Invoke(OperStatus.Expedition, $"海盗结束，没有登录");
+                            SetLastPirateTime(cfgIndex);
                             IsExpeditionWorking = false;
                             SwitchStatus(OperStatus.None);
                             return;
@@ -849,8 +927,8 @@ namespace feeling
                     }
                 }  else
                 {
-                    OperTipsEvent.Invoke(OperStatus.Expedition, $"{DateTime.Now:MM:dd-hh:mm}|海盗结束，没有登录");
-                    LastExeditionTime = DateTime.Now;
+                    OperTipsEvent.Invoke(OperStatus.Expedition, $"海盗结束，没有登录");
+                    SetLastPirateTime(cfgIndex);
                     IsExpeditionWorking = false;
                     SwitchStatus(OperStatus.None);
                     return;
@@ -858,56 +936,56 @@ namespace feeling
 
                 await GoHome(1500);
 
-           
                 do
                 {
-                    Console.WriteLine($"{DateTime.Now:MM:dd-HH:mm:ss}|PirateMission index{index}");
+                    NativeLog.Info($"PirateMission index{index}");
                     if (index >= pMission.MissionCount)
                     {
-                        if (!IsAutoPirate && CanNotify)
+                        if (!autoLogin && CanNotify)
                         {
                             MessageBox.Show($"海盗任务派出结束，请检测是否成功{_count}/{pMission.MissionCount}");
                         }
-                        OperTipsEvent.Invoke(OperStatus.Pirate, $"{DateTime.Now:MM:dd-HH:mm:ss}|海盗任务结束{_count}/{pMission.MissionCount}");
+                        OperTipsEvent.Invoke(OperStatus.Pirate, $"海盗任务结束{_count}/{pMission.MissionCount}");
                         success = true;
                         break;
                     }
 
-                    OperTipsEvent.Invoke(OperStatus.Pirate, $"{DateTime.Now:MM:dd-HH:mm:ss}|海盗任务{index + 1}/{pMission.MissionCount}");
+                    OperTipsEvent.Invoke(OperStatus.Pirate, $"海盗任务{index + 1}/{pMission.MissionCount}");
 
                     if (!IsPirateWorking)
                     {
-                        OperTipsEvent.Invoke(OperStatus.Pirate, $"{DateTime.Now:MM:dd-HH:mm:ss}|海盗任务停止");
+                        OperTipsEvent.Invoke(OperStatus.Pirate, $"海盗任务停止");
                         success = true;
                         break;
                     }
 
                     var mission = pMission.GetMission(index);
 
-                    Console.WriteLine($"{DateTime.Now:G}|mission {JsonConvert.SerializeObject(mission)}");
+                    NativeLog.Info($"mission {JsonConvert.SerializeObject(mission)}");
 
                     if (lastErr)
                     {
                         Reload();
+                        NativeLog.Info($"重载");
                     }
 
-                    source = await GetHauptframe().GetSourceAsync();
+                    source = await GetFrameSourceAsync();
                     if (HtmlUtil.HasTutorial(source, mHtmlParser))
                     {
-                        Console.WriteLine($"{DateTime.Now:G}|存在错误");
-                        OperTipsEvent.Invoke(OperStatus.Pirate, $"{DateTime.Now:MM:dd-HH:mm:ss}|存在错误");
+                        NativeLog.Info($"存在错误");
+                        OperTipsEvent.Invoke(OperStatus.Pirate, $"存在错误");
                         FrameRunJs(NativeScript.TutorialConfirm());
                         await Task.Delay(1500);
                     }
 
                     // 切换舰队页面
                     GoFleetPage();
-                    source = await GetHauptframe().GetSourceAsync();
-
+                    NativeLog.Info($"切换舰队");
+                    source = await GetFrameSourceAsync();
                     if (index <= 1 && HtmlUtil.IsWechatCodePage(source))
                     {
-                        Console.WriteLine($"{DateTime.Now:G}|在微信验证页");
-                        OperTipsEvent.Invoke(OperStatus.Pirate, $"{DateTime.Now:MM:dd-HH:mm:ss}|需微信验证页");
+                        NativeLog.Info($"在微信验证页");
+                        OperTipsEvent.Invoke(OperStatus.Pirate, $"在微信验证页");
                         success = true;
                         break;
                     }
@@ -924,37 +1002,37 @@ namespace feeling
                     await Task.Delay(1500);
 
                     // 查看舰队队列
-                    source = await GetHauptframe().GetSourceAsync();
+                    source = await GetFrameSourceAsync();
                     if (!source.Contains("id=\"fleetdelaybox\""))
                     {
                         GoFleetPage();
-                        source = await GetHauptframe().GetSourceAsync();
+                        source = await GetFrameSourceAsync();
                     }
 
                     if (!HtmlUtil.ParseFleetQueue(source, out FleetQueue fq))
                     {
                         _nextFunc(false);
-                        Console.WriteLine($"{DateTime.Now:G}|解析航道队列有误");
-                        OperTipsEvent.Invoke(OperStatus.Pirate, $"{DateTime.Now:MM:dd-HH:mm:ss}|解析航道队列有误");
+                        NativeLog.Info($"解析航道队列有误");
+                        OperTipsEvent.Invoke(OperStatus.Pirate, $"解析航道队列有误");
                         continue;
                     }
 
                     if (fq.Count >= fq.MaxCount)
                     {
-                        if (!IsAutoPirate && CanNotify)
+                        if (!autoLogin && CanNotify)
                         {
                             MessageBox.Show("航道已满");
                         }
-                        Console.WriteLine($"{DateTime.Now:G}|航道已满");
-                        OperTipsEvent.Invoke(OperStatus.Pirate, $"{DateTime.Now:MM:dd-HH:mm:ss}|航道已满");
+                        NativeLog.Info($"航道已满");
+                        OperTipsEvent.Invoke(OperStatus.Pirate, $"航道已满");
                         success = true;
                         break;
                     }
 
                     if (HtmlUtil.HasAttack(source, mission.TargetPos))
                     {
-                        Console.WriteLine($"{DateTime.Now:G}|已经存在攻击任务");
-                        OperTipsEvent.Invoke(OperStatus.Pirate, $"{DateTime.Now:MM:dd-HH:mm:ss}|已存在攻击目标任务");
+                        NativeLog.Info($"已经存在攻击任务");
+                        OperTipsEvent.Invoke(OperStatus.Pirate, $"已存在攻击目标任务");
                         _nextFunc(true);
                         continue;
                     }
@@ -968,7 +1046,7 @@ namespace feeling
                         var count = fleet.Count;
                         if (HtmlUtil.ParseShip(source, shipId, out int total))
                         {
-                            Console.WriteLine($"shipId{shipId} count{count}");
+                            NativeLog.Info($"shipId{shipId} count{count}");
                             if (total >= count)
                             {
                                 FrameRunJs(NativeScript.SetShip(shipId, count));
@@ -983,8 +1061,8 @@ namespace feeling
 
                     if (!flag)
                     {
-                        Console.WriteLine($"{DateTime.Now:G}|没有足够舰队数");
-                        OperTipsEvent.Invoke(OperStatus.Pirate, $"{DateTime.Now:MM:dd-HH:mm:ss}|没有足够舰队数");
+                        NativeLog.Info($"没有足够舰队数");
+                        OperTipsEvent.Invoke(OperStatus.Pirate, $"没有足够舰队数");
                         _nextFunc(true);
                         continue;
                     }
@@ -994,32 +1072,33 @@ namespace feeling
                     FrameRunJs(NativeScript.SetShipNext());
                     await Task.Delay(1500);
 
-                    source = await GetHauptframe().GetSourceAsync();
+                    source = await GetFrameSourceAsync();
 
                     // 设置目标点
                     FrameRunJs(NativeScript.SetTarget(mission.X, mission.Y, mission.Z, (int)PlanetType.Star));
                     await Task.Delay(500);
 
-                    source = await GetHauptframe().GetSourceAsync();
+                    source = await GetFrameSourceAsync();
                     // 设置目标继续
                     FrameRunJs(NativeScript.SetTargetNext());
                     await Task.Delay(1500);
 
-                    source = await GetHauptframe().GetSourceAsync();
+                    source = await GetFrameSourceAsync();
                     // 攻击
                     FrameRunJs(NativeScript.SetAttack());
                     await Task.Delay(300);
 
+                    var confirmType = HtmlUtil.AttackConfirmType(source);
                     // 攻击确认
-                    FrameRunJs(NativeScript.SetAttackConfirm());
+                    FrameRunJs(NativeScript.SetAttackConfirm(confirmType));
                     await Task.Delay(1500);
 
                     // 查看结果
-                    source = await GetHauptframe().GetSourceAsync();
+                    source = await GetFrameSourceAsync();
                     if (HtmlUtil.HasFleetSuccess(source, mExpedition.Parser))
                     {
-                        Console.WriteLine($"{DateTime.Now:G}|派遣成功");
-                        OperTipsEvent.Invoke(OperStatus.Pirate, $"{DateTime.Now:MM:dd-HH:mm:ss}|派遣成功");
+                        NativeLog.Info($"派遣成功");
+                        OperTipsEvent.Invoke(OperStatus.Pirate, $"派遣成功");
                         _nextFunc(true);
                         _count++;
                         continue;
@@ -1027,8 +1106,8 @@ namespace feeling
 
                     if (HtmlUtil.HasTutorial(source, mExpedition.Parser))
                     {
-                        Console.WriteLine($"{DateTime.Now:G}|派遣错误");
-                        OperTipsEvent.Invoke(OperStatus.Pirate, $"{DateTime.Now:MM:dd-HH:mm:ss}|派遣错误");
+                        NativeLog.Info($"派遣错误");
+                        OperTipsEvent.Invoke(OperStatus.Pirate, $"派遣错误");
                         FrameRunJs(NativeScript.TutorialConfirm());
                         await Task.Delay(1500);
                     }
@@ -1038,22 +1117,22 @@ namespace feeling
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"DoPirate catch {ex.Message}");
+                NativeLog.Error($"DoPirate catch {ex.Message}");
             }
 
-            OperTipsEvent.Invoke(OperStatus.Pirate, $"{DateTime.Now:MM:dd-HH:mm:ss}|海盗任务结束{_count}/{pMission.MissionCount}");
+            OperTipsEvent.Invoke(OperStatus.Pirate, $"海盗任务结束{_count}/{pMission.MissionCount}");
 
             var checkNpc = false;
             var autoLogout = false;
             // 如果存在派遣成功的
             if (_count >= 0 || success)
             {
-                LastPirateTime = DateTime.Now;
+                SetLastPirateTime(cfgIndex);
 
-                if (IsPirateWorking && IsAutoPirate)
+                if (IsPirateWorking && autoLogin)
                 {
-                    checkNpc = CheckRefreshNpc(pMission);
-                    autoLogout = isAuto ? true : false;
+                    // checkNpc = CheckRefreshNpc(pMission);
+                    autoLogout = CanAutoLogout();
                 }
             }
 
@@ -1078,12 +1157,24 @@ namespace feeling
             }
         }
 
+        private void SetLastPirateTime(int index = 0)
+        {
+            if (index == 1)
+            {
+                LastPirateTime1 = DateTime.Now;
+            }
+            else
+            {
+                LastPirateTime = DateTime.Now;
+            }
+        }
+
         private bool CheckRefreshNpc(PirateMission pMission)
         {
             if (null == pMission) return false;
             if (pMission.MissionCount <= 0) return false;
 
-            var pMissionCfg = PirateUtil.MyPirateMission;
+            var pMissionCfg = PirateUtil.MyMission;
             if (null == pMissionCfg || pMissionCfg.MissionCount <= 0) return false;
 
             return pMissionCfg.MissionCount - pMission.MissionCount >= 8;
@@ -1095,111 +1186,226 @@ namespace feeling
         internal async Task GetCode()
         {
             SwitchStatus(OperStatus.System);
-            OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}开始获取验证码");
+            OperTipsEvent.Invoke(OperStatus.System, $"开始获取验证码");
 
             try
             {
                 Reload();
                 await GoHome(1500);
-                var source = await GetHauptframe().GetSourceAsync();
+                var source = await GetFrameSourceAsync();
                 if (HtmlUtil.IsWechatCodePage(source))
                 {
                     FrameRunJs(NativeScript.GetCode());
-                    OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}点击获取验证码");
+                    OperTipsEvent.Invoke(OperStatus.System, $"点击获取验证码");
                 }
                 else
                 {
-                    OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}不在验证码页");
+                    OperTipsEvent.Invoke(OperStatus.System, $"不在验证码页");
                 }
             }
             catch (SystemException)
             {
-                OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}获取验证码异常");
+                OperTipsEvent.Invoke(OperStatus.System, $"获取验证码异常");
             }
         }
 
         internal async Task AuthCode(string code)
         {
             SwitchStatus(OperStatus.System);
-            OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}输入验证码");
+            OperTipsEvent.Invoke(OperStatus.System, $"输入验证码");
 
             try
             {
                 // Reload();
                 // await GoHome(1500);
-                var source = await GetHauptframe().GetSourceAsync();
+                var source = await GetFrameSourceAsync();
                 if (HtmlUtil.IsWechatCodePage(source))
                 {
                     FrameRunJs(NativeScript.AuthCode(code));
                     await Task.Delay(200);
                     FrameRunJs(NativeScript.SubmitCode());
-                    OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}输入验证码");
+                    OperTipsEvent.Invoke(OperStatus.System, $"输入验证码");
                 }
                 else
                 {
-                    OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}不在验证码页");
+                    OperTipsEvent.Invoke(OperStatus.System, $"不在验证码页");
                 }
             }
             catch (SystemException)
             {
-                OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}输入验证码异常");
+                OperTipsEvent.Invoke(OperStatus.System, $"输入验证码异常");
             }
         }
 
         #endregion
 
         #region 统治
-        public async Task StartImperium()
+        public async Task StartImperium(bool autoLogin = false)
         {
             try
             {
-                OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}统治");
+                OperTipsEvent.Invoke(OperStatus.System, $"统治");
 
                 Reload();
 
                 if (!HtmlUtil.IsGameUrl(MyAddress))
                 {
-                    OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}统治失败，可能不在游戏页");
+                    OperTipsEvent.Invoke(OperStatus.System, $"统治失败，可能不在游戏页");
                     return;
                 }
 
-                var source = await GetHauptframe().GetSourceAsync();
+                var source = await GetFrameSourceAsync();
                 if (!HtmlUtil.HasImperium(source))
                 {
                     await GoHome();
                     await Task.Delay(1500);
                 }
 
-                source = await GetHauptframe().GetSourceAsync();
+                source = await GetFrameSourceAsync();
                 if (!HtmlUtil.HasImperium(source))
                 {
-                    OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}统治失败，没有统治按钮");
+                    OperTipsEvent.Invoke(OperStatus.System, $"统治失败，没有统治按钮");
                     return;
                 }
 
                 FrameRunJs(NativeScript.ToImperium());
                 await Task.Delay(1500);
-                source = await GetHauptframe().GetSourceAsync();
+                source = await GetFrameSourceAsync();
                 if (!HtmlUtil.HasImperiumDetail(source))
                 {
-                    OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}统治失败，没有统治详情按钮");
+                    OperTipsEvent.Invoke(OperStatus.System, $"统治失败，没有统治详情按钮");
                     return;
                 }
 
                 FrameRunJs(NativeScript.ToImperiumDetail());
                 await Task.Delay(1500);
-                source = await GetHauptframe().GetSourceAsync();
+                source = await GetFrameSourceAsync();
 
                 Reload();
+
+                var autoLogut = false;
+                if (autoLogin)
+                {
+                    autoLogut = CanAutoLogout();
+                }
+
+                if (autoLogut)
+                {
+                    await LogoutAsync();
+                }
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"StartImperium catch {ex.Message}");
+                NativeLog.Error($"StartImperium catch {ex.Message}");
             }
 
-            OperTipsEvent.Invoke(OperStatus.System, $"{DateTime.Now:G}统治结束");
+            OperTipsEvent.Invoke(OperStatus.System, $"统治结束");
         }
         #endregion 统治
+
+        #region 多维
+        public async Task GoCross()
+        {
+            try
+            {
+                OperTipsEvent.Invoke(OperStatus.System, "切换多维宇宙");
+
+                Reload();
+
+                var source = await GetFrameSourceAsync();
+
+                var address = MyWebBrowser.Address;
+                if (address.Contains("w1.cicihappy.com/ogame/frames.php"))
+                {
+                    OperTipsEvent.Invoke(OperStatus.System, "当前处于多维宇宙");
+                    return;
+                }
+
+                if (HtmlUtil.IsGameUrl(MyAddress))
+                {
+                    source = await GetFrameSourceAsync();
+                    if (HtmlUtil.HasTutorial(source))
+                    {
+                        FrameRunJs(NativeScript.TutorialConfirm());
+                        await Task.Delay(1500);
+                        source = await GetFrameSourceAsync();
+                    }
+                }
+
+                await GoHome(1500);
+                await GetFrameSourceAsync();
+                // 切换舰队页面
+                GoFleetPage();
+
+                // 查看舰队队列
+                source = await GetFrameSourceAsync();
+                if (source.Contains("id=\"fleetdelaybox\""))
+                {
+                    mPlanet.Reset();
+                    FrameRunJs(NativeScript.ToCross());
+                    await Task.Delay(2500);
+                    source = await GetFrameSourceAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                NativeLog.Error($"GoCross catch {ex.Message}");
+            }
+            OperTipsEvent.Invoke(OperStatus.System, "切换多维宇宙结束");
+        }
+        #endregion
+
+        #region 返回本宇宙
+        public async Task BackUniverse()
+        {
+            try
+            {
+                OperTipsEvent.Invoke(OperStatus.System, $"返回本宇宙");
+
+                Reload();
+
+                var source = await GetFrameSourceAsync();
+                var address = MyWebBrowser.Address;
+
+                if (!address.Contains("w1.cicihappy.com/ogame/frames.php"))
+                {
+                    OperTipsEvent.Invoke(OperStatus.System, $"当前不是多维宇宙");
+                    return;
+                }
+
+                if (HtmlUtil.IsGameUrl(MyAddress))
+                {
+                    source = await GetFrameSourceAsync();
+                    if (HtmlUtil.HasTutorial(source))
+                    {
+                        FrameRunJs(NativeScript.TutorialConfirm());
+                        await Task.Delay(1500);
+                        source = await GetFrameSourceAsync();
+                    }
+                }
+
+                await GoHome(1500);
+                await GetFrameSourceAsync();
+                // 切换舰队页面
+                GoFleetPage();
+
+                // 查看舰队队列
+                source = await GetFrameSourceAsync();
+                if (source.Contains("id=\"fleetdelaybox\""))
+                {
+                    mPlanet.Reset();
+                    FrameRunJs(NativeScript.BackUniverse());
+                    await Task.Delay(2500);
+                    source = await GetFrameSourceAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                NativeLog.Error($"BackUniverse catch {ex.Message}");
+            }
+            OperTipsEvent.Invoke(OperStatus.System, $"返回本宇宙结束");
+        }
+        #endregion
 
         public void SwitchStatus(OperStatus operStatus)
         {
@@ -1213,13 +1419,128 @@ namespace feeling
         public void Reload()
         {
             MyWebBrowser.Reload();
-            Thread.Sleep(2000);
+            Thread.Sleep(2500);
         }
 
         public async Task GoHome(int delay = 500)
         {
             FrameRunJs(NativeScript.ToHome());
             await Task.Delay(delay);
+        }
+
+        public async Task<string> GetFrameSourceAsync(int retry = 3)
+        {
+            int n = 0;
+            string source;
+            do
+            {
+                try
+                {
+                    source = await GetHauptframe()?.GetSourceAsync();
+                }
+                catch (Exception ex)
+                {
+                    NativeLog.Error($"GetFrameSourceAsync catch {ex.Message}");
+                    source = "";
+                }
+                if (!string.IsNullOrWhiteSpace(source))
+                {
+                    break;
+                }
+
+                await Task.Delay(1000);
+                n++;
+            } while (n < retry);
+            return source;
+        }
+
+        public bool CanAutoLogout()
+        {
+            var now = DateTime.Now;
+            TimeSpan delta;
+            double val = 0;
+            double min = 100;
+            bool hasAuto = false;
+
+            if (!User.AutoLogin) return false;
+
+            if (IsAutoExpedition)
+            {
+                hasAuto = true;
+                delta = now - LastExeditionTime;
+                val = 120 - delta.TotalMinutes;
+                val = val < 0 ? 0 : val;
+                min = Math.Min(val, min);
+            }
+
+            if (IsAutoExpedition1)
+            {
+                hasAuto = true;
+                delta = now - LastExeditionTime1;
+                val = 120 - delta.TotalMinutes;
+                val = val < 0 ? 0 : val;
+                min = Math.Min(val, min);
+            }
+
+            var pMissionCfg = PirateUtil.MyMission;
+            if (IsAutoPirate && null != pMissionCfg)
+            {
+                hasAuto = true;
+                delta = now - LastPirateTime;
+                val = pMissionCfg.Interval - delta.TotalMinutes;
+                val = val < 0 ? 0 : val;
+                min = Math.Min(val, min);
+            }
+
+            var pMissionCfg1 = PirateUtil.MyMission1;
+            if (IsAutoPirate1 && null != pMissionCfg1)
+            {
+                hasAuto = true;
+                delta = now - LastPirateTime1;
+                val = pMissionCfg1.Interval - delta.TotalMinutes;
+                val = val < 0 ? 0 : val;
+                min = Math.Min(val, min);
+            }
+
+            var imperium = ImperiumUtil.MyImperium;
+            if (IsAutoImperium && null != imperium)
+            {
+                hasAuto = true;
+                delta = now - LastImperiumTime;
+                val = imperium.Interval - delta.TotalMinutes;
+                val = val < 0 ? 0 : val;
+                min = Math.Min(val, min);
+            }
+
+            if (!hasAuto) return false;
+            
+            return min >= 10;
+        }
+
+        public void QuickClearLastTime()
+        {
+            var dt = DateTime.Now;
+            dt = dt.AddDays(-1);
+
+            if (IsAutoExpedition)
+            {
+                LastExeditionTime = dt;
+            }
+
+            if (IsAutoPirate)
+            {
+                LastPirateTime = dt;
+            }
+
+            if (IsAutoExpedition1)
+            {
+                LastExeditionTime1 = dt;
+            }
+
+            if (IsAutoPirate1)
+            {
+                LastPirateTime1 = dt;
+            }
         }
     }
 }

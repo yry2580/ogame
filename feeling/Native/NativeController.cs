@@ -297,6 +297,7 @@ namespace feeling
             }
 
             OperTipsEvent.Invoke(OperStatus.System, $"开始登录");
+            NativeLog.Info("开始登录");
 
             // 
             Reload();
@@ -350,12 +351,13 @@ namespace feeling
             if (!needLogin)
             {
                 OperTipsEvent.Invoke(OperStatus.System, $"不需要重新登录");
+                NativeLog.Info("不需要重新登录");
                 return;
             }
 
             await DoLoginAsync(account, psw, universe);
             OperTipsEvent.Invoke(OperStatus.System, $"登录输入完成");
-            
+            NativeLog.Info("登录输入完成");
             try
             {
                 await Task.Delay(2000);
@@ -376,6 +378,7 @@ namespace feeling
             }
 
             OperTipsEvent.Invoke(OperStatus.System, $"登录操作结束");
+            NativeLog.Info("登录操作结束");
         }
 
         protected async Task DoLoginAsync(string account, string psw, int universe)
@@ -417,6 +420,7 @@ namespace feeling
             try
             {
                 OperTipsEvent.Invoke(OperStatus.System, $"退出登录");
+                NativeLog.Info("开始退出登录");
 
                 Reload();
                 var source = await GetFrameSourceAsync();
@@ -428,6 +432,7 @@ namespace feeling
                         MessageBox.Show("退出失败，可能不在游戏页");
                     }
                     OperTipsEvent.Invoke(OperStatus.System, $"退出失败，可能不在游戏页");
+                    NativeLog.Info("退出失败，可能不在游戏页");
                     return;
                 }
 
@@ -438,6 +443,7 @@ namespace feeling
                         MessageBox.Show("当前正在忙，不建议退出");
                     }
                     OperTipsEvent.Invoke(OperStatus.System, $"当前正在忙，不建议退出");
+                    NativeLog.Info("当前正在忙，不建议退出");
                     return;
                 }
 
@@ -456,9 +462,11 @@ namespace feeling
                         MessageBox.Show("退出失败，无退出按钮");
                     }
                     OperTipsEvent.Invoke(OperStatus.System, $"退出失败，无退出按钮");
+                    NativeLog.Info("退出失败，无退出按钮");
                     return;
                 }
 
+                NativeLog.Info("退出登录");
                 FrameRunJs(NativeScript.ToLogout());
                 await Task.Delay(500);
             }
@@ -467,6 +475,7 @@ namespace feeling
                 NativeLog.Error($"LogoutAsync catch {ex.Message}");
             }
 
+            NativeLog.Info("退出操作结束");
             OperTipsEvent.Invoke(OperStatus.System, $"退出操作结束");
         }
         #endregion login
@@ -1450,7 +1459,7 @@ namespace feeling
             var now = DateTime.Now;
             TimeSpan delta;
             double val = 0;
-            double min = 0;
+            double min = 100;
             bool hasAuto = false;
 
             if (!User.AutoLogin) return false;
@@ -1461,7 +1470,7 @@ namespace feeling
                 delta = now - LastExeditionTime;
                 val = 120 - delta.TotalMinutes;
                 val = val < 0 ? 0 : val;
-                min = val;
+                min = Math.Min(val, min);
             }
 
             if (IsAutoExpedition1)
@@ -1470,7 +1479,7 @@ namespace feeling
                 delta = now - LastExeditionTime1;
                 val = 120 - delta.TotalMinutes;
                 val = val < 0 ? 0 : val;
-                min = val;
+                min = Math.Min(val, min);
             }
 
             var pMissionCfg = PirateUtil.MyMission;
@@ -1480,6 +1489,7 @@ namespace feeling
                 delta = now - LastPirateTime;
                 val = pMissionCfg.Interval - delta.TotalMinutes;
                 val = val < 0 ? 0 : val;
+                min = Math.Min(val, min);
             }
 
             var pMissionCfg1 = PirateUtil.MyMission1;
@@ -1489,6 +1499,7 @@ namespace feeling
                 delta = now - LastPirateTime1;
                 val = pMissionCfg1.Interval - delta.TotalMinutes;
                 val = val < 0 ? 0 : val;
+                min = Math.Min(val, min);
             }
 
             var imperium = ImperiumUtil.MyImperium;
@@ -1498,12 +1509,38 @@ namespace feeling
                 delta = now - LastImperiumTime;
                 val = imperium.Interval - delta.TotalMinutes;
                 val = val < 0 ? 0 : val;
+                min = Math.Min(val, min);
             }
 
             if (!hasAuto) return false;
-            min = Math.Min(val, min);
+            
+            return min >= 10;
+        }
 
-            return min > 20;
+        public void QuickClearLastTime()
+        {
+            var dt = DateTime.Now;
+            dt = dt.AddDays(-1);
+
+            if (IsAutoExpedition)
+            {
+                LastExeditionTime = dt;
+            }
+
+            if (IsAutoPirate)
+            {
+                LastPirateTime = dt;
+            }
+
+            if (IsAutoExpedition1)
+            {
+                LastExeditionTime1 = dt;
+            }
+
+            if (IsAutoPirate1)
+            {
+                LastPirateTime1 = dt;
+            }
         }
     }
 }

@@ -130,7 +130,7 @@
     <Compile Include="User\User.cs" />
     <Compile Include="User\UserData.cs" />
     <Compile Include="Util\IoUtil.cs" />
-    <Compile Include="Util\NativeLog.cs" />
+    <Compile Include="Native\NativeLog.cs" />
     <EmbeddedResource Include="Controls\PirateControl.resx">
       <DependentUpon>PirateControl.cs</DependentUpon>
     </EmbeddedResource>

@@ -9,6 +9,7 @@ namespace feeling
     class ExMission
     {
         public List<Mission> List= new List<Mission>();
+        public bool IsCross = false;
         Pos mPos = new Pos();
 
         public void Add(int ship0, string count0, int ship1, string count1, string planetName)
