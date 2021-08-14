@@ -1175,7 +1175,8 @@ namespace feeling
             }
 
             var isCross = PirateUtil.Universe == "w1";
-            if (missionCfg.IsCross != isCross || !NativeController.Instance.MyPlanet.HasData)
+            var isPlanetCross = NativeController.Instance.MyPlanet.Universe == "w1";
+            if (missionCfg.IsCross != isCross || missionCfg.IsCross != isPlanetCross || !NativeController.Instance.MyPlanet.HasData)
             {
                 await NativeController.Instance.DoRefreshNpc(true);
             }
@@ -1364,7 +1365,11 @@ namespace feeling
             }
 
             var isCross = PirateUtil.Universe == "w1";
-            if (!PirateUtil.HasNpcData || missionCfg.IsCross != isCross || ! NativeController.Instance.MyPlanet.HasData)
+            var isPlanetCross = NativeController.Instance.MyPlanet.Universe == "w1";
+            if (!PirateUtil.HasNpcData ||
+                missionCfg.IsCross != isCross ||
+                missionCfg.IsCross != isPlanetCross ||
+                !NativeController.Instance.MyPlanet.HasData)
             {
                 await NativeController.Instance.DoRefreshNpc(true);
             }
