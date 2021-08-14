@@ -1131,7 +1131,7 @@ namespace feeling
                 return;
             }
 
-            if (delta.TotalMinutes < 120)
+            if (val > 0)
             {
                 label.Text = $"{DateTime.Now:G}|自动探险{index + 1}-开{(missionCfg.IsCross ? "-多维" : "")}，{Math.Ceiling(val)}分钟";
                 return;
@@ -1322,7 +1322,7 @@ namespace feeling
                 return;
             }
 
-            if (delta.TotalMinutes < mPirateInterval)
+            if (val > 0)
             {
                 label.Text = $"{DateTime.Now:G}|自动海盗{index + 1}-开{(missionCfg.IsCross ? "-多维" : "")}，{Math.Ceiling(val)}分钟";
                 return;
@@ -1551,7 +1551,7 @@ namespace feeling
                 return;
             }
 
-            if (delta.TotalMinutes < mImperiumInterval)
+            if (val > 0)
             {
                 lb_tz_info.Text = $"{DateTime.Now:G}|自动统治-开，{Math.Ceiling(val)}分钟";
                 return;
