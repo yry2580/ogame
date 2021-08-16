@@ -614,6 +614,8 @@ namespace feeling
         {
             try
             {
+                Text = $"情怀 v{CfgSettings.VersionDesc}";
+
                 var updater = CfgSettings.ProcessDirectory + "auto_updater.exe";
 
                 var confg = new UpdateConfig

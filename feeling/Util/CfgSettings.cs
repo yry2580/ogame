@@ -44,6 +44,22 @@ namespace feeling
         public static int Major => mSettings.Major;
         public static int Minor => mSettings.Minor;
         public static int Patch => mSettings.Patch;
+
+        public static string Version
+        {
+            get
+            {
+                return $"{Major:d2}{Minor:d2}{Patch:d2}";
+            }
+        }
+
+        public static string VersionDesc
+        {
+            get
+            {
+                return $"{Major}.{Minor}.{Patch}";
+            }
+        }
     }
 
     class Settings

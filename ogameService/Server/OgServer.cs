@@ -752,9 +752,9 @@ namespace OgameService
             return false;
         }
 
-        public bool OperAutoLoginOpen(string id, string key, bool open)
+        public bool OperAutoLogoutOpen(string id, string key, bool open)
         {
-            LogUtil.Warn($"OperAutoLoginOpen {id}");
+            LogUtil.Warn($"OperAutoLogoutOpen {id}");
             try
             {
                 if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
@@ -763,7 +763,7 @@ namespace OgameService
                 // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
                 if (null == result || null == result.MySession)
                 {
-                    LogUtil.Warn($"OperAutoLoginOpen 没取到对应cell");
+                    LogUtil.Warn($"OperAutoLogoutOpen 没取到对应cell");
                     return false;
                 }
 
