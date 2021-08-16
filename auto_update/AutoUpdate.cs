@@ -294,8 +294,7 @@ namespace auto_update
                 if (lists.Contains(result)) return result;
             }
             result = mNetVer.Desc;
-            if (lists.Contains(result)) return result;
-            return "";
+            return result;
         }
 
         protected static bool UnzipPatch()
