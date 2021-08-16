@@ -183,7 +183,7 @@ namespace OgameService
                         var arr = mCellDict.Values.ToList();
                         arr.ForEach(c =>
                         {
-                            if (null != c && !mSessions.Contains(c.SessionKey))
+                            if (null != c && (!mSessions.Contains(c.SessionKey) || c.IsOvertime()))
                             {
                                 LogUtil.Error($"失效 {c.Id}");
                                 RemoveCell(c.SessionKey);
