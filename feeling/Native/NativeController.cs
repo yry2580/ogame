@@ -487,14 +487,14 @@ namespace feeling
             Thread.Sleep(delay);
         }
 
-        internal void StartExpedition(ExMission exMission, int index = 0, bool autoLogin = false)
+        internal void StartExpedition(ExMission exMission, int index = 0, bool isAuto = false)
         {
             SwitchStatus(OperStatus.Expedition);
             IsExpeditionWorking = true;
             OperTipsEvent.Invoke(OperStatus.Expedition, $"开始探险");
             Task.Run(() =>
             {
-                DoExpedition(exMission, index, autoLogin);
+                DoExpedition(exMission, index, isAuto);
             });
         }
 
@@ -536,7 +536,7 @@ namespace feeling
             IsExpeditionWorking = false;
         }
 
-        protected async void DoExpedition(ExMission exMission, int cfgIndex = 0, bool autoLogin = false)
+        protected async void DoExpedition(ExMission exMission, int cfgIndex = 0, bool isAuto = false)
         {
             int index = 0;
             int _count = 0;
@@ -774,7 +774,7 @@ namespace feeling
             {
                 SetLastExpeditionTime(cfgIndex);
 
-                if (IsExpeditionWorking && autoLogin)
+                if (IsExpeditionWorking && isAuto)
                 {
                     autoLogout = CanAutoLogout();
                 }
@@ -855,14 +855,14 @@ namespace feeling
             SwitchStatus(OperStatus.None);
         }
 
-        internal void StartPirate(PirateMission pMission, int cfgIndex = 0, bool autoLogin = false)
+        internal void StartPirate(PirateMission pMission, int cfgIndex = 0, bool isAuto = false)
         {
             SwitchStatus(OperStatus.Pirate);
             IsPirateWorking = true;
 
             Task.Run(() =>
             {
-                DoPirate(pMission, cfgIndex, autoLogin);
+                DoPirate(pMission, cfgIndex, isAuto);
             });
         }
 
@@ -872,7 +872,7 @@ namespace feeling
             IsPirateWorking = false;
         }
 
-        protected async void DoPirate(PirateMission pMission, int cfgIndex = 0, bool autoLogin = false)
+        protected async void DoPirate(PirateMission pMission, int cfgIndex = 0, bool isAuto = false)
         {
             int index = 0;
             int _count = 0;
@@ -941,7 +941,7 @@ namespace feeling
                     NativeLog.Info($"PirateMission index{index}");
                     if (index >= pMission.MissionCount)
                     {
-                        if (!autoLogin && CanNotify)
+                        if (!isAuto && CanNotify)
                         {
                             MessageBox.Show($"海盗任务派出结束，请检测是否成功{_count}/{pMission.MissionCount}");
                         }
@@ -1019,7 +1019,7 @@ namespace feeling
 
                     if (fq.Count >= fq.MaxCount)
                     {
-                        if (!autoLogin && CanNotify)
+                        if (!isAuto && CanNotify)
                         {
                             MessageBox.Show("航道已满");
                         }
@@ -1129,7 +1129,7 @@ namespace feeling
             {
                 SetLastPirateTime(cfgIndex);
 
-                if (IsPirateWorking && autoLogin)
+                if (IsPirateWorking && isAuto)
                 {
                     // checkNpc = CheckRefreshNpc(pMission);
                     autoLogout = CanAutoLogout();
@@ -1240,7 +1240,7 @@ namespace feeling
         #endregion
 
         #region 统治
-        public async Task StartImperium(bool autoLogin = false)
+        public async Task StartImperium(bool isAuto = false)
         {
             try
             {
@@ -1284,7 +1284,7 @@ namespace feeling
                 Reload();
 
                 var autoLogut = false;
-                if (autoLogin)
+                if (isAuto)
                 {
                     autoLogut = CanAutoLogout();
                 }
@@ -1462,7 +1462,7 @@ namespace feeling
             double min = 100;
             bool hasAuto = false;
 
-            if (!User.AutoLogin) return false;
+            if (!User.AutoLogout) return false;
 
             if (IsAutoExpedition)
             {

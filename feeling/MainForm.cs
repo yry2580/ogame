@@ -14,6 +14,7 @@ using System.Windows.Forms;
 using CefSharp;
 using CefSharp.WinForms;
 using Newtonsoft.Json;
+using auto_update;
 #if !NET45
 using OgameService;
 #endif
@@ -125,7 +126,7 @@ namespace feeling
             w_user_password.Text = NativeController.User.Password;
             w_user_universe.Text = NativeController.User.Universe.ToString();
 
-            cbox_auto_login.Checked = NativeController.User.AutoLogin;
+            cbox_auto_logout.Checked = NativeController.User.AutoLogout;
 
             InitExpedition();
             RedrawAccount();
@@ -388,7 +389,7 @@ namespace feeling
                         btn_tz_start.Enabled = false;
                         btn_cross.Enabled = false;
                         btn_universe.Enabled = false;
-                        cbox_auto_login.Enabled = false;
+                        cbox_auto_logout.Enabled = false;
                         SetQuickBtn(false);
                         break;
                     case OperStatus.Galaxy:
@@ -399,7 +400,7 @@ namespace feeling
                         btn_tz_start.Enabled = false;
                         btn_cross.Enabled = false;
                         btn_universe.Enabled = false;
-                        cbox_auto_login.Enabled = false;
+                        cbox_auto_logout.Enabled = false;
                         SetQuickBtn(false);
                         break;
                     case OperStatus.Expedition:
@@ -410,7 +411,7 @@ namespace feeling
                         btn_tz_start.Enabled = false;
                         btn_cross.Enabled = false;
                         btn_universe.Enabled = false;
-                        cbox_auto_login.Enabled = false;
+                        cbox_auto_logout.Enabled = false;
                         SetQuickBtn(false);
                         break;
                     case OperStatus.Pirate:
@@ -421,7 +422,7 @@ namespace feeling
                         btn_tz_start.Enabled = false;
                         btn_cross.Enabled = false;
                         btn_universe.Enabled = false;
-                        cbox_auto_login.Enabled = false;
+                        cbox_auto_logout.Enabled = false;
                         SetQuickBtn(false);
                         break;
                     case OperStatus.None:
@@ -433,7 +434,7 @@ namespace feeling
                         btn_tz_start.Enabled = true;
                         btn_cross.Enabled = true;
                         btn_universe.Enabled = true;
-                        cbox_auto_login.Enabled = true;
+                        cbox_auto_logout.Enabled = true;
                         SetQuickBtn(true);
                         break;
                 }
@@ -532,7 +533,7 @@ namespace feeling
             w_user_account.Enabled = enabled;
             btn_user_login.Enabled = enabled;
             btn_user_logout.Enabled = enabled;
-            cbox_auto_login.Enabled = enabled;
+            cbox_auto_logout.Enabled = enabled;
         }
 
         public void SetPirateButton(bool enabled, bool canStop = false)
@@ -605,6 +606,38 @@ namespace feeling
             mClient.DataReceived += OnServerReceived;
             mClient.HeartbeatHandler += onHeartbeat;
 #endif
+
+            DoUpdate();
+        }
+
+        private void DoUpdate()
+        {
+            try
+            {
+                var updater = CfgSettings.ProcessDirectory + "auto_updater.exe";
+
+                var confg = new UpdateConfig
+                {
+                    AppName = "feeling.exe",
+                    VersionLocalPath = CfgSettings.SettingFile,
+                    VersionUrl = "http://bkbibi.teammvp.beer/netcore/feeling/version.json",
+                };
+
+                if (File.Exists(updater) && AutoUpdate.NeedUpdate(confg))
+                {
+                    Process process = new Process();
+                    var startInfo = new ProcessStartInfo(updater);
+                    startInfo.UseShellExecute = true;
+                    process.StartInfo = startInfo;
+                    process.Start();
+                    Environment.Exit(0);
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                NativeLog.Error($"DoUpdate {ex.Message}");
+            }
         }
 
 #if !NET45
@@ -700,9 +733,9 @@ namespace feeling
                         NativeController.Instance.CanNotify = false;
                         await SetExpeditionCfg(data.ExpeditionCfgIndex);
                         break;
-                    case CmdEnum.AutoLoginOpen:
+                    case CmdEnum.AutoLogoutOpen:
                         NativeController.Instance.CanNotify = false;
-                        await SetAutoLoginOpen(data.AutoLoginOpen);
+                        await SetAutoLogoutOpen(data.AutoLogoutOpen);
                         break;
                     case CmdEnum.AutoImperiumOpen:
                         NativeController.Instance.CanNotify = false;
@@ -789,7 +822,7 @@ namespace feeling
                 PirateCfgIndex = rbtn_cfg1.Checked ? 1 : 0,
                 ExpeditionCfgIndex = rbtn_ex_cfg1.Checked ? 1 : 0,
 
-                AutoLoginOpen = NativeController.User.AutoLogin,
+                AutoLogoutOpen = NativeController.User.AutoLogout,
                 AutoPirateOpen = mAutoPirate,
                 AutoPirateOpen1 = mAutoPirate1,
                 AutoExpeditionOpen = mAutoExpedition,
@@ -1082,13 +1115,13 @@ namespace feeling
             RedrawQuick();
         }
 
-        private void doExpedtion(bool autoLogin = false)
+        private void doExpedtion(bool isAuto = false)
         {
             if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
 
             var exMission = GetExMission();
             
-            NativeController.Instance.StartExpedition(exMission, rbtn_ex_cfg1.Checked ? 1 : 0, autoLogin);
+            NativeController.Instance.StartExpedition(exMission, rbtn_ex_cfg1.Checked ? 1 : 0, isAuto);
             Redraw();
         }
 
@@ -1146,14 +1179,10 @@ namespace feeling
             label.Text = $"{DateTime.Now:G}|自动探险{index + 1}开始";
 
             mIsBusy = true;
+
             NativeController.Instance.CanNotify = false;
-
-            var autoLogin = NativeController.User.AutoLogin;
-            if (autoLogin)
-            {
-                await TryLogin();
-            }
-
+            await TryLogin();
+            
             if (index == 1)
             {
                 rbtn_ex_cfg1.Checked = true;
@@ -1182,7 +1211,7 @@ namespace feeling
             }
 
             mIsBusy = false;
-            doExpedtion(autoLogin);
+            doExpedtion(true);
         }
 
         private PirateMission GetPirateMission()
@@ -1228,12 +1257,12 @@ namespace feeling
             doPirate();
         }
 
-        private void doPirate(bool isAuto = false, bool autoLogin = false)
+        private void doPirate(bool isAuto = false)
         {
             if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
 
             var pMission = GetPirateMission();
-            NativeController.Instance.StartPirate(pMission, rbtn_cfg1.Checked ? 1 : 0, autoLogin);
+            NativeController.Instance.StartPirate(pMission, rbtn_cfg1.Checked ? 1 : 0, isAuto);
             Redraw();
         }
 
@@ -1338,13 +1367,10 @@ namespace feeling
             label.Text = $"{DateTime.Now:G}|自动海盗{index + 1}开始";
 
             mIsBusy = true;
-            var autoLogin = NativeController.User.AutoLogin;
-            if (autoLogin)
-            {
-                NativeController.Instance.CanNotify = false;
-                await TryLogin();
-            }
-
+            
+            NativeController.Instance.CanNotify = false;
+            await TryLogin();
+            
             if (index == 1)
             {
                 rbtn_cfg1.Checked = true;
@@ -1375,7 +1401,7 @@ namespace feeling
             }
 
             mIsBusy = false;
-            doPirate(true, autoLogin);
+            doPirate(true);
         }
 
         private void cbox_hd_auto_CheckedChanged(object sender, EventArgs e)
@@ -1570,20 +1596,16 @@ namespace feeling
 
             mIsBusy = true;
 
-            var autoLogin = NativeController.User.AutoLogin;
-            if (autoLogin)
-            {
-                NativeController.Instance.CanNotify = false;
-                await TryLogin();
-                await AdjustUniverse();
-            }
-
+            NativeController.Instance.CanNotify = false;
+            await TryLogin();
+            await AdjustUniverse();
+            
             mIsBusy = false;
 
-            await DoImperium(autoLogin);
+            await DoImperium(true);
         }
 
-        private async Task DoImperium(bool autoLogin = false)
+        private async Task DoImperium(bool isAuto = false)
         {
             try
             {
@@ -1591,7 +1613,7 @@ namespace feeling
 
                 NativeController.Instance.SwitchStatus(OperStatus.System);
 
-                await NativeController.Instance.StartImperium(autoLogin);
+                await NativeController.Instance.StartImperium(isAuto);
             }
             catch (Exception ex)
             {
@@ -1874,10 +1896,10 @@ namespace feeling
             NativeController.Instance.SwitchStatus(OperStatus.None);
         }
 
-        private void cbox_auto_login_CheckedChanged(object sender, EventArgs e)
+        private void cbox_auto_logout_CheckedChanged(object sender, EventArgs e)
         {
-            var autoLogin = cbox_auto_login.Checked;
-            NativeController.User.SetAutoLogin(autoLogin);
+            var isChecked = cbox_auto_logout.Checked;
+            NativeController.User.SetAutoLogout(isChecked);
         }
 
         private async Task AdjustUniverse()
@@ -1919,12 +1941,12 @@ namespace feeling
             NativeController.Instance.SwitchStatus(OperStatus.None);
         }
 
-        private async Task SetAutoLoginOpen(bool open)
+        private async Task SetAutoLogoutOpen(bool open)
         {
             try
             {
                 var msg = open ? "开" : "关";
-                mLastContent = $"{DateTime.Now:G}|设置自动登录({msg})";
+                mLastContent = $"{DateTime.Now:G}|设置自动退出({msg})";
                 if (OperStatus.None != NativeController.Instance.MyOperStatus)
                 {
                     mLastContent = $"{DateTime.Now:G}|当前不是空闲状态，不能设置";
@@ -1933,16 +1955,16 @@ namespace feeling
 
                 NativeController.Instance.SwitchStatus(OperStatus.System);
 
-                if (cbox_auto_login.Checked != open)
+                if (cbox_auto_logout.Checked != open)
                 {
-                    cbox_auto_login.Checked = open;
+                    cbox_auto_logout.Checked = open;
                     await Task.Delay(200);
                 }
-                mLastContent = $"{DateTime.Now:G}|设置自动登录({msg})完成";
+                mLastContent = $"{DateTime.Now:G}|设置自动退出({msg})完成";
             }
             catch (Exception ex)
             {
-                NativeLog.Error($"SetAutoLoginOpen catch {ex.Message}");
+                NativeLog.Error($"SetAutoLogoutOpen catch {ex.Message}");
             }
 
             NativeController.Instance.SwitchStatus(OperStatus.None);

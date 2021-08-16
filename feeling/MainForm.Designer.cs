@@ -134,7 +134,7 @@ namespace feeling
             this.lb_tx_info = new System.Windows.Forms.Label();
             this.label15 = new System.Windows.Forms.Label();
             this.w_user_box = new System.Windows.Forms.GroupBox();
-            this.cbox_auto_login = new System.Windows.Forms.CheckBox();
+            this.cbox_auto_logout = new System.Windows.Forms.CheckBox();
             this.btn_universe = new System.Windows.Forms.Button();
             this.btn_cross = new System.Windows.Forms.Button();
             this.w_user_account = new System.Windows.Forms.ComboBox();
@@ -1281,7 +1281,7 @@ namespace feeling
             // 
             // w_user_box
             // 
-            this.w_user_box.Controls.Add(this.cbox_auto_login);
+            this.w_user_box.Controls.Add(this.cbox_auto_logout);
             this.w_user_box.Controls.Add(this.btn_universe);
             this.w_user_box.Controls.Add(this.btn_cross);
             this.w_user_box.Controls.Add(this.w_user_account);
@@ -1301,14 +1301,14 @@ namespace feeling
             // 
             // cbox_auto_login
             // 
-            this.cbox_auto_login.AutoSize = true;
-            this.cbox_auto_login.Location = new System.Drawing.Point(8, 101);
-            this.cbox_auto_login.Name = "cbox_auto_login";
-            this.cbox_auto_login.Size = new System.Drawing.Size(180, 16);
-            this.cbox_auto_login.TabIndex = 46;
-            this.cbox_auto_login.Text = "自动登录（用于自动海盗等）";
-            this.cbox_auto_login.UseVisualStyleBackColor = true;
-            this.cbox_auto_login.CheckedChanged += new System.EventHandler(this.cbox_auto_login_CheckedChanged);
+            this.cbox_auto_logout.AutoSize = true;
+            this.cbox_auto_logout.Location = new System.Drawing.Point(8, 101);
+            this.cbox_auto_logout.Name = "cbox_auto_login";
+            this.cbox_auto_logout.Size = new System.Drawing.Size(180, 16);
+            this.cbox_auto_logout.TabIndex = 46;
+            this.cbox_auto_logout.Text = "自动登录（用于自动海盗等）";
+            this.cbox_auto_logout.UseVisualStyleBackColor = true;
+            this.cbox_auto_logout.CheckedChanged += new System.EventHandler(this.cbox_auto_logout_CheckedChanged);
             // 
             // btn_universe
             // 
@@ -1538,7 +1538,7 @@ namespace feeling
         private System.Windows.Forms.Button btn_cross;
         private System.Windows.Forms.RadioButton rbtn_ex_cfg1;
         private System.Windows.Forms.RadioButton rbtn_ex_cfg0;
-        private System.Windows.Forms.CheckBox cbox_auto_login;
+        private System.Windows.Forms.CheckBox cbox_auto_logout;
         private System.Windows.Forms.Label lb_hd_interval1;
         private System.Windows.Forms.Button btn_hd_interval1;
         private System.Windows.Forms.TextBox w_hd_inverval1;

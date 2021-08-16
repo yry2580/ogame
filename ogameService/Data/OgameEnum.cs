@@ -35,7 +35,7 @@ namespace OgameService
         GoCross,
         BackUniverse,
         ExpeditionCfg,
-        AutoLoginOpen,
+        AutoLogoutOpen,
         AutoImperiumOpen,
         AutoPirateOpen1,
         AutoExpeditionOpen1,

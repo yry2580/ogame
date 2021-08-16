@@ -129,6 +129,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="User\User.cs" />
     <Compile Include="User\UserData.cs" />
+    <Compile Include="Util\CfgSettings.cs" />
     <Compile Include="Util\IoUtil.cs" />
     <Compile Include="Native\NativeLog.cs" />
     <EmbeddedResource Include="Controls\PirateControl.resx">
@@ -147,6 +148,9 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <None Include="appsettings.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -165,6 +169,10 @@
     <Content Include="favicon.ico" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\auto_update\auto_update.csproj">
+      <Project>{7910855f-0402-4ed9-bf81-498f8c7e7625}</Project>
+      <Name>auto_update</Name>
+    </ProjectReference>
     <ProjectReference Include="..\ogameService\OgameService.csproj">
       <Project>{f41a3506-72f5-49d4-b4f1-55504c9e3ff2}</Project>
       <Name>OgameService</Name>
@@ -181,4 +189,9 @@
     <Error Condition="!Exists('..\packages\CefSharp.Common.91.1.160\build\CefSharp.Common.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\CefSharp.Common.91.1.160\build\CefSharp.Common.targets'))" />
   </Target>
   <Import Project="..\packages\CefSharp.Common.91.1.160\build\CefSharp.Common.targets" Condition="Exists('..\packages\CefSharp.Common.91.1.160\build\CefSharp.Common.targets')" />
+  <PropertyGroup>
+    <PostBuildEvent>copy $(SolutionDir)auto_updater\$(OutDir)auto_updater.exe $(TargetDir)
+copy $(SolutionDir)auto_updater\$(OutDir)auto_updater.exe.config $(TargetDir)
+copy $(SolutionDir)auto_updater\$(OutDir)auto_updater.pdb $(TargetDir)</PostBuildEvent>
+  </PropertyGroup>
 </Project>

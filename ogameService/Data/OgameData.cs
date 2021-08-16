@@ -24,7 +24,7 @@ namespace OgameService
         public int PirateCfgIndex = 0;
         public int ExpeditionCfgIndex = 0;
 
-        public bool AutoLoginOpen = false;
+        public bool AutoLogoutOpen = false;
         public bool AutoPirateOpen = false;
         public bool AutoPirateOpen1 = false;
         public bool AutoExpeditionOpen = false;

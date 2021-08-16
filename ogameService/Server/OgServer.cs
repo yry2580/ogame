@@ -768,8 +768,8 @@ namespace OgameService
                 }
 
                 OgameData data = new OgameData();
-                data.Cmd = CmdEnum.AutoLoginOpen;
-                data.AutoLoginOpen = open;
+                data.Cmd = CmdEnum.AutoLogoutOpen;
+                data.AutoLogoutOpen = open;
 
                 mServer.SendTo(result.MySession, OgameData.ToBytes(data));
                 return true;
