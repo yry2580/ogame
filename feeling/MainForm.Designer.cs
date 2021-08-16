@@ -1299,14 +1299,14 @@ namespace feeling
             this.w_user_box.TabStop = false;
             this.w_user_box.Text = "用户";
             // 
-            // cbox_auto_login
+            // cbox_auto_logout
             // 
             this.cbox_auto_logout.AutoSize = true;
             this.cbox_auto_logout.Location = new System.Drawing.Point(8, 101);
-            this.cbox_auto_logout.Name = "cbox_auto_login";
+            this.cbox_auto_logout.Name = "cbox_auto_logout";
             this.cbox_auto_logout.Size = new System.Drawing.Size(180, 16);
             this.cbox_auto_logout.TabIndex = 46;
-            this.cbox_auto_logout.Text = "自动登录（用于自动海盗等）";
+            this.cbox_auto_logout.Text = "自动退出（用于自动海盗等）";
             this.cbox_auto_logout.UseVisualStyleBackColor = true;
             this.cbox_auto_logout.CheckedChanged += new System.EventHandler(this.cbox_auto_logout_CheckedChanged);
             // 

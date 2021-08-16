@@ -83,7 +83,7 @@ namespace feeling
                 {
                     await _LookThread();
                 }));
-                Thread.Sleep(1000 * 60);
+                Thread.Sleep(1000 * 30);
             } while (true);
         }
 
@@ -606,7 +606,6 @@ namespace feeling
             mClient.DataReceived += OnServerReceived;
             mClient.HeartbeatHandler += onHeartbeat;
 #endif
-
             DoUpdate();
         }
 
@@ -1178,6 +1177,12 @@ namespace feeling
                 return;
             }
 
+            if (!Network.IsConnected)
+            {
+                label.Text = $"{DateTime.Now:G}|网络异常";
+                return;
+            }
+
             label.Text = $"{DateTime.Now:G}|自动探险{index + 1}开始";
 
             mIsBusy = true;
@@ -1363,6 +1368,12 @@ namespace feeling
             if (OperStatus.None != NativeController.Instance.MyOperStatus)
             {
                 label.Text = $"{DateTime.Now:G}|其他操作正忙";
+                return;
+            }
+
+            if (!Network.IsConnected)
+            {
+                label.Text = $"{DateTime.Now:G}|网络异常";
                 return;
             }
 
@@ -1593,6 +1604,12 @@ namespace feeling
             if (OperStatus.None != NativeController.Instance.MyOperStatus)
             {
                 lb_tz_info.Text = $"{DateTime.Now:G}|其他操作正忙";
+                return;
+            }
+
+            if (!Network.IsConnected)
+            {
+                lb_tz_info.Text = $"{DateTime.Now:G}|网络异常";
                 return;
             }
 

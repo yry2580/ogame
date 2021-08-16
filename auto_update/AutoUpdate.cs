@@ -15,7 +15,7 @@ namespace auto_update
         static VersionConfig mNetVer;
         static VersionConfig mLocalVer;
 
-        static readonly string mAutoUpdateFile = GetDir() + "autoupdate.log";
+        static readonly string mAutoUpdateFile = GetDir() + "auto_update.log";
         static string mPatchDir = GetDir() + "patch/";
         static string mPatchName = "";
         static string mZipPath = "";
@@ -285,13 +285,11 @@ namespace auto_update
             string result = "";
             if (null == mNetVer) return result;
 
-            var lists = mNetVer.VersionList;
-            if (null == lists || lists.Count <= 0) return result;
-
             if (config.IgnoreDebug)
             {
                 result = mNetVer.ProdDesc();
-                if (lists.Contains(result)) return result;
+                var lists = mNetVer.VersionList;
+                if (null != lists && lists.Contains(result)) return result;
             }
             result = mNetVer.Desc;
             return result;
