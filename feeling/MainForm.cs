@@ -1214,6 +1214,7 @@ namespace feeling
             else
             {
                 await BackUniverse();
+                await SureLogin();
             }
 
             var isCross = PirateUtil.Universe == "w1";
@@ -1325,6 +1326,19 @@ namespace feeling
             Redraw();
         }
 
+        private async Task SureLogin()
+        {
+            var source = await NativeController.Instance.GetFrameSourceAsync();
+
+            NativeLog.Info($"SureLogin");
+            if (string.IsNullOrWhiteSpace(source) || (source.Contains("退出成功") && source.Contains("重新登录")))
+            {
+                NativeLog.Info($"SureLogin TryLogin");
+                await TryLogin();
+            }
+            NativeLog.Info($"SureLogin end");
+        }
+
         private async Task doAutoPirate(int index = 0)
         {
             Label label;
@@ -1407,6 +1421,7 @@ namespace feeling
             else
             {
                 await BackUniverse();
+                await SureLogin();
             }
 
             var isCross = PirateUtil.Universe == "w1";
