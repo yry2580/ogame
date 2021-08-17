@@ -134,6 +134,7 @@ namespace feeling
             this.lb_tx_info = new System.Windows.Forms.Label();
             this.label15 = new System.Windows.Forms.Label();
             this.w_user_box = new System.Windows.Forms.GroupBox();
+            this.btn_test = new System.Windows.Forms.Button();
             this.cbox_auto_logout = new System.Windows.Forms.CheckBox();
             this.btn_universe = new System.Windows.Forms.Button();
             this.btn_cross = new System.Windows.Forms.Button();
@@ -1281,6 +1282,7 @@ namespace feeling
             // 
             // w_user_box
             // 
+            this.w_user_box.Controls.Add(this.btn_test);
             this.w_user_box.Controls.Add(this.cbox_auto_logout);
             this.w_user_box.Controls.Add(this.btn_universe);
             this.w_user_box.Controls.Add(this.btn_cross);
@@ -1298,6 +1300,16 @@ namespace feeling
             this.w_user_box.TabIndex = 1;
             this.w_user_box.TabStop = false;
             this.w_user_box.Text = "用户";
+            // 
+            // btn_test
+            // 
+            this.btn_test.Location = new System.Drawing.Point(8, 119);
+            this.btn_test.Name = "btn_test";
+            this.btn_test.Size = new System.Drawing.Size(56, 23);
+            this.btn_test.TabIndex = 47;
+            this.btn_test.Text = "测 试";
+            this.btn_test.UseVisualStyleBackColor = true;
+            this.btn_test.Click += new System.EventHandler(this.btn_test_Click);
             // 
             // cbox_auto_logout
             // 
@@ -1556,5 +1568,6 @@ namespace feeling
         private System.Windows.Forms.Button btn_quick_auto_check;
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label lb_quick_auto;
+        private System.Windows.Forms.Button btn_test;
     }
 }

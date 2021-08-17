@@ -101,6 +101,7 @@
     <Compile Include="Html\Galaxy\Galaxy.cs" />
     <Compile Include="Html\Imperium\Imperium.cs" />
     <Compile Include="Html\Imperium\ImperiumUtil.cs" />
+    <Compile Include="Html\Rank\RankUser.cs" />
     <Compile Include="Parser\HtmlUtil.cs" />
     <Compile Include="Html\Pirate\PirateUtil.cs" />
     <Compile Include="Html\Pirate\PirateMission.cs" />

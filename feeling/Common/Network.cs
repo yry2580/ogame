@@ -123,14 +123,14 @@ namespace feeling
                     if (sp.TotalMinutes < 3) return;
                 }
 
-                var ret = GetNetStatus("www.cicihappy.com");
+                var ret = GetNetStatus("baidu.com");
                 if (NetStatus.LanConnected == ret || NetStatus.ModemConnected == ret)
                 {
                     mIsConnected = true;
                     return;
                 }
 
-                ret = GetNetStatus("baidu.com");
+                ret = GetNetStatus("www.cicihappy.com");
                 if (NetStatus.LanConnected == ret || NetStatus.ModemConnected == ret)
                 {
                     mIsConnected = true;

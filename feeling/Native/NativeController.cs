@@ -24,6 +24,7 @@ namespace feeling
         public volatile bool IsWorking = false;
         public volatile bool IsPirateWorking = false;
         public volatile bool IsExpeditionWorking = false;
+        public volatile bool IsUserWorking = false;
 
         public volatile string MyAddress = "";
         public DelegateStatusChange StatusChangeEvent;
@@ -76,7 +77,7 @@ namespace feeling
 
         public void ScanPlanet()
         {
-            Task.Run(async() =>
+            Task.Run(async () =>
             {
                 try
                 {
@@ -89,7 +90,7 @@ namespace feeling
                     }
                 }
                 catch (Exception)
-                { 
+                {
                 }
             });
         }
@@ -373,7 +374,7 @@ namespace feeling
                     }
                 }
             }
-            catch(Exception)
+            catch (Exception)
             {
             }
 
@@ -470,7 +471,7 @@ namespace feeling
                 FrameRunJs(NativeScript.ToLogout());
                 await Task.Delay(500);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 NativeLog.Error($"LogoutAsync catch {ex.Message}");
             }
@@ -559,7 +560,7 @@ namespace feeling
 
             try
             {
-                
+
                 OperTipsEvent.Invoke(OperStatus.Expedition, $"开始处理探险");
 
                 if (exMission.List.Count <= 0)
@@ -605,7 +606,7 @@ namespace feeling
                 do
                 {
                     NativeLog.Info($"ex-mession index{index}");
-                    OperTipsEvent.Invoke(OperStatus.Expedition, $"探险{index+1}");
+                    OperTipsEvent.Invoke(OperStatus.Expedition, $"探险{index + 1}");
 
                     if (index >= exMission.List.Count)
                     {
@@ -794,7 +795,7 @@ namespace feeling
         }
 
         private void SetLastExpeditionTime(int index)
-        { 
+        {
             if (index == 1)
             {
                 LastExeditionTime1 = DateTime.Now;
@@ -925,7 +926,8 @@ namespace feeling
                             return;
                         }
                     }
-                }  else
+                }
+                else
                 {
                     OperTipsEvent.Invoke(OperStatus.Expedition, $"海盗结束，没有登录");
                     SetLastPirateTime(cfgIndex);
@@ -989,7 +991,7 @@ namespace feeling
                         success = true;
                         break;
                     }
-                    
+
                     // 切换触发球
                     int idx = mPlanet.GetPlanetIndex(mission.PlanetName);
                     if (idx < 0)
@@ -1513,7 +1515,7 @@ namespace feeling
             }
 
             if (!hasAuto) return false;
-            
+
             return min >= 10;
         }
 
@@ -1542,5 +1544,157 @@ namespace feeling
                 LastPirateTime1 = dt;
             }
         }
+
+        #region 收集用户
+
+        internal void StartScanUser()
+        {
+            SwitchStatus(OperStatus.System);
+            IsUserWorking = true;
+
+            Task.Run(() =>
+            {
+                DoScanUser();
+            });
+        }
+
+        protected async void DoScanUser()
+        {
+            var lists = new List<RankUser>();
+
+            var account = "null404";
+            var psw = "yaya520184";
+            var universe = 1;
+            string source = "";
+            string name = "";
+            string crossName = "";
+            var ret = false;
+            bool lastError = false;
+            
+            try
+            {
+                OperTipsEvent.Invoke(OperStatus.System, $"收集用户开始");
+                NativeLog.Info($"收集用户开始");
+                NativeLog.Info($"扫描排行榜");
+
+                do
+                {
+                    var arr = await DoUniverseUser(account, psw, universe);
+                    NativeLog.Info($"收集 u{universe} 多维账号");
+                    if (null != arr && arr.Count > 0)
+                    {
+                        for (int i = 0; i < arr.Count; i++)
+                        {
+                            name = arr[i].Name;
+
+                            FrameRunJs(NativeScript.ToSearch());
+                            await Task.Delay(1500);
+                            source = await GetFrameSourceAsync();
+
+                            FrameRunJs(NativeScript.SearchUser(name));
+                            await Task.Delay(200);
+
+                            FrameRunJs(NativeScript.SearchUserSubmit());
+                            await Task.Delay(1500);
+                            source = await GetFrameSourceAsync();
+
+                            ret = HtmlUtil.ParseSearchCrossName(source, name, out crossName);
+                            if (ret)
+                            {
+                                arr[i].CrossName = crossName;
+                            }
+
+                        }
+
+                        lists.AddRange(arr);
+                    }
+                    else
+                    {
+                        if (!lastError)
+                        {
+                            lastError = true;
+                            NativeLog.Info($"重试");
+                            continue;
+                        }
+                    }
+
+                    lastError = false;
+                    NativeLog.Info($"收集 u{universe} 多维账号 结束");
+
+                    await LogoutAsync();
+                    await Task.Delay(2000);
+                    source = await GetFrameSourceAsync();
+
+                    universe++;
+                } while (universe < 25);
+
+                NativeLog.Info($"搜索用户");
+            }
+            catch (Exception ex)
+            {
+                NativeLog.Error($"DoScanUser catch {ex.Message}");
+            }
+
+            RankUser.Save(lists);
+
+            OperTipsEvent.Invoke(OperStatus.System, $"收集用户结束");
+            NativeLog.Info($"收集用户结束");
+            IsUserWorking = false;
+            SwitchStatus(OperStatus.None);
+        }
+
+        protected async Task<List<RankUser>> DoUniverseUser(string account, string psw, int universe)
+        {
+            var lists = new List<RankUser>();
+            string source;
+
+            OperTipsEvent.Invoke(OperStatus.System, $"开始收集 u{universe}");
+            NativeLog.Info($"开始收集 u{universe}");
+            await LoginAsync(account, psw, universe);
+
+            try
+            {
+                Reload();
+
+                if (HtmlUtil.IsGameUrl(MyAddress))
+                {
+                    source = await GetFrameSourceAsync();
+                    if (HtmlUtil.HasTutorial(source))
+                    {
+                        FrameRunJs(NativeScript.TutorialConfirm());
+                        await Task.Delay(1500);
+                        source = await GetFrameSourceAsync();
+                    }
+                }
+
+                await GoHome(1500);
+
+                FrameRunJs(NativeScript.ToRank());
+                await Task.Delay(1500);
+                source = await GetFrameSourceAsync();
+
+                FrameRunJs(NativeScript.SelectRank(0));
+                await Task.Delay(2000);
+                source = await GetFrameSourceAsync();
+
+                var ret = HtmlUtil.ParseRank(source, universe, ref lists);
+            }
+            catch (Exception ex)
+            {
+                NativeLog.Error($"DoUniverseUser catch {ex.Message}");
+            }
+
+            OperTipsEvent.Invoke(OperStatus.System, $"收集 u{universe} 结束");
+            NativeLog.Info($"收集 u{universe} 结束");
+
+            return lists;
+        }
+
+        internal void StopScanUser()
+        {
+            if (!IsUserWorking) return;
+            IsUserWorking = false;
+        }
+        #endregion
     }
 }

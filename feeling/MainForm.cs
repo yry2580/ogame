@@ -66,6 +66,12 @@ namespace feeling
             NativeController.Instance.NpcChangeEvent += OnNpcChange;
 
             InitData();
+
+#if DEBUG
+            btn_test.Visible = true;
+#else
+            btn_test.Visible = false;
+#endif
         }
 
         private void OnNpcChange()
@@ -2150,6 +2156,17 @@ namespace feeling
             NativeLog.Info("一键所选配置自动开始");
             NativeController.Instance.QuickClearLastTime();
             NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private void btn_test_Click(object sender, EventArgs e)
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                NativeLog.Info("正忙，不能测试");
+                return;
+            }
+            NativeController.Instance.CanNotify = false;
+            NativeController.Instance.StartScanUser();
         }
     }
 }

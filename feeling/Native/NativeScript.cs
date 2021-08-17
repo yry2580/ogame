@@ -239,5 +239,41 @@ namespace feeling
             script += $"doc.querySelector(\"a[href*='.cicihappy.com/ogame/frames.php'][href*='http://u']\").click()";
             return script;
         }
+
+        public static string ToRank()
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += "doc.querySelector(\"#header_top a[href*='stat.php']\").click()";
+            return script;
+        }
+
+        public static string SelectRank(int index)
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += "var se = doc.querySelector(\"#statform select[name='range']\");";
+            script += $"se.selectedIndex={index};se.onchange();";
+            return script;
+        }
+
+        public static string ToSearch()
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += "doc.querySelector(\"#header_top a[href*='search.php']\").click()";
+            return script;
+        }
+
+        public static string SearchUser(string name)
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"form[action='search.php'] input[name='searchtext']\").value='{name}'";
+            return script;
+        }
+
+        public static string SearchUserSubmit()
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"form[action='search.php'] input[type='submit']\").click()";
+            return script;
+        }
     }
 }

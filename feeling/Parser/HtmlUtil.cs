@@ -443,5 +443,60 @@ namespace feeling
 #endif
             return null != node;
         }
+
+        public static bool ParseRank(string source, int universe, ref List<RankUser> lists)
+        {
+#if !NET45
+            if (string.IsNullOrWhiteSpace(source)) return false;
+            var parser = new OgameParser();
+            parser.LoadHtml(source);
+            var nodes = parser?.QuerySelectorAll("tr[id^='position']");
+            if (null == nodes || nodes.Length <= 0) return false;
+
+            var max = Math.Min(20, nodes.Length);
+            for (int i = 0; i < max; i++)
+            {
+                var arr = nodes[i].QuerySelectorAll("th");
+                lists.Add(new RankUser
+                {
+                    Rank = $"{i+1}",
+                    Name = arr[2].TextContent.Trim(),
+                    Union = arr[4].TextContent.Trim(),
+                    Score = arr[5].TextContent.Trim().Replace(",", ""),
+                    Universe = $"u{universe}",
+                });
+            }
+
+            return true;
+#else
+            return false;
+
+#endif
+        }
+
+        public static bool ParseSearchCrossName(string source, string name, out string crossName)
+        {
+            crossName = "";
+#if !NET45
+            if (string.IsNullOrWhiteSpace(source)) return false;
+            var parser = new OgameParser();
+            parser.LoadHtml(source);
+            var nodes = parser?.QuerySelectorAll("#pagecontent>table tbody tr");
+            if (null == nodes || nodes.Length <= 0) return false;
+
+            var val = nodes.Where(tr => tr.Children.Length > 0 && tr.Children[0].TextContent.Trim() == name)
+                .Select(tr => tr.Children[3].TextContent.Trim()).FirstOrDefault();
+
+            if (!string.IsNullOrWhiteSpace(val))
+            {
+                crossName = val;
+            }
+
+            return true;
+#else
+            return false;
+
+#endif
+        }
     }
 }
