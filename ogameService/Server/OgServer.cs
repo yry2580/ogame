@@ -894,6 +894,36 @@ namespace OgameService
             return false;
         }
 
+        public object OperPirateSpeed(string id, string key, int index)
+        {
+            LogUtil.Warn($"OperPirateSpeed {id}");
+            try
+            {
+                if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+                mCellDict.TryGetValue(key, out OgCell result);
+                // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+                if (null == result || null == result.MySession)
+                {
+                    LogUtil.Warn($"OperPirateSpeed 没取到对应cell");
+                    return false;
+                }
+
+                OgameData data = new OgameData();
+                data.Cmd = CmdEnum.PirateSpeed;
+                data.PirateSpeedIndex = index;
+
+                mServer.SendTo(result.MySession, OgameData.ToBytes(data));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Error($"OperPirateSpeed {key} catch {ex.Message}");
+            }
+            return false;
+        }
+
+
         public void ShowAllCell()
         {
             LogUtil.Warn("=============== ShowAllCell =====================");

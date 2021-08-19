@@ -70,6 +70,8 @@ namespace feeling
             this.tx0_ship0_cb = new System.Windows.Forms.ComboBox();
             this.tx0_ship0 = new System.Windows.Forms.TextBox();
             this.tab_haidao = new System.Windows.Forms.TabPage();
+            this.label23 = new System.Windows.Forms.Label();
+            this.hd_speed_cb = new System.Windows.Forms.ComboBox();
             this.cbox_hd_cfg_cross = new System.Windows.Forms.CheckBox();
             this.lb_hd_interval1 = new System.Windows.Forms.Label();
             this.btn_hd_interval1 = new System.Windows.Forms.Button();
@@ -587,6 +589,8 @@ namespace feeling
             // 
             // tab_haidao
             // 
+            this.tab_haidao.Controls.Add(this.label23);
+            this.tab_haidao.Controls.Add(this.hd_speed_cb);
             this.tab_haidao.Controls.Add(this.cbox_hd_cfg_cross);
             this.tab_haidao.Controls.Add(this.lb_hd_interval1);
             this.tab_haidao.Controls.Add(this.btn_hd_interval1);
@@ -620,11 +624,30 @@ namespace feeling
             this.tab_haidao.Text = "海盗";
             this.tab_haidao.UseVisualStyleBackColor = true;
             // 
+            // label23
+            // 
+            this.label23.AutoSize = true;
+            this.label23.Location = new System.Drawing.Point(0, 59);
+            this.label23.Name = "label23";
+            this.label23.Size = new System.Drawing.Size(41, 12);
+            this.label23.TabIndex = 66;
+            this.label23.Text = "速度：";
+            // 
+            // hd_speed_cb
+            // 
+            this.hd_speed_cb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.hd_speed_cb.FormattingEnabled = true;
+            this.hd_speed_cb.Location = new System.Drawing.Point(44, 55);
+            this.hd_speed_cb.Name = "hd_speed_cb";
+            this.hd_speed_cb.Size = new System.Drawing.Size(51, 20);
+            this.hd_speed_cb.TabIndex = 65;
+            this.hd_speed_cb.SelectedIndexChanged += new System.EventHandler(this.hd_speed_cb_SelectedIndexChanged);
+            // 
             // cbox_hd_cfg_cross
             // 
             this.cbox_hd_cfg_cross.AutoSize = true;
             this.cbox_hd_cfg_cross.Enabled = false;
-            this.cbox_hd_cfg_cross.Location = new System.Drawing.Point(173, 35);
+            this.cbox_hd_cfg_cross.Location = new System.Drawing.Point(173, 33);
             this.cbox_hd_cfg_cross.Name = "cbox_hd_cfg_cross";
             this.cbox_hd_cfg_cross.Size = new System.Drawing.Size(48, 16);
             this.cbox_hd_cfg_cross.TabIndex = 64;
@@ -642,9 +665,9 @@ namespace feeling
             // 
             // btn_hd_interval1
             // 
-            this.btn_hd_interval1.Location = new System.Drawing.Point(109, 98);
+            this.btn_hd_interval1.Location = new System.Drawing.Point(109, 99);
             this.btn_hd_interval1.Name = "btn_hd_interval1";
-            this.btn_hd_interval1.Size = new System.Drawing.Size(50, 22);
+            this.btn_hd_interval1.Size = new System.Drawing.Size(50, 20);
             this.btn_hd_interval1.TabIndex = 62;
             this.btn_hd_interval1.Text = "设置";
             this.btn_hd_interval1.UseVisualStyleBackColor = true;
@@ -652,7 +675,7 @@ namespace feeling
             // 
             // w_hd_inverval1
             // 
-            this.w_hd_inverval1.Location = new System.Drawing.Point(165, 99);
+            this.w_hd_inverval1.Location = new System.Drawing.Point(165, 100);
             this.w_hd_inverval1.Name = "w_hd_inverval1";
             this.w_hd_inverval1.Size = new System.Drawing.Size(62, 21);
             this.w_hd_inverval1.TabIndex = 61;
@@ -670,7 +693,7 @@ namespace feeling
             // cbox_hd_auto1
             // 
             this.cbox_hd_auto1.AutoSize = true;
-            this.cbox_hd_auto1.Location = new System.Drawing.Point(85, 59);
+            this.cbox_hd_auto1.Location = new System.Drawing.Point(173, 57);
             this.cbox_hd_auto1.Name = "cbox_hd_auto1";
             this.cbox_hd_auto1.Size = new System.Drawing.Size(54, 16);
             this.cbox_hd_auto1.TabIndex = 59;
@@ -704,7 +727,7 @@ namespace feeling
             // 
             // btn_hd_stop
             // 
-            this.btn_hd_stop.Location = new System.Drawing.Point(53, 31);
+            this.btn_hd_stop.Location = new System.Drawing.Point(53, 29);
             this.btn_hd_stop.Name = "btn_hd_stop";
             this.btn_hd_stop.Size = new System.Drawing.Size(50, 22);
             this.btn_hd_stop.TabIndex = 55;
@@ -722,7 +745,7 @@ namespace feeling
             // lb_hd_interval
             // 
             this.lb_hd_interval.AutoSize = true;
-            this.lb_hd_interval.Location = new System.Drawing.Point(72, 80);
+            this.lb_hd_interval.Location = new System.Drawing.Point(72, 83);
             this.lb_hd_interval.Name = "lb_hd_interval";
             this.lb_hd_interval.Size = new System.Drawing.Size(23, 12);
             this.lb_hd_interval.TabIndex = 53;
@@ -730,9 +753,9 @@ namespace feeling
             // 
             // btn_hd_interval
             // 
-            this.btn_hd_interval.Location = new System.Drawing.Point(109, 76);
+            this.btn_hd_interval.Location = new System.Drawing.Point(109, 79);
             this.btn_hd_interval.Name = "btn_hd_interval";
-            this.btn_hd_interval.Size = new System.Drawing.Size(50, 22);
+            this.btn_hd_interval.Size = new System.Drawing.Size(50, 20);
             this.btn_hd_interval.TabIndex = 51;
             this.btn_hd_interval.Text = "设置";
             this.btn_hd_interval.UseVisualStyleBackColor = true;
@@ -749,7 +772,7 @@ namespace feeling
             // label12
             // 
             this.label12.AutoSize = true;
-            this.label12.Location = new System.Drawing.Point(6, 80);
+            this.label12.Location = new System.Drawing.Point(6, 83);
             this.label12.Name = "label12";
             this.label12.Size = new System.Drawing.Size(71, 12);
             this.label12.TabIndex = 49;
@@ -778,7 +801,7 @@ namespace feeling
             // cbox_hd_auto
             // 
             this.cbox_hd_auto.AutoSize = true;
-            this.cbox_hd_auto.Location = new System.Drawing.Point(8, 60);
+            this.cbox_hd_auto.Location = new System.Drawing.Point(109, 57);
             this.cbox_hd_auto.Name = "cbox_hd_auto";
             this.cbox_hd_auto.Size = new System.Drawing.Size(54, 16);
             this.cbox_hd_auto.TabIndex = 46;
@@ -798,7 +821,7 @@ namespace feeling
             // 
             // btn_hd_save
             // 
-            this.btn_hd_save.Location = new System.Drawing.Point(106, 31);
+            this.btn_hd_save.Location = new System.Drawing.Point(106, 29);
             this.btn_hd_save.Name = "btn_hd_save";
             this.btn_hd_save.Size = new System.Drawing.Size(50, 22);
             this.btn_hd_save.TabIndex = 11;
@@ -808,7 +831,7 @@ namespace feeling
             // 
             // btn_hd_start
             // 
-            this.btn_hd_start.Location = new System.Drawing.Point(0, 31);
+            this.btn_hd_start.Location = new System.Drawing.Point(0, 29);
             this.btn_hd_start.Name = "btn_hd_start";
             this.btn_hd_start.Size = new System.Drawing.Size(50, 22);
             this.btn_hd_start.TabIndex = 10;
@@ -1569,5 +1592,7 @@ namespace feeling
         private System.Windows.Forms.Label label13;
         private System.Windows.Forms.Label lb_quick_auto;
         private System.Windows.Forms.Button btn_test;
+        private System.Windows.Forms.ComboBox hd_speed_cb;
+        private System.Windows.Forms.Label label23;
     }
 }

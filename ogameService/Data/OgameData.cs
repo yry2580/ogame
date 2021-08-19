@@ -22,6 +22,7 @@ namespace OgameService
 
         public string FleetContent = "";
         public int PirateCfgIndex = 0;
+        public int PirateSpeedIndex = 0;
         public int ExpeditionCfgIndex = 0;
 
         public bool AutoLogoutOpen = false;

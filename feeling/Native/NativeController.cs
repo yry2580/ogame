@@ -63,6 +63,7 @@ namespace feeling
         public bool IsAutoImperium = false;
         public DateTime LastImperiumTime = DateTime.Now;
 
+        public int PirateSpeedIndex = 0;
 
         public void HandleWebBrowserFrameEnd(string url)
         {
@@ -1079,8 +1080,14 @@ namespace feeling
                     // 设置目标点
                     FrameRunJs(NativeScript.SetTarget(mission.X, mission.Y, mission.Z, (int)PlanetType.Star));
                     await Task.Delay(500);
-
                     source = await GetFrameSourceAsync();
+                    if (PirateSpeedIndex != 0)
+                    {
+                        FrameRunJs(NativeScript.SetSpeed(PirateSpeedIndex));
+                        await Task.Delay(500);
+                        source = await GetFrameSourceAsync();
+                    }
+
                     // 设置目标继续
                     FrameRunJs(NativeScript.SetTargetNext());
                     await Task.Delay(1500);

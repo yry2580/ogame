@@ -132,6 +132,19 @@ namespace feeling
         }
 
         /// <summary>
+        /// 设置速度
+        /// </summary>
+        /// <param name="index"></param>
+        /// <returns></returns>
+        public static string SetSpeed(int index)
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += "var se = doc.querySelector(\"select[name='speed']\");";
+            script += $"se.selectedIndex={index};se.onchange();";
+            return script;
+        }
+
+        /// <summary>
         /// 设置目标=》继续
         /// </summary>
         /// <returns></returns>

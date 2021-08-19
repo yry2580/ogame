@@ -42,6 +42,7 @@ namespace OgameService
         QuickAutoCheck,
         QuickAutoUncheck,
         QuickAutoStart,
+        PirateSpeed,
     }
 
     public enum StatusEnum

@@ -150,6 +150,15 @@ namespace feeling
             PirateUtil.Initialize();
 
             PirateCfg();
+
+            hd_speed_cb.Items.Clear();
+            ShipSpeed.SpeedLists.ForEach(e =>
+            {
+                hd_speed_cb.Items.Add(e);
+            });
+
+            hd_speed_cb.SelectedIndex = 0;
+            NativeController.Instance.PirateSpeedIndex = 0;
         }
 
         protected void InitImperium()
@@ -554,6 +563,7 @@ namespace feeling
             btn_hd_stop.Enabled = !enabled && canStop;
             rbtn_cfg0.Enabled = enabled;
             rbtn_cfg1.Enabled = enabled;
+            hd_speed_cb.Enabled = enabled;
         }
 
         public void SetExpeditionButton(bool enabled, bool canStop = false)
@@ -757,6 +767,9 @@ namespace feeling
                     case CmdEnum.QuickAutoStart:
                         DoQuickAutoStart();
                         break;
+                    case CmdEnum.PirateSpeed:
+                        await SetPirateSpeed(data.PirateSpeedIndex);
+                        break;
                     default:
                         break;
                 }
@@ -828,6 +841,7 @@ namespace feeling
                 FleetContent = fleetContent,
                 PirateCfgIndex = rbtn_cfg1.Checked ? 1 : 0,
                 ExpeditionCfgIndex = rbtn_ex_cfg1.Checked ? 1 : 0,
+                PirateSpeedIndex = NativeController.Instance.PirateSpeedIndex,
 
                 AutoLogoutOpen = NativeController.User.AutoLogout,
                 AutoPirateOpen = mAutoPirate,
@@ -2182,6 +2196,50 @@ namespace feeling
             }
             NativeController.Instance.CanNotify = false;
             NativeController.Instance.StartScanUser();
+        }
+
+        private async Task SetPirateSpeed(int index)
+        {
+            try
+            {
+                if (OperStatus.None != NativeController.Instance.MyOperStatus)
+                {
+                    mLastContent = $"{DateTime.Now:G}|当前不是空闲状态，不能设置";
+                    return;
+                }
+
+                if (index < 0 || index >= ShipSpeed.SpeedLists.Count)
+                {
+                    mLastContent = $"{DateTime.Now:G}|设置海盗速度不符合{index}";
+                    return;
+                }
+
+                var text = ShipSpeed.SpeedLists[index];
+                mLastContent = $"{DateTime.Now:G}|设置海盗速度({text}%)";
+
+                NativeController.Instance.SwitchStatus(OperStatus.System);
+                hd_speed_cb.SelectedIndex = index;
+                await Task.Delay(200);
+                
+                mLastContent = $"{DateTime.Now:G}|设置海盗速度({text}%)完成";
+            }
+            catch (Exception ex)
+            {
+                NativeLog.Error($"SetPirateSpeed catch {ex.Message}");
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private void hd_speed_cb_SelectedIndexChanged(object sender, EventArgs e)
+        {
+            var idx = hd_speed_cb.SelectedIndex;
+            if (idx < 0)
+            {
+                idx = 0;
+                hd_speed_cb.SelectedIndex = idx;
+            }
+            NativeController.Instance.PirateSpeedIndex = idx;
         }
     }
 }
