@@ -622,7 +622,10 @@ namespace feeling
             mClient.DataReceived += OnServerReceived;
             mClient.HeartbeatHandler += onHeartbeat;
 #endif
+
+#if !DEBUG
             DoUpdate();
+#endif
         }
 
         private void DoUpdate()
@@ -1236,6 +1239,10 @@ namespace feeling
             if (missionCfg.IsCross != isCross || missionCfg.IsCross != isPlanetCross || !NativeController.Instance.MyPlanet.HasData)
             {
                 await NativeController.Instance.DoRefreshNpc(true);
+                if (!NativeController.Instance.MyPlanet.HasData)
+                {
+                    await NativeController.Instance.DoRefreshNpc(true);
+                }
             }
 
             mIsBusy = false;
@@ -1446,6 +1453,10 @@ namespace feeling
                 !NativeController.Instance.MyPlanet.HasData)
             {
                 await NativeController.Instance.DoRefreshNpc(true);
+                if (!PirateUtil.HasNpcData)
+                {
+                    await NativeController.Instance.DoRefreshNpc(true);
+                }
             }
 
             mIsBusy = false;

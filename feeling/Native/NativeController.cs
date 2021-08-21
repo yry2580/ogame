@@ -214,6 +214,8 @@ namespace feeling
 
                     count++;
                     FrameRunJs(NativeScript.RefreshGalaxy(mGalaxy.NextX, mGalaxy.NextY));
+                    await Task.Delay(200);
+                    FrameRunJs(NativeScript.RefreshGalaxySubmit());
                     mScanPage = $"{mGalaxy.NextX}:{mGalaxy.NextY}";
                     FireScanGalaxy();
                     await Task.Delay(1500);
@@ -1200,21 +1202,29 @@ namespace feeling
             try
             {
                 Reload();
-                await GoHome(1500);
                 var source = await GetFrameSourceAsync();
+                await GoHome(1500);
+                source = await GetFrameSourceAsync();
+
+                FrameRunJs(NativeScript.ToCode());
+                await Task.Delay(1500);
+                source = await GetFrameSourceAsync();
                 if (HtmlUtil.IsWechatCodePage(source))
                 {
                     FrameRunJs(NativeScript.GetCode());
                     OperTipsEvent.Invoke(OperStatus.System, $"点击获取验证码");
+                    NativeLog.Info("点击获取验证码");
                 }
                 else
                 {
+                    NativeLog.Warn("不在验证码页");
                     OperTipsEvent.Invoke(OperStatus.System, $"不在验证码页");
                 }
             }
-            catch (SystemException)
+            catch (Exception ex)
             {
                 OperTipsEvent.Invoke(OperStatus.System, $"获取验证码异常");
+                NativeLog.Error($"不在验证码页 {ex.Message}");
             }
         }
 

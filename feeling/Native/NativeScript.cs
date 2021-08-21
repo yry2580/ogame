@@ -70,9 +70,19 @@ namespace feeling
         /// <returns></returns>
         public static string RefreshGalaxy(int x, int y)
         {
-            var script = $"document.querySelectorAll('#galaxy_form table input[type=text]')[0].value = {x};";
-            script += $"document.querySelectorAll('#galaxy_form table input[type=text]')[1].value= {y};";
-            script += $"document.querySelectorAll('#galaxy_form table input[type=submit]')[0].click();";
+            var script = "doc = window.parent.frames[\"Hauptframe\"].document;";
+            script += $"doc.querySelectorAll(\"#galaxy_form table input[type=text]\")[0].value = {x};";
+            script += $"doc.querySelectorAll(\"#galaxy_form table input[type=text]\")[1].value= {y};";
+            // script += $"document.querySelectorAll('#galaxy_form table input[type=submit]')[0].click();";
+            // script += $"document.querySelector('#galaxy_form table #sendgalaxyselector).click();";
+
+            return script;
+        }
+
+        public static string RefreshGalaxySubmit()
+        {
+            var script = "doc = window.parent.frames[\"Hauptframe\"].document;";
+            script += $"doc.querySelector(\"#galaxy_form table #sendgalaxyselector\").click();";
             return script;
         }
 
@@ -204,10 +214,17 @@ namespace feeling
             return script;
         }
 
+        public static string ToCode()
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"a[href*='overview.php?precode=true']\").click()";
+            return script;
+        }
+
         public static string GetCode()
         {
             var script = "doc = window.parent.frames['Hauptframe'].document;";
-            script += $"doc.querySelector(\"form input[value = '点击发送微信验证码']\").click()";
+            script += $"doc.querySelector(\"form input[value='点击发送微信验证码']\").click()";
             return script;
         }
 

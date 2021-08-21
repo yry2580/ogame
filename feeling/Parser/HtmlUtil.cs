@@ -372,7 +372,7 @@ namespace feeling
             var parser = new OgameParser();
             parser.LoadHtml(source);
 #if !NET45
-            var node = parser.QuerySelector("#overviewdata a[href='overview.php?precode=true']");
+            var node = parser.QuerySelector("#overviewdata a[href*='overview.php?precode=true']");
 #else
             var node = parser.QuerySelector("//*[@id='overviewdata']//a[@href='overview.php?precode=true']");
 #endif
