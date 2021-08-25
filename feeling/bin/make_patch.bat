@@ -11,15 +11,14 @@ del ".\patch\OgameService.pdb" /q;
 del ".\patch\OgameServiceLog.config" /q;
 
 
-echo f |xcopy ".\Release\appsettings.json" ".\patch\appsettings.json" /y /e /i 
-echo f |xcopy ".\Release\feeling.exe" ".\patch\feeling.exe" /y /e /i 
-echo f |xcopy ".\Release\feeling.exe.config" ".\patch\feeling.exe.config" /s /i 
-echo f |xcopy ".\Release\feeling.pdb" ".\patch\feeling.pdb" /y /e /i 
-
-echo f |xcopy ".\Release\OgameService.dll" ".\patch\OgameService.dll" /y /e /i 
-echo f |xcopy ".\Release\OgameService.dll.config" ".\patch\OgameService.dll.config" /y /e /i 
-echo f |xcopy ".\Release\OgameService.pdb" ".\patch\OgameService.pdb" /s /i 
-echo f |xcopy ".\Release\OgameServiceLog.config" ".\patch\OgameServiceLog.config" /y /e /i 
+echo f |xcopy ".\Release\appsettings.json" ".\patch" /y
+echo f |xcopy ".\Release\feeling.exe" ".\patch" /y
+echo f |xcopy ".\Release\feeling.exe.config" ".\patch"
+echo f |xcopy ".\Release\feeling.pdb" ".\patch" /y
+echo f |xcopy ".\Release\OgameService.dll" ".\patch" /y
+echo f |xcopy ".\Release\OgameService.dll.config" ".\patch" /y 
+echo f |xcopy ".\Release\OgameService.pdb" ".\patch" /y
+echo f |xcopy ".\Release\OgameServiceLog.config" ".\patch" /y 
 
 
 

@@ -1452,6 +1452,7 @@ namespace feeling
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "情怀";
             this.Activated += new System.EventHandler(this.MainForm_Activated);
+            this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.MainForm_FormClosed);
             this.Load += new System.EventHandler(this.MainForm_Load);
             this.Leave += new System.EventHandler(this.MainForm_Leave);
             this.w_split_container.Panel2.ResumeLayout(false);

@@ -72,6 +72,8 @@ namespace feeling
 #else
             btn_test.Visible = false;
 #endif
+
+            SystemSleep.PreventSleep();
         }
 
         private void OnNpcChange()
@@ -1236,13 +1238,17 @@ namespace feeling
 
             var isCross = PirateUtil.Universe == "w1";
             var isPlanetCross = NativeController.Instance.MyPlanet.Universe == "w1";
-            if (missionCfg.IsCross != isCross || missionCfg.IsCross != isPlanetCross || !NativeController.Instance.MyPlanet.HasData)
+            if (missionCfg.IsCross != isCross ||
+                missionCfg.IsCross != isPlanetCross ||
+                !NativeController.Instance.MyPlanet.HasData)
             {
                 await NativeController.Instance.DoRefreshNpc(true);
                 if (!NativeController.Instance.MyPlanet.HasData)
                 {
                     await NativeController.Instance.DoRefreshNpc(true);
                 }
+
+                RedrawPlanet();
             }
 
             mIsBusy = false;
@@ -1435,6 +1441,7 @@ namespace feeling
             }
 
             await Task.Delay(500);
+
             if (missionCfg.IsCross)
             {
                 await GoCross();
@@ -1453,10 +1460,12 @@ namespace feeling
                 !NativeController.Instance.MyPlanet.HasData)
             {
                 await NativeController.Instance.DoRefreshNpc(true);
-                if (!PirateUtil.HasNpcData)
+                if (!PirateUtil.HasNpcData || !NativeController.Instance.MyPlanet.HasData)
                 {
                     await NativeController.Instance.DoRefreshNpc(true);
                 }
+
+                RedrawPlanet();
             }
 
             mIsBusy = false;
@@ -2251,6 +2260,11 @@ namespace feeling
                 hd_speed_cb.SelectedIndex = idx;
             }
             NativeController.Instance.PirateSpeedIndex = idx;
+        }
+
+        private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            SystemSleep.ResotreSleep();
         }
     }
 }

@@ -831,17 +831,19 @@ namespace feeling
             {
                 SwitchStatus(OperStatus.System);
                 OperTipsEvent.Invoke(OperStatus.System, $"刷球");
+                NativeLog.Info("刷球");
                 if (!isAuto)
                 {
                     mPlanet.Reset();
                 }
                 PirateUtil.ResetNpc();
                 Reload();
+                var source = await GetFrameSourceAsync();
                 await GoHome(1500);
 
                 if (HtmlUtil.IsGameUrl(MyAddress))
                 {
-                    var source = await GetFrameSourceAsync();
+                    await GetFrameSourceAsync();
                     FrameRunJs(NativeScript.ToGalaxy());
                     await Task.Delay(1500);
                     source = await GetFrameSourceAsync();
@@ -856,6 +858,7 @@ namespace feeling
             }
 
             OperTipsEvent.Invoke(OperStatus.System, $"刷球完成");
+            NativeLog.Info("刷球完成");
             SwitchStatus(OperStatus.None);
         }
 

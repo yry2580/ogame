@@ -17,6 +17,7 @@ namespace feeling
 
         public bool Parse(string source, string address = "")
         {
+            NativeLog.Info("Planet Parse");
             if (!HtmlUtil.ParseOwnerPlanets(source, out List<string> result, mHtmlParser)) return false;
             if (null == result) return false;
 
@@ -26,11 +27,14 @@ namespace feeling
                 Universe = mat.Groups["universe"].Value;
             }
             List = result;
+            
+            NativeLog.Info("Planet Parse end");
             return true;
         }
 
         public void Reset()
         {
+            NativeLog.Info("Planet Reset");
             Universe = "";
             List.Clear();
         }

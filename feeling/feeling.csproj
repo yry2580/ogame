@@ -135,6 +135,7 @@
     <Compile Include="Util\CfgSettings.cs" />
     <Compile Include="Util\IoUtil.cs" />
     <Compile Include="Native\NativeLog.cs" />
+    <Compile Include="Util\SystemSleep.cs" />
     <EmbeddedResource Include="Controls\PirateControl.resx">
       <DependentUpon>PirateControl.cs</DependentUpon>
     </EmbeddedResource>
