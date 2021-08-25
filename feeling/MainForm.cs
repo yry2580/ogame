@@ -1247,8 +1247,6 @@ namespace feeling
                 {
                     await NativeController.Instance.DoRefreshNpc(true);
                 }
-
-                RedrawPlanet();
             }
 
             mIsBusy = false;
@@ -1464,8 +1462,6 @@ namespace feeling
                 {
                     await NativeController.Instance.DoRefreshNpc(true);
                 }
-
-                RedrawPlanet();
             }
 
             mIsBusy = false;

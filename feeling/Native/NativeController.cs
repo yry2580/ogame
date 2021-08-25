@@ -832,10 +832,7 @@ namespace feeling
                 SwitchStatus(OperStatus.System);
                 OperTipsEvent.Invoke(OperStatus.System, $"刷球");
                 NativeLog.Info("刷球");
-                if (!isAuto)
-                {
-                    mPlanet.Reset();
-                }
+                mPlanet.Reset();
                 PirateUtil.ResetNpc();
                 Reload();
                 var source = await GetFrameSourceAsync();
