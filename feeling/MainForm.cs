@@ -190,32 +190,44 @@ namespace feeling
 
             tx0_ship0_cb.Items.Clear();
             tx0_ship1_cb.Items.Clear();
+            tx0_ship2_cb.Items.Clear();
             tx1_ship0_cb.Items.Clear();
             tx1_ship1_cb.Items.Clear();
+            tx1_ship2_cb.Items.Clear();
             tx2_ship0_cb.Items.Clear();
             tx2_ship1_cb.Items.Clear();
+            tx2_ship2_cb.Items.Clear();
             tx3_ship0_cb.Items.Clear();
             tx3_ship1_cb.Items.Clear();
+            tx3_ship2_cb.Items.Clear();
             exShipOptions.ForEach(e =>
             {
                 tx0_ship0_cb.Items.Add(e);
                 tx0_ship1_cb.Items.Add(e);
+                tx0_ship2_cb.Items.Add(e);
                 tx1_ship0_cb.Items.Add(e);
                 tx1_ship1_cb.Items.Add(e);
+                tx1_ship2_cb.Items.Add(e);
                 tx2_ship0_cb.Items.Add(e);
                 tx2_ship1_cb.Items.Add(e);
+                tx2_ship2_cb.Items.Add(e);
                 tx3_ship0_cb.Items.Add(e);
                 tx3_ship1_cb.Items.Add(e);
+                tx3_ship2_cb.Items.Add(e);
             });
 
             tx0_ship0_cb.SelectedIndex = 0;
             tx0_ship1_cb.SelectedIndex = 0;
+            tx0_ship2_cb.SelectedIndex = 0;
             tx1_ship0_cb.SelectedIndex = 0;
             tx1_ship1_cb.SelectedIndex = 0;
+            tx1_ship2_cb.SelectedIndex = 0;
             tx2_ship0_cb.SelectedIndex = 0;
             tx2_ship1_cb.SelectedIndex = 0;
+            tx2_ship2_cb.SelectedIndex = 0;
             tx3_ship0_cb.SelectedIndex = 0;
             tx3_ship1_cb.SelectedIndex = 0;
+            tx3_ship2_cb.SelectedIndex = 0;
 
             RevertCfg();
         }
@@ -307,6 +319,7 @@ namespace feeling
                 {
                     (Controls.Find($"tx{i}_ship0", true)[0] as TextBox).Text = "";
                     (Controls.Find($"tx{i}_ship1", true)[0] as TextBox).Text = "";
+                    (Controls.Find($"tx{i}_ship2", true)[0] as TextBox).Text = "";
                     continue;
                 }
 
@@ -319,6 +332,7 @@ namespace feeling
 
                 (Controls.Find($"tx{i}_ship0", true)[0] as TextBox).Text = "";
                 (Controls.Find($"tx{i}_ship1", true)[0] as TextBox).Text = "";
+                (Controls.Find($"tx{i}_ship2", true)[0] as TextBox).Text = "";
 
                 var count = mission.FleetList.Count;
                 var fleet = mission.FleetList[0];
@@ -333,6 +347,14 @@ namespace feeling
                     idx = exOptions.FindIndex(e => e == fleet.ShipType);
                     (Controls.Find($"tx{i}_ship1_cb", true)[0] as ComboBox).SelectedIndex = idx < 0 ? 0 : idx;
                     (Controls.Find($"tx{i}_ship1", true)[0] as TextBox).Text = fleet.Count.ToString();
+                }
+
+                if (mission.FleetList.Count > 2)
+                {
+                    fleet = mission.FleetList[2];
+                    idx = exOptions.FindIndex(e => e == fleet.ShipType);
+                    (Controls.Find($"tx{i}_ship2_cb", true)[0] as ComboBox).SelectedIndex = idx < 0 ? 0 : idx;
+                    (Controls.Find($"tx{i}_ship2", true)[0] as TextBox).Text = fleet.Count.ToString();
                 }
             }
 
@@ -1041,32 +1063,40 @@ namespace feeling
         {
             ExMission exMission = new ExMission();
             exMission.Add(
+                tx0_planet.Text.Trim(),
                 tx0_ship0_cb.SelectedIndex,
                 tx0_ship0.Text.Trim(),
                 tx0_ship1_cb.SelectedIndex,
                 tx0_ship1.Text.Trim(),
-                tx0_planet.Text.Trim()
+                tx0_ship2_cb.SelectedIndex,
+                tx0_ship2.Text.Trim()
             );
             exMission.Add(
+                tx1_planet.Text.Trim(),
                 tx1_ship0_cb.SelectedIndex,
                 tx1_ship0.Text.Trim(),
                 tx1_ship1_cb.SelectedIndex,
                 tx1_ship1.Text.Trim(),
-                tx1_planet.Text.Trim()
+                tx1_ship2_cb.SelectedIndex,
+                tx1_ship2.Text.Trim()
             );
             exMission.Add(
+                tx2_planet.Text.Trim(),
                 tx2_ship0_cb.SelectedIndex,
                 tx2_ship0.Text.Trim(),
                 tx2_ship1_cb.SelectedIndex,
                 tx2_ship1.Text.Trim(),
-                tx2_planet.Text.Trim()
+                tx2_ship2_cb.SelectedIndex,
+                tx2_ship2.Text.Trim()
             );
             exMission.Add(
+                tx3_planet.Text.Trim(),
                 tx3_ship0_cb.SelectedIndex,
                 tx3_ship0.Text.Trim(),
                 tx3_ship1_cb.SelectedIndex,
                 tx3_ship1.Text.Trim(),
-                tx3_planet.Text.Trim()
+                tx3_ship2_cb.SelectedIndex,
+                tx3_ship2.Text.Trim()
             );
             return exMission;
         }
