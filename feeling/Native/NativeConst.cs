@@ -11,6 +11,8 @@ namespace feeling
         public static string CurrentDirectory = AppDomain.CurrentDomain.BaseDirectory;
         public static string FileDirectory = CurrentDirectory + "Out/";
         public static string CfgDirectory = CurrentDirectory + "UserCfg/";
+        public static int MaxUniverseCount = 24;
+        public static int RankPageSize = 30;
     }
 
     public enum OperStatus

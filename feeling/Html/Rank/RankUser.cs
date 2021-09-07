@@ -31,7 +31,7 @@ namespace feeling
                 string str = "";
                 foreach (var item in lists)
                 {
-                    str = $"{item.Universe},{item.Rank},{item.Name},{item.Union},{item.CrossName},{item.Score}";
+                    str = $"\"{item.Universe}\",\"{item.Rank}\",\"{item.Name}\",\"{item.Union}\",\"{item.CrossName}\",\"{item.Score}\"";
                     sb.AppendLine(str);
                 }
 

@@ -453,7 +453,7 @@ namespace feeling
             var nodes = parser?.QuerySelectorAll("tr[id^='position']");
             if (null == nodes || nodes.Length <= 0) return false;
 
-            var max = Math.Min(20, nodes.Length);
+            var max = Math.Min(NativeConst.RankPageSize, nodes.Length);
             for (int i = 0; i < max; i++)
             {
                 var arr = nodes[i].QuerySelectorAll("th");

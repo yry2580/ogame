@@ -1643,9 +1643,9 @@ namespace feeling
                     source = await GetFrameSourceAsync();
 
                     universe++;
-                } while (universe < 25);
+                } while (universe <= NativeConst.MaxUniverseCount);
 
-                NativeLog.Info($"搜索用户");
+                NativeLog.Info($"搜索用户结束");
             }
             catch (Exception ex)
             {
