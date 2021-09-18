@@ -12,6 +12,7 @@ namespace feeling
         public string Password = "";
         public int Universe = 21;
         public bool AutoLogout = false;
+        public bool MorningIdle = false;
         public Dictionary<string, string> AccountDict = new Dictionary<string, string>();
 
         public void Add(string account, string psw, int universe)

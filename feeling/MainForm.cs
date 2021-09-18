@@ -101,17 +101,38 @@ namespace feeling
             {
                 if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
 
-                await doAutoExpedtion();
-                await doAutoPirate();
-                await doAutoExpedtion(1);
-                await doAutoPirate(1);
-                await doAutoImperium();
+                var canAuto = CheckCanAuto();
+                if (canAuto)
+                {
+                    await doAutoExpedtion();
+                    await doAutoPirate();
+                    await doAutoExpedtion(1);
+                    await doAutoPirate(1);
+                    await doAutoImperium();
+                }
+
                 SendData();
             }
             catch (Exception ex)
             {
                 NativeLog.Error($"_LookThread {ex.Message}");
             }
+        }
+
+        private bool CheckCanAuto()
+        {
+            var dt = DateTime.Now;
+
+            if (NativeController.User.MorningIdle)
+            {
+                if (dt.Hour >= 1 && dt.Hour < 6)
+                {
+                    NativeLog.Info("凌晨空闲模式");
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         private void OnOperTipsChange(OperStatus operStatus, string tips)
@@ -135,6 +156,7 @@ namespace feeling
             w_user_universe.Text = NativeController.User.Universe.ToString();
 
             cbox_auto_logout.Checked = NativeController.User.AutoLogout;
+            cbox_morning_idle.Checked = NativeController.User.MorningIdle;
 
             InitExpedition();
             RedrawAccount();
@@ -797,6 +819,10 @@ namespace feeling
                     case CmdEnum.PirateSpeed:
                         await SetPirateSpeed(data.PirateSpeedIndex);
                         break;
+                    case CmdEnum.MorningIdle:
+                        NativeController.Instance.CanNotify = false;
+                        await SetMorningIdle(data.MorningIdle);
+                        break;
                     default:
                         break;
                 }
@@ -881,6 +907,8 @@ namespace feeling
                 PirateAutoMsg1 = lb_hd_info1.Text.Trim(),
                 ExpeditionAutoMsg = lb_tx_info.Text.Trim(),
                 ExpeditionAutoMsg1 = lb_tx_info1.Text.Trim(),
+
+                MorningIdle = NativeController.User.MorningIdle,
             };
 
             mClient?.SendData(gameData);
@@ -2291,6 +2319,41 @@ namespace feeling
         private void MainForm_FormClosed(object sender, FormClosedEventArgs e)
         {
             SystemSleep.ResotreSleep();
+        }
+
+        private async Task SetMorningIdle(bool open)
+        {
+            try
+            {
+                var msg = open ? "开" : "关";
+                mLastContent = $"{DateTime.Now:G}|设置凌晨空闲({msg})";
+                if (OperStatus.None != NativeController.Instance.MyOperStatus)
+                {
+                    mLastContent = $"{DateTime.Now:G}|当前不是空闲状态，不能设置";
+                    return;
+                }
+
+                NativeController.Instance.SwitchStatus(OperStatus.System);
+
+                if (cbox_morning_idle.Checked != open)
+                {
+                    cbox_morning_idle.Checked = open;
+                    await Task.Delay(200);
+                }
+                mLastContent = $"{DateTime.Now:G}|设置凌晨空闲({msg})完成";
+            }
+            catch (Exception ex)
+            {
+                NativeLog.Error($"SetMorningIdle catch {ex.Message}");
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private void cbox_morning_idle_CheckedChanged(object sender, EventArgs e)
+        {
+            var isChecked = cbox_morning_idle.Checked;
+            NativeController.User.SetMorningIdle(isChecked);
         }
     }
 }

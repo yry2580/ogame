@@ -33,6 +33,14 @@ namespace feeling
             this.w_split_container = new System.Windows.Forms.SplitContainer();
             this.w_tab = new System.Windows.Forms.TabControl();
             this.tab_tanxian = new System.Windows.Forms.TabPage();
+            this.tx3_ship2_cb = new System.Windows.Forms.ComboBox();
+            this.tx3_ship2 = new System.Windows.Forms.TextBox();
+            this.tx2_ship2_cb = new System.Windows.Forms.ComboBox();
+            this.tx2_ship2 = new System.Windows.Forms.TextBox();
+            this.tx1_ship2_cb = new System.Windows.Forms.ComboBox();
+            this.tx1_ship2 = new System.Windows.Forms.TextBox();
+            this.tx0_ship2_cb = new System.Windows.Forms.ComboBox();
+            this.tx0_ship2 = new System.Windows.Forms.TextBox();
             this.cbox_tx_auto1 = new System.Windows.Forms.CheckBox();
             this.cbox_ex_cfg_cross = new System.Windows.Forms.CheckBox();
             this.rbtn_ex_cfg1 = new System.Windows.Forms.RadioButton();
@@ -92,6 +100,11 @@ namespace feeling
             this.btn_hd_revert = new System.Windows.Forms.Button();
             this.btn_hd_save = new System.Windows.Forms.Button();
             this.btn_hd_start = new System.Windows.Forms.Button();
+            this.w_pirate4 = new feeling.PirateControl();
+            this.w_pirate3 = new feeling.PirateControl();
+            this.w_pirate2 = new feeling.PirateControl();
+            this.w_pirate1 = new feeling.PirateControl();
+            this.w_pirate0 = new feeling.PirateControl();
             this.w_galaxy = new System.Windows.Forms.TabPage();
             this.btn_galaxy_open = new System.Windows.Forms.Button();
             this.w_galaxy_status_lb = new System.Windows.Forms.Label();
@@ -143,19 +156,7 @@ namespace feeling
             this.label5 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.tx3_ship2_cb = new System.Windows.Forms.ComboBox();
-            this.tx3_ship2 = new System.Windows.Forms.TextBox();
-            this.tx2_ship2_cb = new System.Windows.Forms.ComboBox();
-            this.tx2_ship2 = new System.Windows.Forms.TextBox();
-            this.tx1_ship2_cb = new System.Windows.Forms.ComboBox();
-            this.tx1_ship2 = new System.Windows.Forms.TextBox();
-            this.tx0_ship2_cb = new System.Windows.Forms.ComboBox();
-            this.tx0_ship2 = new System.Windows.Forms.TextBox();
-            this.w_pirate4 = new feeling.PirateControl();
-            this.w_pirate3 = new feeling.PirateControl();
-            this.w_pirate2 = new feeling.PirateControl();
-            this.w_pirate1 = new feeling.PirateControl();
-            this.w_pirate0 = new feeling.PirateControl();
+            this.cbox_morning_idle = new System.Windows.Forms.CheckBox();
             ((System.ComponentModel.ISupportInitialize)(this.w_split_container)).BeginInit();
             this.w_split_container.Panel2.SuspendLayout();
             this.w_split_container.SuspendLayout();
@@ -252,6 +253,82 @@ namespace feeling
             this.tab_tanxian.TabIndex = 1;
             this.tab_tanxian.Text = "探险";
             this.tab_tanxian.UseVisualStyleBackColor = true;
+            // 
+            // tx3_ship2_cb
+            // 
+            this.tx3_ship2_cb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.tx3_ship2_cb.FormattingEnabled = true;
+            this.tx3_ship2_cb.Location = new System.Drawing.Point(528, 92);
+            this.tx3_ship2_cb.Name = "tx3_ship2_cb";
+            this.tx3_ship2_cb.Size = new System.Drawing.Size(100, 20);
+            this.tx3_ship2_cb.TabIndex = 69;
+            // 
+            // tx3_ship2
+            // 
+            this.tx3_ship2.Location = new System.Drawing.Point(636, 91);
+            this.tx3_ship2.MaxLength = 20;
+            this.tx3_ship2.Name = "tx3_ship2";
+            this.tx3_ship2.Size = new System.Drawing.Size(86, 21);
+            this.tx3_ship2.TabIndex = 68;
+            this.tx3_ship2.WordWrap = false;
+            this.tx3_ship2.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.w_count_KeyPress);
+            // 
+            // tx2_ship2_cb
+            // 
+            this.tx2_ship2_cb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.tx2_ship2_cb.FormattingEnabled = true;
+            this.tx2_ship2_cb.Location = new System.Drawing.Point(528, 63);
+            this.tx2_ship2_cb.Name = "tx2_ship2_cb";
+            this.tx2_ship2_cb.Size = new System.Drawing.Size(100, 20);
+            this.tx2_ship2_cb.TabIndex = 67;
+            // 
+            // tx2_ship2
+            // 
+            this.tx2_ship2.Location = new System.Drawing.Point(636, 64);
+            this.tx2_ship2.MaxLength = 20;
+            this.tx2_ship2.Name = "tx2_ship2";
+            this.tx2_ship2.Size = new System.Drawing.Size(86, 21);
+            this.tx2_ship2.TabIndex = 66;
+            this.tx2_ship2.WordWrap = false;
+            this.tx2_ship2.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.w_count_KeyPress);
+            // 
+            // tx1_ship2_cb
+            // 
+            this.tx1_ship2_cb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.tx1_ship2_cb.FormattingEnabled = true;
+            this.tx1_ship2_cb.Location = new System.Drawing.Point(528, 37);
+            this.tx1_ship2_cb.Name = "tx1_ship2_cb";
+            this.tx1_ship2_cb.Size = new System.Drawing.Size(100, 20);
+            this.tx1_ship2_cb.TabIndex = 65;
+            // 
+            // tx1_ship2
+            // 
+            this.tx1_ship2.Location = new System.Drawing.Point(636, 36);
+            this.tx1_ship2.MaxLength = 20;
+            this.tx1_ship2.Name = "tx1_ship2";
+            this.tx1_ship2.Size = new System.Drawing.Size(86, 21);
+            this.tx1_ship2.TabIndex = 64;
+            this.tx1_ship2.WordWrap = false;
+            this.tx1_ship2.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.w_count_KeyPress);
+            // 
+            // tx0_ship2_cb
+            // 
+            this.tx0_ship2_cb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.tx0_ship2_cb.FormattingEnabled = true;
+            this.tx0_ship2_cb.Location = new System.Drawing.Point(528, 8);
+            this.tx0_ship2_cb.Name = "tx0_ship2_cb";
+            this.tx0_ship2_cb.Size = new System.Drawing.Size(100, 20);
+            this.tx0_ship2_cb.TabIndex = 63;
+            // 
+            // tx0_ship2
+            // 
+            this.tx0_ship2.Location = new System.Drawing.Point(636, 9);
+            this.tx0_ship2.MaxLength = 20;
+            this.tx0_ship2.Name = "tx0_ship2";
+            this.tx0_ship2.Size = new System.Drawing.Size(86, 21);
+            this.tx0_ship2.TabIndex = 62;
+            this.tx0_ship2.WordWrap = false;
+            this.tx0_ship2.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.w_count_KeyPress);
             // 
             // cbox_tx_auto1
             // 
@@ -855,6 +932,71 @@ namespace feeling
             this.btn_hd_start.UseVisualStyleBackColor = true;
             this.btn_hd_start.Click += new System.EventHandler(this.btn_hd_start_Click);
             // 
+            // w_pirate4
+            // 
+            this.w_pirate4.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.w_pirate4.Location = new System.Drawing.Point(846, 0);
+            this.w_pirate4.MyCount = 0;
+            this.w_pirate4.MyMode = 0;
+            this.w_pirate4.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate4.MyOptions")));
+            this.w_pirate4.MyPlanet = "";
+            this.w_pirate4.MyTitle = "银河系5";
+            this.w_pirate4.Name = "w_pirate4";
+            this.w_pirate4.Size = new System.Drawing.Size(150, 150);
+            this.w_pirate4.TabIndex = 4;
+            // 
+            // w_pirate3
+            // 
+            this.w_pirate3.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.w_pirate3.Location = new System.Drawing.Point(693, 0);
+            this.w_pirate3.MyCount = 0;
+            this.w_pirate3.MyMode = 0;
+            this.w_pirate3.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate3.MyOptions")));
+            this.w_pirate3.MyPlanet = "";
+            this.w_pirate3.MyTitle = "银河系4";
+            this.w_pirate3.Name = "w_pirate3";
+            this.w_pirate3.Size = new System.Drawing.Size(150, 150);
+            this.w_pirate3.TabIndex = 3;
+            // 
+            // w_pirate2
+            // 
+            this.w_pirate2.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.w_pirate2.Location = new System.Drawing.Point(539, 0);
+            this.w_pirate2.MyCount = 0;
+            this.w_pirate2.MyMode = 0;
+            this.w_pirate2.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate2.MyOptions")));
+            this.w_pirate2.MyPlanet = "";
+            this.w_pirate2.MyTitle = "银河系3";
+            this.w_pirate2.Name = "w_pirate2";
+            this.w_pirate2.Size = new System.Drawing.Size(150, 150);
+            this.w_pirate2.TabIndex = 2;
+            // 
+            // w_pirate1
+            // 
+            this.w_pirate1.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.w_pirate1.Location = new System.Drawing.Point(386, 0);
+            this.w_pirate1.MyCount = 0;
+            this.w_pirate1.MyMode = 0;
+            this.w_pirate1.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate1.MyOptions")));
+            this.w_pirate1.MyPlanet = "";
+            this.w_pirate1.MyTitle = "银河系2";
+            this.w_pirate1.Name = "w_pirate1";
+            this.w_pirate1.Size = new System.Drawing.Size(150, 150);
+            this.w_pirate1.TabIndex = 1;
+            // 
+            // w_pirate0
+            // 
+            this.w_pirate0.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.w_pirate0.Location = new System.Drawing.Point(233, 0);
+            this.w_pirate0.MyCount = 0;
+            this.w_pirate0.MyMode = 0;
+            this.w_pirate0.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate0.MyOptions")));
+            this.w_pirate0.MyPlanet = "";
+            this.w_pirate0.MyTitle = "银河系1";
+            this.w_pirate0.Name = "w_pirate0";
+            this.w_pirate0.Size = new System.Drawing.Size(150, 150);
+            this.w_pirate0.TabIndex = 0;
+            // 
             // w_galaxy
             // 
             this.w_galaxy.Controls.Add(this.btn_galaxy_open);
@@ -1256,6 +1398,7 @@ namespace feeling
             // 
             // w_user_box
             // 
+            this.w_user_box.Controls.Add(this.cbox_morning_idle);
             this.w_user_box.Controls.Add(this.btn_test);
             this.w_user_box.Controls.Add(this.cbox_auto_logout);
             this.w_user_box.Controls.Add(this.btn_universe);
@@ -1270,14 +1413,14 @@ namespace feeling
             this.w_user_box.Controls.Add(this.label1);
             this.w_user_box.Location = new System.Drawing.Point(9, 7);
             this.w_user_box.Name = "w_user_box";
-            this.w_user_box.Size = new System.Drawing.Size(194, 172);
+            this.w_user_box.Size = new System.Drawing.Size(194, 181);
             this.w_user_box.TabIndex = 1;
             this.w_user_box.TabStop = false;
             this.w_user_box.Text = "用户";
             // 
             // btn_test
             // 
-            this.btn_test.Location = new System.Drawing.Point(8, 119);
+            this.btn_test.Location = new System.Drawing.Point(8, 131);
             this.btn_test.Name = "btn_test";
             this.btn_test.Size = new System.Drawing.Size(56, 23);
             this.btn_test.TabIndex = 47;
@@ -1288,7 +1431,7 @@ namespace feeling
             // cbox_auto_logout
             // 
             this.cbox_auto_logout.AutoSize = true;
-            this.cbox_auto_logout.Location = new System.Drawing.Point(8, 101);
+            this.cbox_auto_logout.Location = new System.Drawing.Point(8, 92);
             this.cbox_auto_logout.Name = "cbox_auto_logout";
             this.cbox_auto_logout.Size = new System.Drawing.Size(180, 16);
             this.cbox_auto_logout.TabIndex = 46;
@@ -1298,7 +1441,7 @@ namespace feeling
             // 
             // btn_universe
             // 
-            this.btn_universe.Location = new System.Drawing.Point(129, 146);
+            this.btn_universe.Location = new System.Drawing.Point(129, 155);
             this.btn_universe.Name = "btn_universe";
             this.btn_universe.Size = new System.Drawing.Size(56, 23);
             this.btn_universe.TabIndex = 20;
@@ -1308,7 +1451,7 @@ namespace feeling
             // 
             // btn_cross
             // 
-            this.btn_cross.Location = new System.Drawing.Point(129, 119);
+            this.btn_cross.Location = new System.Drawing.Point(129, 131);
             this.btn_cross.Name = "btn_cross";
             this.btn_cross.Size = new System.Drawing.Size(56, 23);
             this.btn_cross.TabIndex = 19;
@@ -1327,7 +1470,7 @@ namespace feeling
             // 
             // btn_user_logout
             // 
-            this.btn_user_logout.Location = new System.Drawing.Point(67, 146);
+            this.btn_user_logout.Location = new System.Drawing.Point(67, 155);
             this.btn_user_logout.Name = "btn_user_logout";
             this.btn_user_logout.Size = new System.Drawing.Size(59, 23);
             this.btn_user_logout.TabIndex = 17;
@@ -1337,7 +1480,7 @@ namespace feeling
             // 
             // btn_user_login
             // 
-            this.btn_user_login.Location = new System.Drawing.Point(8, 146);
+            this.btn_user_login.Location = new System.Drawing.Point(8, 155);
             this.btn_user_login.Name = "btn_user_login";
             this.btn_user_login.Size = new System.Drawing.Size(56, 23);
             this.btn_user_login.TabIndex = 16;
@@ -1347,7 +1490,7 @@ namespace feeling
             // 
             // w_user_universe
             // 
-            this.w_user_universe.Location = new System.Drawing.Point(53, 74);
+            this.w_user_universe.Location = new System.Drawing.Point(53, 66);
             this.w_user_universe.MaxLength = 2;
             this.w_user_universe.Name = "w_user_universe";
             this.w_user_universe.Size = new System.Drawing.Size(26, 21);
@@ -1357,7 +1500,7 @@ namespace feeling
             // 
             // w_user_password
             // 
-            this.w_user_password.Location = new System.Drawing.Point(53, 45);
+            this.w_user_password.Location = new System.Drawing.Point(53, 41);
             this.w_user_password.MaxLength = 20;
             this.w_user_password.Name = "w_user_password";
             this.w_user_password.Size = new System.Drawing.Size(135, 21);
@@ -1368,7 +1511,7 @@ namespace feeling
             // label5
             // 
             this.label5.AutoSize = true;
-            this.label5.Location = new System.Drawing.Point(6, 48);
+            this.label5.Location = new System.Drawing.Point(6, 44);
             this.label5.Name = "label5";
             this.label5.Size = new System.Drawing.Size(47, 12);
             this.label5.TabIndex = 12;
@@ -1377,7 +1520,7 @@ namespace feeling
             // label3
             // 
             this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(6, 77);
+            this.label3.Location = new System.Drawing.Point(6, 69);
             this.label3.Name = "label3";
             this.label3.Size = new System.Drawing.Size(47, 12);
             this.label3.TabIndex = 11;
@@ -1392,146 +1535,16 @@ namespace feeling
             this.label1.TabIndex = 10;
             this.label1.Text = "账 号:";
             // 
-            // tx3_ship2_cb
+            // cbox_morning_idle
             // 
-            this.tx3_ship2_cb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.tx3_ship2_cb.FormattingEnabled = true;
-            this.tx3_ship2_cb.Location = new System.Drawing.Point(528, 92);
-            this.tx3_ship2_cb.Name = "tx3_ship2_cb";
-            this.tx3_ship2_cb.Size = new System.Drawing.Size(100, 20);
-            this.tx3_ship2_cb.TabIndex = 69;
-            // 
-            // tx3_ship2
-            // 
-            this.tx3_ship2.Location = new System.Drawing.Point(636, 91);
-            this.tx3_ship2.MaxLength = 20;
-            this.tx3_ship2.Name = "tx3_ship2";
-            this.tx3_ship2.Size = new System.Drawing.Size(86, 21);
-            this.tx3_ship2.TabIndex = 68;
-            this.tx3_ship2.WordWrap = false;
-            this.tx3_ship2.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.w_count_KeyPress);
-            // 
-            // tx2_ship2_cb
-            // 
-            this.tx2_ship2_cb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.tx2_ship2_cb.FormattingEnabled = true;
-            this.tx2_ship2_cb.Location = new System.Drawing.Point(528, 63);
-            this.tx2_ship2_cb.Name = "tx2_ship2_cb";
-            this.tx2_ship2_cb.Size = new System.Drawing.Size(100, 20);
-            this.tx2_ship2_cb.TabIndex = 67;
-            // 
-            // tx2_ship2
-            // 
-            this.tx2_ship2.Location = new System.Drawing.Point(636, 64);
-            this.tx2_ship2.MaxLength = 20;
-            this.tx2_ship2.Name = "tx2_ship2";
-            this.tx2_ship2.Size = new System.Drawing.Size(86, 21);
-            this.tx2_ship2.TabIndex = 66;
-            this.tx2_ship2.WordWrap = false;
-            this.tx2_ship2.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.w_count_KeyPress);
-            // 
-            // tx1_ship2_cb
-            // 
-            this.tx1_ship2_cb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.tx1_ship2_cb.FormattingEnabled = true;
-            this.tx1_ship2_cb.Location = new System.Drawing.Point(528, 37);
-            this.tx1_ship2_cb.Name = "tx1_ship2_cb";
-            this.tx1_ship2_cb.Size = new System.Drawing.Size(100, 20);
-            this.tx1_ship2_cb.TabIndex = 65;
-            // 
-            // tx1_ship2
-            // 
-            this.tx1_ship2.Location = new System.Drawing.Point(636, 36);
-            this.tx1_ship2.MaxLength = 20;
-            this.tx1_ship2.Name = "tx1_ship2";
-            this.tx1_ship2.Size = new System.Drawing.Size(86, 21);
-            this.tx1_ship2.TabIndex = 64;
-            this.tx1_ship2.WordWrap = false;
-            this.tx1_ship2.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.w_count_KeyPress);
-            // 
-            // tx0_ship2_cb
-            // 
-            this.tx0_ship2_cb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
-            this.tx0_ship2_cb.FormattingEnabled = true;
-            this.tx0_ship2_cb.Location = new System.Drawing.Point(528, 8);
-            this.tx0_ship2_cb.Name = "tx0_ship2_cb";
-            this.tx0_ship2_cb.Size = new System.Drawing.Size(100, 20);
-            this.tx0_ship2_cb.TabIndex = 63;
-            // 
-            // tx0_ship2
-            // 
-            this.tx0_ship2.Location = new System.Drawing.Point(636, 9);
-            this.tx0_ship2.MaxLength = 20;
-            this.tx0_ship2.Name = "tx0_ship2";
-            this.tx0_ship2.Size = new System.Drawing.Size(86, 21);
-            this.tx0_ship2.TabIndex = 62;
-            this.tx0_ship2.WordWrap = false;
-            this.tx0_ship2.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.w_count_KeyPress);
-            // 
-            // w_pirate4
-            // 
-            this.w_pirate4.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.w_pirate4.Location = new System.Drawing.Point(846, 0);
-            this.w_pirate4.MyCount = 0;
-            this.w_pirate4.MyMode = 0;
-            this.w_pirate4.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate4.MyOptions")));
-            this.w_pirate4.MyPlanet = "";
-            this.w_pirate4.MyTitle = "银河系5";
-            this.w_pirate4.Name = "w_pirate4";
-            this.w_pirate4.Size = new System.Drawing.Size(150, 150);
-            this.w_pirate4.TabIndex = 4;
-            // 
-            // w_pirate3
-            // 
-            this.w_pirate3.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.w_pirate3.Location = new System.Drawing.Point(693, 0);
-            this.w_pirate3.MyCount = 0;
-            this.w_pirate3.MyMode = 0;
-            this.w_pirate3.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate3.MyOptions")));
-            this.w_pirate3.MyPlanet = "";
-            this.w_pirate3.MyTitle = "银河系4";
-            this.w_pirate3.Name = "w_pirate3";
-            this.w_pirate3.Size = new System.Drawing.Size(150, 150);
-            this.w_pirate3.TabIndex = 3;
-            // 
-            // w_pirate2
-            // 
-            this.w_pirate2.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.w_pirate2.Location = new System.Drawing.Point(539, 0);
-            this.w_pirate2.MyCount = 0;
-            this.w_pirate2.MyMode = 0;
-            this.w_pirate2.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate2.MyOptions")));
-            this.w_pirate2.MyPlanet = "";
-            this.w_pirate2.MyTitle = "银河系3";
-            this.w_pirate2.Name = "w_pirate2";
-            this.w_pirate2.Size = new System.Drawing.Size(150, 150);
-            this.w_pirate2.TabIndex = 2;
-            // 
-            // w_pirate1
-            // 
-            this.w_pirate1.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.w_pirate1.Location = new System.Drawing.Point(386, 0);
-            this.w_pirate1.MyCount = 0;
-            this.w_pirate1.MyMode = 0;
-            this.w_pirate1.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate1.MyOptions")));
-            this.w_pirate1.MyPlanet = "";
-            this.w_pirate1.MyTitle = "银河系2";
-            this.w_pirate1.Name = "w_pirate1";
-            this.w_pirate1.Size = new System.Drawing.Size(150, 150);
-            this.w_pirate1.TabIndex = 1;
-            // 
-            // w_pirate0
-            // 
-            this.w_pirate0.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.w_pirate0.Location = new System.Drawing.Point(233, 0);
-            this.w_pirate0.MyCount = 0;
-            this.w_pirate0.MyMode = 0;
-            this.w_pirate0.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate0.MyOptions")));
-            this.w_pirate0.MyPlanet = "";
-            this.w_pirate0.MyTitle = "银河系1";
-            this.w_pirate0.Name = "w_pirate0";
-            this.w_pirate0.Size = new System.Drawing.Size(150, 150);
-            this.w_pirate0.TabIndex = 0;
+            this.cbox_morning_idle.AutoSize = true;
+            this.cbox_morning_idle.Location = new System.Drawing.Point(8, 113);
+            this.cbox_morning_idle.Name = "cbox_morning_idle";
+            this.cbox_morning_idle.Size = new System.Drawing.Size(126, 16);
+            this.cbox_morning_idle.TabIndex = 48;
+            this.cbox_morning_idle.Text = "凌晨空闲（1-6点）";
+            this.cbox_morning_idle.UseVisualStyleBackColor = true;
+            this.cbox_morning_idle.CheckedChanged += new System.EventHandler(this.cbox_morning_idle_CheckedChanged);
             // 
             // MainForm
             // 
@@ -1695,5 +1708,6 @@ namespace feeling
         private System.Windows.Forms.TextBox tx1_ship2;
         private System.Windows.Forms.ComboBox tx0_ship2_cb;
         private System.Windows.Forms.TextBox tx0_ship2;
+        private System.Windows.Forms.CheckBox cbox_morning_idle;
     }
 }

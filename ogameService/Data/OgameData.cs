@@ -37,6 +37,8 @@ namespace OgameService
         public string ExpeditionAutoMsg = "";
         public string ExpeditionAutoMsg1 = "";
 
+        public bool MorningIdle = false;
+
         public static byte[] ToBytes(OgameData data)
         {
             return Encoding.UTF8.GetBytes(ToJson(data));

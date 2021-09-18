@@ -17,6 +17,7 @@ namespace feeling
         public string Password => MyUserData.Password;
         public int Universe => MyUserData.Universe;
         public bool AutoLogout => MyUserData.AutoLogout;
+        public bool MorningIdle => MyUserData.MorningIdle;
 
         public User()
         {
@@ -88,6 +89,12 @@ namespace feeling
         public void SetAutoLogout(bool autoLogout = false)
         {
             MyUserData.AutoLogout = autoLogout;
+            SaveUserData();
+        }
+
+        public void SetMorningIdle(bool isIdle = false)
+        {
+            MyUserData.MorningIdle = isIdle;
             SaveUserData();
         }
     }

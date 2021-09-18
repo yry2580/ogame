@@ -923,6 +923,34 @@ namespace OgameService
             return false;
         }
 
+        public bool OperMorningIdle(string id, string key, bool open)
+        {
+            LogUtil.Warn($"OperMorningIdle {id}");
+            try
+            {
+                if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+                mCellDict.TryGetValue(key, out OgCell result);
+                // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+                if (null == result || null == result.MySession)
+                {
+                    LogUtil.Warn($"OperMorningIdle 没取到对应cell");
+                    return false;
+                }
+
+                OgameData data = new OgameData();
+                data.Cmd = CmdEnum.MorningIdle;
+                data.MorningIdle = open;
+
+                mServer.SendTo(result.MySession, OgameData.ToBytes(data));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Error($"OperMorningIdle {key} catch {ex.Message}");
+            }
+            return false;
+        }
 
         public void ShowAllCell()
         {
