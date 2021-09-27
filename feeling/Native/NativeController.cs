@@ -65,6 +65,8 @@ namespace feeling
 
         public int PirateSpeedIndex = 0;
 
+        public DateTime LastHaidaoZiyuanTime = DateTime.Now.AddDays(-1);
+
         public void HandleWebBrowserFrameEnd(string url)
         {
             MyAddress = MyWebBrowser.Address;
@@ -1145,6 +1147,8 @@ namespace feeling
                     // checkNpc = CheckRefreshNpc(pMission);
                     autoLogout = CanAutoLogout();
                 }
+
+                await DoGetHaidaoZiyuan();
             }
 
             IsPirateWorking = false;
@@ -1178,6 +1182,51 @@ namespace feeling
             {
                 LastPirateTime = DateTime.Now;
             }
+        }
+
+        private async Task DoGetHaidaoZiyuan()
+        {
+            try
+            {
+                var now = DateTime.Now;
+                if (LastHaidaoZiyuanTime.Date.Equals(now.Date))
+                {
+                    NativeLog.Info("领取海盗资源-今天处理过了");
+                    return;
+                }
+
+                NativeLog.Info("领取海盗资源");
+                Reload();
+                var source = await GetFrameSourceAsync();
+                await GoHome(1500);
+
+                if (HtmlUtil.IsGameUrl(MyAddress))
+                {
+                    NativeLog.Info("领取海盗资源-任务礼包");
+                    await GetFrameSourceAsync();
+                    FrameRunJs(NativeScript.ToTaskList());
+                    await Task.Delay(1500);
+                    source = await GetFrameSourceAsync();
+                    NativeLog.Info("领取海盗资源-攻击海盗分页");
+                    FrameRunJs(NativeScript.TaskListAttackHaidaoTab());
+                    await Task.Delay(1500);
+                    source = await GetFrameSourceAsync();
+                    NativeLog.Info("领取海盗资源-领取资源");
+                    FrameRunJs(NativeScript.TaskListGetAttackHaidaoZiyuan());
+                    await Task.Delay(1500);
+                    Reload();
+                    await GetFrameSourceAsync();
+
+                    // 记录
+                    LastHaidaoZiyuanTime = now;
+                }
+            }
+            catch (Exception ex)
+            {
+                NativeLog.Error($"DoGetHaidaoZiyuan catch {ex.Message}");
+            }
+
+            NativeLog.Info("领取海盗资源结束");
         }
 
         private bool CheckRefreshNpc(PirateMission pMission)

@@ -273,10 +273,11 @@ namespace feeling
         {
             var idx = rbtn_cfg1.Checked ? 1 : 0;
 
-/*          
-            // 读取配置
-            if (!PirateUtil.ReadCfg(idx)) return false;
-*/
+            NativeLog.Info($"读取海盗配置，当前配置：{idx + 1}");
+            /*          
+                // 读取配置
+                if (!PirateUtil.ReadCfg(idx)) return false;
+            */
             var pMissionCfg = PirateUtil.MyMission;
             var pMissionCfg1 = PirateUtil.MyMission1;
 
@@ -329,6 +330,8 @@ namespace feeling
             var exMissionCfg1 = Expedition.MyExMissionCfg1;
 
             var missionCfg = cfgIdx == 1 ? exMissionCfg1 : exMissionCfg;
+
+            NativeLog.Info($"读取探险配置，当前配置：{cfgIdx + 1}");
 
             // if (null == exMissionCfg) return false;
 
@@ -1281,6 +1284,8 @@ namespace feeling
             {
                 rbtn_ex_cfg0.Checked = true;
             }
+
+            NativeLog.Info($"探险{index + 1}");
 
             await Task.Delay(500);
 

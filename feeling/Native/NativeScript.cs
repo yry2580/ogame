@@ -305,5 +305,26 @@ namespace feeling
             script += $"doc.querySelector(\"form[action='search.php'] input[type='submit']\").click()";
             return script;
         }
+
+        public static string ToTaskList()
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"a[href^='tasklist.php']\").click()";
+            return script;
+        }
+
+        public static string TaskListAttackHaidaoTab()
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"#attackhaidaotab]\").click()";
+            return script;
+        }
+
+        public static string TaskListGetAttackHaidaoZiyuan()
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"input[onclick*='getattackhaidaoziyuan'][value*='领取资源']\").click()";
+            return script;
+        }
     }
 }
