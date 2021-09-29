@@ -498,5 +498,19 @@ namespace feeling
 
 #endif
         }
+
+        public static bool IsMoon(string source, OgameParser parser = null)
+        {
+            if (string.IsNullOrWhiteSpace(source)) return false;
+            parser = parser ?? new OgameParser();
+            parser.LoadHtml(source);
+
+            var node = parser.QuerySelector("#resources tbody>tr:nth-child(4)>td:nth-child(4)");
+            if (null == node) return false;
+            var text = node.TextContent.Trim();
+            if (text == "0") return true;
+
+            return false;
+        }
     }
 }

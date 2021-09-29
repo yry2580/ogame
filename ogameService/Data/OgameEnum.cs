@@ -44,6 +44,7 @@ namespace OgameService
         QuickAutoStart,
         PirateSpeed,
         MorningIdle,
+        Transfer,
     }
 
     public enum StatusEnum

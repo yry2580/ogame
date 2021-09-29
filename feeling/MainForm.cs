@@ -454,6 +454,7 @@ namespace feeling
                         btn_cross.Enabled = false;
                         btn_universe.Enabled = false;
                         cbox_auto_logout.Enabled = false;
+                        btn_transfer.Enabled = false;
                         SetQuickBtn(false);
                         break;
                     case OperStatus.Galaxy:
@@ -465,6 +466,7 @@ namespace feeling
                         btn_cross.Enabled = false;
                         btn_universe.Enabled = false;
                         cbox_auto_logout.Enabled = false;
+                        btn_transfer.Enabled = false;
                         SetQuickBtn(false);
                         break;
                     case OperStatus.Expedition:
@@ -476,6 +478,7 @@ namespace feeling
                         btn_cross.Enabled = false;
                         btn_universe.Enabled = false;
                         cbox_auto_logout.Enabled = false;
+                        btn_transfer.Enabled = false;
                         SetQuickBtn(false);
                         break;
                     case OperStatus.Pirate:
@@ -487,6 +490,7 @@ namespace feeling
                         btn_cross.Enabled = false;
                         btn_universe.Enabled = false;
                         cbox_auto_logout.Enabled = false;
+                        btn_transfer.Enabled = false;
                         SetQuickBtn(false);
                         break;
                     case OperStatus.None:
@@ -499,6 +503,7 @@ namespace feeling
                         btn_cross.Enabled = true;
                         btn_universe.Enabled = true;
                         cbox_auto_logout.Enabled = true;
+                        btn_transfer.Enabled = true;
                         SetQuickBtn(true);
                         break;
                 }
@@ -825,6 +830,10 @@ namespace feeling
                     case CmdEnum.MorningIdle:
                         NativeController.Instance.CanNotify = false;
                         await SetMorningIdle(data.MorningIdle);
+                        break;
+                    case CmdEnum.Transfer:
+                        NativeController.Instance.CanNotify = false;
+                        DoTransfer();
                         break;
                     default:
                         break;
@@ -2359,6 +2368,18 @@ namespace feeling
         {
             var isChecked = cbox_morning_idle.Checked;
             NativeController.User.SetMorningIdle(isChecked);
+        }
+
+        private void DoTransfer()
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
+            NativeController.Instance.StartTransfer();
+            Redraw();
+        }
+
+        private void btn_transfer_Click(object sender, EventArgs e)
+        {
+            DoTransfer();
         }
     }
 }

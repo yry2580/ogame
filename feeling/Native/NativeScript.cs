@@ -141,6 +141,13 @@ namespace feeling
             return script;
         }
 
+        public static string SetTargetType(int pt)
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"select[name=planettype] option[value='{pt}']\").selected=true;";
+            return script;
+        }
+
         /// <summary>
         /// 设置速度
         /// </summary>
@@ -173,6 +180,20 @@ namespace feeling
         {
             var script = "doc = window.parent.frames['Hauptframe'].document;";
             script += $"doc.querySelector(\"input[name='mission'][value='1']\").click()";
+            return script;
+        }
+
+        public static string SetTransfer()
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"input[name='mission'][value='3']\").click()";
+            return script;
+        }
+
+        public static string SetMaxResource(int val)
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"a[href*=\\\"maxResource('{val}')\\\"]\").click()";
             return script;
         }
 

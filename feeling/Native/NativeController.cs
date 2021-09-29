@@ -25,6 +25,7 @@ namespace feeling
         public volatile bool IsPirateWorking = false;
         public volatile bool IsExpeditionWorking = false;
         public volatile bool IsUserWorking = false;
+        public volatile bool IsTransferWorking = false;
 
         public volatile string MyAddress = "";
         public DelegateStatusChange StatusChangeEvent;
@@ -924,7 +925,7 @@ namespace feeling
                         source = await GetFrameSourceAsync();
                         if (!HtmlUtil.IsInGame(source))
                         {
-                            OperTipsEvent.Invoke(OperStatus.Expedition, $"海盗结束，没有登录");
+                            OperTipsEvent.Invoke(OperStatus.Pirate, $"海盗结束，没有登录");
                             SetLastPirateTime(cfgIndex);
                             IsExpeditionWorking = false;
                             SwitchStatus(OperStatus.None);
@@ -934,7 +935,7 @@ namespace feeling
                 }
                 else
                 {
-                    OperTipsEvent.Invoke(OperStatus.Expedition, $"海盗结束，没有登录");
+                    OperTipsEvent.Invoke(OperStatus.Pirate, $"海盗结束，没有登录");
                     SetLastPirateTime(cfgIndex);
                     IsExpeditionWorking = false;
                     SwitchStatus(OperStatus.None);
@@ -1475,6 +1476,245 @@ namespace feeling
         }
         #endregion
 
+        #region 转移资源到月球
+        internal void StartTransfer()
+        {
+            SwitchStatus(OperStatus.System);
+            IsTransferWorking = true;
+
+            Task.Run(() =>
+            {
+                DoTransfer();
+            });
+        }
+
+        internal void StopTransfer()
+        {
+            if (!IsTransferWorking) return;
+            IsTransferWorking = false;
+        }
+
+        protected async void DoTransfer()
+        {
+            int index = 0;
+            int _count = 0;
+            bool lastErr = false;
+            string source = "";
+
+            var _nextFunc = new Action<bool>(isSkip =>
+            {
+                if (lastErr || isSkip)
+                {
+                    lastErr = false;
+                    index++;
+                }
+                else
+                {
+                    lastErr = true;
+                }
+            });
+
+            var planetLists = MyPlanet.List;
+            try
+            {
+                OperTipsEvent.Invoke(OperStatus.System, $"开始转移资源");
+
+                Reload();
+
+                if (HtmlUtil.IsGameUrl(MyAddress))
+                {
+                    source = await GetFrameSourceAsync();
+                    if (HtmlUtil.HasTutorial(source))
+                    {
+                        FrameRunJs(NativeScript.TutorialConfirm());
+                        await Task.Delay(1500);
+                        source = await GetFrameSourceAsync();
+                        if (!HtmlUtil.IsInGame(source))
+                        {
+                            OperTipsEvent.Invoke(OperStatus.System, $"转移资源结束，没有登录");
+                            NativeLog.Info("转移资源-没有登录");
+                            IsTransferWorking = false;
+                            SwitchStatus(OperStatus.None);
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+                    OperTipsEvent.Invoke(OperStatus.System, $"转移资源结束，没有登录");
+                    NativeLog.Info("转移资源-没有登录");
+                    IsTransferWorking = false;
+                    SwitchStatus(OperStatus.None);
+                    return;
+                }
+
+                await GoHome(1500);
+
+                do
+                {
+                    NativeLog.Info($"资源转移 index{index}");
+                    if (index >= planetLists.Count)
+                    {
+                        OperTipsEvent.Invoke(OperStatus.System, $"资源转移结束{_count}/{planetLists.Count}");
+                        break;
+                    }
+
+                    OperTipsEvent.Invoke(OperStatus.System, $"资源转移{index + 1}/{planetLists.Count}");
+
+                    if (!IsTransferWorking)
+                    {
+                        OperTipsEvent.Invoke(OperStatus.System, $"资源转移停止");
+                        break;
+                    }
+
+                    var planetDesc = planetLists[index];
+
+                    if (lastErr)
+                    {
+                        Reload();
+                        NativeLog.Info($"重载");
+                    }
+
+                    source = await GetFrameSourceAsync();
+                    if (HtmlUtil.HasTutorial(source, mHtmlParser))
+                    {
+                        NativeLog.Info($"存在错误");
+                        OperTipsEvent.Invoke(OperStatus.Pirate, $"存在错误");
+                        FrameRunJs(NativeScript.TutorialConfirm());
+                        await Task.Delay(1500);
+                    }
+
+                    // 切换舰队页面
+                    GoFleetPage();
+                    NativeLog.Info($"切换舰队");
+                    source = await GetFrameSourceAsync();
+                    if (index <= 1 && HtmlUtil.IsWechatCodePage(source))
+                    {
+                        NativeLog.Info($"在微信验证页");
+                        OperTipsEvent.Invoke(OperStatus.Pirate, $"在微信验证页");
+                        break;
+                    }
+
+                    FrameRunJs(NativeScript.SelectPlanet(index));
+                    await Task.Delay(1500);
+
+                    // 查看舰队队列
+                    source = await GetFrameSourceAsync();
+                    if (!source.Contains("id=\"fleetdelaybox\""))
+                    {
+                        GoFleetPage();
+                        source = await GetFrameSourceAsync();
+                    }
+
+                    if (HtmlUtil.IsMoon(source))
+                    {
+                        NativeLog.Info($"没有能量（{planetDesc}）不需要转移");
+                        _nextFunc(true);
+                        continue;
+                    }
+
+                    if (!HtmlUtil.ParseFleetQueue(source, out FleetQueue fq))
+                    {
+                        _nextFunc(false);
+                        NativeLog.Info($"解析航道队列有误");
+                        OperTipsEvent.Invoke(OperStatus.Pirate, $"解析航道队列有误");
+                        continue;
+                    }
+
+                    if (fq.Count >= fq.MaxCount)
+                    {
+                        NativeLog.Info($"航道已满");
+                        OperTipsEvent.Invoke(OperStatus.Pirate, $"航道已满");
+                        break;
+                    }
+
+                    bool flag = false;
+                    var shipId = Ship.GetShipId(ShipType.LC);
+                    if (HtmlUtil.ParseShip(source, shipId, out int total))
+                    {
+                        if (total > 0)
+                        {
+                            FrameRunJs(NativeScript.SetShip(shipId, total));
+                            await Task.Delay(100);
+                            flag = true;
+                        }
+                    }
+
+                    if (!flag)
+                    {
+                        NativeLog.Info($"没有大型运输机");
+                        OperTipsEvent.Invoke(OperStatus.System, $"没有大型运输机");
+                        _nextFunc(true);
+                        continue;
+                    }
+                    await Task.Delay(500);
+
+                    // 继续
+                    FrameRunJs(NativeScript.SetShipNext());
+                    await Task.Delay(1500);
+
+                    source = await GetFrameSourceAsync();
+
+                    // 设置目标点
+                    FrameRunJs(NativeScript.SetTargetType((int)PlanetType.Moon));
+                    await Task.Delay(500);
+                    source = await GetFrameSourceAsync();
+
+                    // 设置目标继续
+                    FrameRunJs(NativeScript.SetTargetNext());
+                    await Task.Delay(1500);
+
+                    source = await GetFrameSourceAsync();
+                    // 运输
+                    FrameRunJs(NativeScript.SetTransfer());
+                    await Task.Delay(300);
+
+                    FrameRunJs(NativeScript.SetMaxResource(1));
+                    await Task.Delay(100);
+                    FrameRunJs(NativeScript.SetMaxResource(2));
+                    await Task.Delay(100);
+                    FrameRunJs(NativeScript.SetMaxResource(3));
+                    await Task.Delay(100);
+
+                    var confirmType = HtmlUtil.AttackConfirmType(source);
+                    // 攻击确认
+                    FrameRunJs(NativeScript.SetAttackConfirm(confirmType));
+                    await Task.Delay(1500);
+
+                    // 查看结果
+                    source = await GetFrameSourceAsync();
+                    if (HtmlUtil.HasFleetSuccess(source, mExpedition.Parser))
+                    {
+                        NativeLog.Info($"派遣成功");
+                        OperTipsEvent.Invoke(OperStatus.Pirate, $"派遣成功");
+                        _nextFunc(true);
+                        _count++;
+                        continue;
+                    }
+
+                    if (HtmlUtil.HasTutorial(source, mExpedition.Parser))
+                    {
+                        NativeLog.Info($"派遣错误");
+                        OperTipsEvent.Invoke(OperStatus.Pirate, $"派遣错误");
+                        FrameRunJs(NativeScript.TutorialConfirm());
+                        await Task.Delay(1500);
+                    }
+
+                    _nextFunc(false);
+                } while (true);
+            }
+            catch (Exception ex)
+            {
+                NativeLog.Error($"DoTransfer catch {ex.Message}");
+            }
+
+            OperTipsEvent.Invoke(OperStatus.System, $"资源转运{_count}/{planetLists.Count}");
+
+            IsTransferWorking = false;
+            SwitchStatus(OperStatus.None);
+        }
+
+        #endregion 转移资源到月球
         public void SwitchStatus(OperStatus operStatus)
         {
             if (MyOperStatus == operStatus) return;
