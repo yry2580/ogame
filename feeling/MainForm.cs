@@ -2370,9 +2370,10 @@ namespace feeling
             NativeController.User.SetMorningIdle(isChecked);
         }
 
-        private void DoTransfer()
+        private async void DoTransfer()
         {
             if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
+            await TryLogin();
             NativeController.Instance.StartTransfer();
             Redraw();
         }

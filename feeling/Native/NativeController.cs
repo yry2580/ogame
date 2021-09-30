@@ -1708,7 +1708,7 @@ namespace feeling
                 NativeLog.Error($"DoTransfer catch {ex.Message}");
             }
 
-            OperTipsEvent.Invoke(OperStatus.System, $"资源转运{_count}/{planetLists.Count}");
+            OperTipsEvent.Invoke(OperStatus.System, $"资源转运结束{_count}/{planetLists.Count}");
 
             IsTransferWorking = false;
             SwitchStatus(OperStatus.None);

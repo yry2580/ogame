@@ -505,11 +505,16 @@ namespace feeling
             parser = parser ?? new OgameParser();
             parser.LoadHtml(source);
 
+#if !NET45
             var node = parser.QuerySelector("#resources tbody>tr:nth-child(4)>td:nth-child(4)");
             if (null == node) return false;
             var text = node.TextContent.Trim();
+#else
+            var node = parser.QuerySelector("//*[@id='resources']//tbody/tr:nth-child(4)/td:nth-child(4)");
+            if (null == node) return false;
+            var text = node.InnerText.Trim();
+#endif
             if (text == "0") return true;
-
             return false;
         }
     }
