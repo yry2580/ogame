@@ -125,7 +125,7 @@ namespace feeling
 
             if (NativeController.User.MorningIdle)
             {
-                if (dt.Hour >= 1 && dt.Hour < 6)
+                if (dt.Hour > 23 || dt.Hour < 5)
                 {
                     NativeLog.Info("凌晨空闲模式");
                     return false;
@@ -1495,6 +1495,7 @@ namespace feeling
             }
 
             label.Text = $"{DateTime.Now:G}|自动海盗{index + 1}开始";
+            NativeLog.Info($"自动海盗{index + 1}开始");
 
             mIsBusy = true;
             

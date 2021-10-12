@@ -866,7 +866,6 @@ namespace feeling
         {
             SwitchStatus(OperStatus.Pirate);
             IsPirateWorking = true;
-
             Task.Run(() =>
             {
                 DoPirate(pMission, cfgIndex, isAuto);
@@ -903,10 +902,12 @@ namespace feeling
             try
             {
                 OperTipsEvent.Invoke(OperStatus.Pirate, $"开始海盗");
+                NativeLog.Info("刷球完成");
 
                 if (pMission.MissionCount <= 0)
                 {
                     OperTipsEvent.Invoke(OperStatus.Pirate, $"没有海盗任务");
+                    NativeLog.Info("没有海盗任务");
                     SetLastPirateTime(cfgIndex);
                     IsPirateWorking = false;
                     SwitchStatus(OperStatus.None);
@@ -926,6 +927,7 @@ namespace feeling
                         if (!HtmlUtil.IsInGame(source))
                         {
                             OperTipsEvent.Invoke(OperStatus.Pirate, $"海盗结束，没有登录");
+                            NativeLog.Info("海盗任务结束，没有登录");
                             SetLastPirateTime(cfgIndex);
                             IsExpeditionWorking = false;
                             SwitchStatus(OperStatus.None);
@@ -936,6 +938,7 @@ namespace feeling
                 else
                 {
                     OperTipsEvent.Invoke(OperStatus.Pirate, $"海盗结束，没有登录");
+                    NativeLog.Info("海盗任务结束，没有登录");
                     SetLastPirateTime(cfgIndex);
                     IsExpeditionWorking = false;
                     SwitchStatus(OperStatus.None);
@@ -1135,6 +1138,7 @@ namespace feeling
             }
 
             OperTipsEvent.Invoke(OperStatus.Pirate, $"海盗任务结束{_count}/{pMission.MissionCount}");
+            NativeLog.Info($"海盗任务结束{_count}-{success}");
 
             var checkNpc = false;
             var autoLogout = false;

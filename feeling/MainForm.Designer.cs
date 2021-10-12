@@ -127,6 +127,8 @@ namespace feeling
             this.label20 = new System.Windows.Forms.Label();
             this.label21 = new System.Windows.Forms.Label();
             this.cbox_tz_auto = new System.Windows.Forms.CheckBox();
+            this.w_oper = new System.Windows.Forms.TabPage();
+            this.btn_transfer = new System.Windows.Forms.Button();
             this.w_info = new System.Windows.Forms.TabPage();
             this.lb_quick_auto = new System.Windows.Forms.Label();
             this.label13 = new System.Windows.Forms.Label();
@@ -157,8 +159,6 @@ namespace feeling
             this.label5 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.w_oper = new System.Windows.Forms.TabPage();
-            this.btn_transfer = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.w_split_container)).BeginInit();
             this.w_split_container.Panel2.SuspendLayout();
             this.w_split_container.SuspendLayout();
@@ -167,9 +167,9 @@ namespace feeling
             this.tab_haidao.SuspendLayout();
             this.w_galaxy.SuspendLayout();
             this.w_imperium.SuspendLayout();
+            this.w_oper.SuspendLayout();
             this.w_info.SuspendLayout();
             this.w_user_box.SuspendLayout();
-            this.w_oper.SuspendLayout();
             this.SuspendLayout();
             // 
             // w_split_container
@@ -1231,6 +1231,27 @@ namespace feeling
             this.cbox_tz_auto.UseVisualStyleBackColor = true;
             this.cbox_tz_auto.CheckedChanged += new System.EventHandler(this.cbox_tz_auto_CheckedChanged);
             // 
+            // w_oper
+            // 
+            this.w_oper.Controls.Add(this.btn_transfer);
+            this.w_oper.Location = new System.Drawing.Point(4, 22);
+            this.w_oper.Name = "w_oper";
+            this.w_oper.Padding = new System.Windows.Forms.Padding(3);
+            this.w_oper.Size = new System.Drawing.Size(996, 150);
+            this.w_oper.TabIndex = 6;
+            this.w_oper.Text = "功能";
+            this.w_oper.UseVisualStyleBackColor = true;
+            // 
+            // btn_transfer
+            // 
+            this.btn_transfer.Location = new System.Drawing.Point(6, 3);
+            this.btn_transfer.Name = "btn_transfer";
+            this.btn_transfer.Size = new System.Drawing.Size(75, 23);
+            this.btn_transfer.TabIndex = 0;
+            this.btn_transfer.Text = "资源到月球";
+            this.btn_transfer.UseVisualStyleBackColor = true;
+            this.btn_transfer.Click += new System.EventHandler(this.btn_transfer_Click);
+            // 
             // w_info
             // 
             this.w_info.Controls.Add(this.lb_quick_auto);
@@ -1427,9 +1448,9 @@ namespace feeling
             this.cbox_morning_idle.AutoSize = true;
             this.cbox_morning_idle.Location = new System.Drawing.Point(8, 113);
             this.cbox_morning_idle.Name = "cbox_morning_idle";
-            this.cbox_morning_idle.Size = new System.Drawing.Size(126, 16);
+            this.cbox_morning_idle.Size = new System.Drawing.Size(132, 16);
             this.cbox_morning_idle.TabIndex = 48;
-            this.cbox_morning_idle.Text = "凌晨空闲（1-6点）";
+            this.cbox_morning_idle.Text = "凌晨空闲（23-5点）";
             this.cbox_morning_idle.UseVisualStyleBackColor = true;
             this.cbox_morning_idle.CheckedChanged += new System.EventHandler(this.cbox_morning_idle_CheckedChanged);
             // 
@@ -1550,27 +1571,6 @@ namespace feeling
             this.label1.TabIndex = 10;
             this.label1.Text = "账 号:";
             // 
-            // w_oper
-            // 
-            this.w_oper.Controls.Add(this.btn_transfer);
-            this.w_oper.Location = new System.Drawing.Point(4, 22);
-            this.w_oper.Name = "w_oper";
-            this.w_oper.Padding = new System.Windows.Forms.Padding(3);
-            this.w_oper.Size = new System.Drawing.Size(996, 150);
-            this.w_oper.TabIndex = 6;
-            this.w_oper.Text = "功能";
-            this.w_oper.UseVisualStyleBackColor = true;
-            // 
-            // btn_transfer
-            // 
-            this.btn_transfer.Location = new System.Drawing.Point(6, 3);
-            this.btn_transfer.Name = "btn_transfer";
-            this.btn_transfer.Size = new System.Drawing.Size(75, 23);
-            this.btn_transfer.TabIndex = 0;
-            this.btn_transfer.Text = "资源到月球";
-            this.btn_transfer.UseVisualStyleBackColor = true;
-            this.btn_transfer.Click += new System.EventHandler(this.btn_transfer_Click);
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -1597,11 +1597,11 @@ namespace feeling
             this.w_galaxy.PerformLayout();
             this.w_imperium.ResumeLayout(false);
             this.w_imperium.PerformLayout();
+            this.w_oper.ResumeLayout(false);
             this.w_info.ResumeLayout(false);
             this.w_info.PerformLayout();
             this.w_user_box.ResumeLayout(false);
             this.w_user_box.PerformLayout();
-            this.w_oper.ResumeLayout(false);
             this.ResumeLayout(false);
 
         }
