@@ -980,6 +980,35 @@ namespace OgameService
             return false;
         }
 
+        public bool OperAutoTransferOpen(string id, string key, bool open)
+        {
+            LogUtil.Warn($"OperAutoTransferOpen {id}");
+            try
+            {
+                if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+                mCellDict.TryGetValue(key, out OgCell result);
+                // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+                if (null == result || null == result.MySession)
+                {
+                    LogUtil.Warn($"OperAutoTransferOpen 没取到对应cell");
+                    return false;
+                }
+
+                OgameData data = new OgameData();
+                data.Cmd = CmdEnum.AutoTransferOpen;
+                data.AutoTransferOpen = open;
+
+                mServer.SendTo(result.MySession, OgameData.ToBytes(data));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Error($"OperAutoTransferOpen {key} catch {ex.Message}");
+            }
+            return false;
+        }
+
         public void ShowAllCell()
         {
             LogUtil.Warn("=============== ShowAllCell =====================");

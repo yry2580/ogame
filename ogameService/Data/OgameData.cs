@@ -31,6 +31,7 @@ namespace OgameService
         public bool AutoExpeditionOpen = false;
         public bool AutoExpeditionOpen1 = false;
         public bool AutoImperiumOpen = false;
+        public bool AutoTransferOpen = false;
 
         public string PirateAutoMsg = "";
         public string PirateAutoMsg1 = "";

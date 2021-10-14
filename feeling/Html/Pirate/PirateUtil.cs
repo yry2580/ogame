@@ -49,7 +49,8 @@ namespace feeling
             try
             {
                 pMission.IsCross = Universe == "w1";
-                
+
+                NativeLog.Info($"PirateUtil save idx: {idx}、isCross: {pMission.IsCross}");
                 if (idx == 1)
                 {
                     MyMission1 = pMission;

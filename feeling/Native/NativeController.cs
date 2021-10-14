@@ -68,6 +68,10 @@ namespace feeling
 
         public DateTime LastHaidaoZiyuanTime = DateTime.Now.AddDays(-1);
 
+        public bool IsAutoTransfer = false;
+        public DateTime LastTransferTime = DateTime.Now.AddDays(-1);
+        public DateTime LastTransferTime1 = DateTime.Now.AddDays(-1);
+
         public void HandleWebBrowserFrameEnd(string url)
         {
             MyAddress = MyWebBrowser.Address;
@@ -1522,6 +1526,7 @@ namespace feeling
             try
             {
                 OperTipsEvent.Invoke(OperStatus.System, $"开始转移资源");
+                NativeLog.Info($"开始转移资源");
 
                 Reload();
 
@@ -1715,6 +1720,16 @@ namespace feeling
             OperTipsEvent.Invoke(OperStatus.System, $"资源转运结束{_count}/{planetLists.Count}");
 
             IsTransferWorking = false;
+
+            if (MyPlanet.Universe.Contains("w1"))
+            {
+                LastTransferTime1 = DateTime.Now;
+            }
+            else
+            {
+                LastTransferTime = DateTime.Now;
+            }
+
             SwitchStatus(OperStatus.None);
         }
 

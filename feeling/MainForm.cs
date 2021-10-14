@@ -125,7 +125,7 @@ namespace feeling
 
             if (NativeController.User.MorningIdle)
             {
-                if (dt.Hour > 23 || dt.Hour < 5)
+                if (dt.Hour >= 23 || dt.Hour < 5)
                 {
                     NativeLog.Info("凌晨空闲模式");
                     return false;
@@ -455,6 +455,7 @@ namespace feeling
                         btn_universe.Enabled = false;
                         cbox_auto_logout.Enabled = false;
                         btn_transfer.Enabled = false;
+                        cbox_auto_transfer.Enabled = false;
                         SetQuickBtn(false);
                         break;
                     case OperStatus.Galaxy:
@@ -467,6 +468,7 @@ namespace feeling
                         btn_universe.Enabled = false;
                         cbox_auto_logout.Enabled = false;
                         btn_transfer.Enabled = false;
+                        cbox_auto_transfer.Enabled = false;
                         SetQuickBtn(false);
                         break;
                     case OperStatus.Expedition:
@@ -479,6 +481,7 @@ namespace feeling
                         btn_universe.Enabled = false;
                         cbox_auto_logout.Enabled = false;
                         btn_transfer.Enabled = false;
+                        cbox_auto_transfer.Enabled = false;
                         SetQuickBtn(false);
                         break;
                     case OperStatus.Pirate:
@@ -491,6 +494,7 @@ namespace feeling
                         btn_universe.Enabled = false;
                         cbox_auto_logout.Enabled = false;
                         btn_transfer.Enabled = false;
+                        cbox_auto_transfer.Enabled = false;
                         SetQuickBtn(false);
                         break;
                     case OperStatus.None:
@@ -504,6 +508,7 @@ namespace feeling
                         btn_universe.Enabled = true;
                         cbox_auto_logout.Enabled = true;
                         btn_transfer.Enabled = true;
+                        cbox_auto_transfer.Enabled = true;
                         SetQuickBtn(true);
                         break;
                 }
@@ -835,6 +840,10 @@ namespace feeling
                         NativeController.Instance.CanNotify = false;
                         DoTransfer();
                         break;
+                    case CmdEnum.AutoTransferOpen:
+                        NativeController.Instance.CanNotify = false;
+                        await SetAutoTransferOpen(data.AutoTransferOpen);
+                        break;
                     default:
                         break;
                 }
@@ -914,6 +923,7 @@ namespace feeling
                 AutoExpeditionOpen = mAutoExpedition,
                 AutoExpeditionOpen1 = mAutoExpedition1,
                 AutoImperiumOpen = mAutoImperium,
+                AutoTransferOpen = NativeController.Instance.IsAutoTransfer,
 
                 PirateAutoMsg = lb_hd_info.Text.Trim(),
                 PirateAutoMsg1 = lb_hd_info1.Text.Trim(),
@@ -1479,6 +1489,12 @@ namespace feeling
             if (val > 0)
             {
                 label.Text = $"{DateTime.Now:G}|自动海盗{index + 1}-开{(missionCfg.IsCross ? "-多维" : "")}，{Math.Ceiling(val)}分钟";
+
+                if (val <= 60 && val >= 20)
+                {
+                    await DoAutoTransfer(index);
+                }
+
                 return;
             }
 
@@ -2371,10 +2387,85 @@ namespace feeling
             NativeController.User.SetMorningIdle(isChecked);
         }
 
-        private async void DoTransfer()
+        private async Task SetAutoTransferOpen(bool open)
+        {
+            try
+            {
+                var msg = open ? "开" : "关";
+                mLastContent = $"{DateTime.Now:G}|设置自动转运资源({msg})";
+                if (OperStatus.None != NativeController.Instance.MyOperStatus)
+                {
+                    mLastContent = $"{DateTime.Now:G}|当前不是空闲状态，不能设置";
+                    return;
+                }
+
+                NativeController.Instance.SwitchStatus(OperStatus.System);
+
+                if (cbox_auto_transfer.Checked != open)
+                {
+                    cbox_auto_transfer.Checked = open;
+                    await Task.Delay(200);
+                }
+                mLastContent = $"{DateTime.Now:G}|自动转运资源({msg})完成";
+            }
+            catch (Exception ex)
+            {
+                NativeLog.Error($"SetAutoTransferOpen catch {ex.Message}");
+            }
+
+            NativeController.Instance.SwitchStatus(OperStatus.None);
+        }
+
+        private async Task DoAutoTransfer(int index = 0)
+        {
+            var now = DateTime.Now;
+
+            if (!NativeController.Instance.IsAutoTransfer) return;
+            if (now.Hour < 20) return;
+            if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
+
+            DateTime lastTime = NativeController.Instance.LastTransferTime;
+
+            if (index != 0)
+            {
+                lastTime = NativeController.Instance.LastTransferTime1;
+            }
+
+            if (lastTime.Date.Equals(now.Date))
+            {
+                return;
+            }
+
+            mIsBusy = true;
+            NativeLog.Info($"自动转运资源：{index}");
+
+            NativeController.Instance.CanNotify = false;
+            await TryLogin();
+
+            var isPlanetCross = NativeController.Instance.MyPlanet.Universe.Contains("w1");
+            var isCross = (index != 0);
+
+            if (!NativeController.Instance.MyPlanet.HasData || isCross != isPlanetCross)
+            {
+                await NativeController.Instance.DoRefreshNpc(true);
+                if (!NativeController.Instance.MyPlanet.HasData)
+                {
+                    await NativeController.Instance.DoRefreshNpc(true);
+                }
+            }
+
+            mIsBusy = false;
+            DoTransfer(true);
+        }
+        
+        private async void DoTransfer(bool isAuto = false)
         {
             if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
-            await TryLogin();
+            NativeController.Instance.CanNotify = false;
+            if (!isAuto)
+            {
+                await TryLogin();
+            }
             NativeController.Instance.StartTransfer();
             Redraw();
         }
@@ -2382,6 +2473,11 @@ namespace feeling
         private void btn_transfer_Click(object sender, EventArgs e)
         {
             DoTransfer();
+        }
+
+        private void cbox_auto_transfer_CheckedChanged(object sender, EventArgs e)
+        {
+            NativeController.Instance.IsAutoTransfer = cbox_auto_transfer.Checked;
         }
     }
 }
