@@ -906,7 +906,7 @@ namespace feeling
             try
             {
                 OperTipsEvent.Invoke(OperStatus.Pirate, $"开始海盗");
-                NativeLog.Info("刷球完成");
+                NativeLog.Info("开始海盗");
 
                 if (pMission.MissionCount <= 0)
                 {
@@ -1438,7 +1438,7 @@ namespace feeling
             try
             {
                 OperTipsEvent.Invoke(OperStatus.System, $"返回本宇宙");
-
+                NativeLog.Info("返回本宇宙");
                 Reload();
 
                 var source = await GetFrameSourceAsync();
@@ -1447,6 +1447,7 @@ namespace feeling
                 if (!address.Contains("w1.cicihappy.com/ogame/frames.php"))
                 {
                     OperTipsEvent.Invoke(OperStatus.System, $"当前不是多维宇宙");
+                    NativeLog.Info("当前不是多维宇宙");
                     return;
                 }
 
@@ -1461,10 +1462,13 @@ namespace feeling
                     }
                 }
 
+                NativeLog.Info("返回概况");
                 await GoHome(1500);
                 await GetFrameSourceAsync();
                 // 切换舰队页面
                 GoFleetPage();
+
+                NativeLog.Info("切换舰队页");
 
                 // 查看舰队队列
                 source = await GetFrameSourceAsync();
@@ -1481,6 +1485,7 @@ namespace feeling
                 NativeLog.Error($"BackUniverse catch {ex.Message}");
             }
             OperTipsEvent.Invoke(OperStatus.System, $"返回本宇宙结束");
+            NativeLog.Info("返回本宇宙结束");
         }
         #endregion
 
@@ -2021,5 +2026,15 @@ namespace feeling
             IsUserWorking = false;
         }
         #endregion
+
+        public void ResetStatus()
+        {
+            StopScanGalaxy();
+            StopExpedition();
+            StopPirate();
+            StopScanUser();
+            StopTransfer();
+            SwitchStatus(OperStatus.None);
+        }
     }
 }

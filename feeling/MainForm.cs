@@ -442,7 +442,7 @@ namespace feeling
             try
             {
                 var operStatus = NativeController.Instance.MyOperStatus;
-
+                var enabled = false;
                 switch (operStatus)
                 {
                     case OperStatus.System:
@@ -510,14 +510,17 @@ namespace feeling
                         btn_transfer.Enabled = true;
                         cbox_auto_transfer.Enabled = true;
                         SetQuickBtn(true);
+                        enabled = true;
                         break;
                 }
 
+                mWebBrowser.Enabled = enabled;
             }
             catch(Exception ex)
             {
                 NativeLog.Error($"Redraw catch {ex.Message}");
             }
+
 
             SendData();
         }
@@ -1517,7 +1520,8 @@ namespace feeling
             
             NativeController.Instance.CanNotify = false;
             await TryLogin();
-            
+
+            NativeLog.Info($"切换配置{index + 1}");
             if (index == 1)
             {
                 rbtn_cfg1.Checked = true;
@@ -1539,6 +1543,8 @@ namespace feeling
                 await SureLogin();
             }
 
+            NativeLog.Info($"检测是否刷球{index + 1}");
+/*          
             var isCross = PirateUtil.Universe == "w1";
             var isPlanetCross = NativeController.Instance.MyPlanet.Universe == "w1";
             if (!PirateUtil.HasNpcData ||
@@ -1552,8 +1558,16 @@ namespace feeling
                     await NativeController.Instance.DoRefreshNpc(true);
                 }
             }
+*/
+
+            await NativeController.Instance.DoRefreshNpc(true);
+            if (!PirateUtil.HasNpcData || !NativeController.Instance.MyPlanet.HasData)
+            {
+                await NativeController.Instance.DoRefreshNpc(true);
+            }
 
             mIsBusy = false;
+            NativeLog.Info($"开始尝试处理海盗{index + 1}");
             doPirate(true);
         }
 
