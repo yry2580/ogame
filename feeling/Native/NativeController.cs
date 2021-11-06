@@ -1764,11 +1764,22 @@ namespace feeling
         {
             int n = 0;
             string source;
+            
             do
             {
                 try
                 {
-                    source = await GetHauptframe()?.GetSourceAsync();
+                    var _task = GetHauptframe()?.GetSourceAsync();
+                    if (_task == await Task.WhenAny(_task, Task.Delay(30000)))
+                    {
+                        source = await _task;
+                    }
+                    else
+                    {
+                        NativeLog.Error($"GetFrameSourceAsync 超时");
+                        source = "";
+                    }
+                    // source = await GetHauptframe()?.GetSourceAsync();
                 }
                 catch (Exception ex)
                 {
