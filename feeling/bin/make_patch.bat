@@ -1,6 +1,8 @@
 @echo off
 echo µ±Ç°Â·¾¶ %cd%
 
+// del ".\patch\*.*" /q /s
+
 del ".\patch\appsettings.json" /q;
 del ".\patch\feeling.exe" /q;
 del ".\patch\feeling.exe.config" /q;

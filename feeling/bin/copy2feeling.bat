@@ -1,7 +1,9 @@
 @echo off
 echo µ±Ç°Â·¾¶ %cd%
 
-xcopy "./Release" "./feeling" /y /e
+del ".\feeling\*.*" /q /s
+
+xcopy ".\Release" ".\feeling" /y /e
 
 if exist ".\feeling\GPUCache\" rd /s/q ".\feeling\GPUCache\";
 if exist ".\feeling\Out\" rd /s/q ".\feeling\Out\";
