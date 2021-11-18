@@ -991,12 +991,23 @@ namespace feeling
 
         private void w_count_KeyPress(object sender, KeyPressEventArgs e)
         {
-            if (e.KeyChar != '\b')//这是允许输入退格键
+            //只允许输入数字，粘贴数字
+            if (!(char.IsNumber(e.KeyChar) || e.KeyChar == (char)8 || e.KeyChar == (char)3 || e.KeyChar == (char)22))
             {
-                if ((e.KeyChar < '0') || (e.KeyChar > '9'))//这是允许输入0-9数字
+                e.Handled = true;
+            }
+            try
+            {
+                if (e.KeyChar == (char)22)
                 {
-                    e.Handled = true;
+                    Convert.ToInt64(Clipboard.GetText());  //检查是否数字
+                    Clipboard.SetText(Clipboard.GetText().Trim()); //去空格
                 }
+            }
+            catch (Exception)
+            {
+                e.Handled = true;
+                //throw;
             }
         }
 
