@@ -636,10 +636,6 @@ namespace feeling
                         break;
                     }
 
-                    var mission = exMission.GetMission(index);
-
-                    NativeLog.Info($"mission {JsonConvert.SerializeObject(mission)}");
-
                     if (lastErr)
                     {
                         Reload();
@@ -656,6 +652,17 @@ namespace feeling
                     GoFleetPage();
 
                     source = await GetFrameSourceAsync();
+                    if (HtmlUtil.ParseFleetQueue(source, out FleetQueue fq))
+                    {
+                        if (index < fq.ExCount)
+                        {
+                            NativeLog.Info($"修正探险序号：{index}({fq.ExCount})");
+                            index = fq.ExCount;
+                        }
+                    }
+
+                    var mission = exMission.GetMission(index);
+                    NativeLog.Info($"mission {JsonConvert.SerializeObject(mission)}");
 
                     // 切换触发球
                     int idx = mPlanet.GetPlanetIndex(mission.PlanetName);
@@ -670,7 +677,7 @@ namespace feeling
 
                     // 查看舰队队列
                     source = await GetFrameSourceAsync();
-                    if (!HtmlUtil.ParseFleetQueue(source, out FleetQueue fq))
+                    if (!HtmlUtil.ParseFleetQueue(source, out fq))
                     {
                         _nextFunc(false);
                         OperTipsEvent.Invoke(OperStatus.Expedition, $"解析探险队列有误");

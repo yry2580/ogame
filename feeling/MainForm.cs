@@ -1240,7 +1240,8 @@ namespace feeling
             if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
 
             var exMission = GetExMission();
-            
+
+            NativeLog.Info($"doExpedtion {JsonConvert.SerializeObject(exMission)}");
             NativeController.Instance.StartExpedition(exMission, rbtn_ex_cfg1.Checked ? 1 : 0, isAuto);
             Redraw();
         }
