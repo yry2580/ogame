@@ -34,6 +34,9 @@ namespace feeling
         int mPirateInterval = 120; // 分
         int mPirateInterval1 = 120; // 分
 
+        int mExpeditionInterval = 120; // 分
+        int mExpeditionInterval1 = 120; // 分
+
         bool mAutoImperium = false;
         int mImperiumInterval = 240; // 分
 
@@ -206,6 +209,9 @@ namespace feeling
 
         protected void InitExpedition()
         {
+            lb_tx_interval.Text = mExpeditionInterval.ToString();
+            lb_tx_interval1.Text = mExpeditionInterval1.ToString();
+
             Expedition.Initialize();
 
             var exShipOptions = Expedition.GetShipOptions();
@@ -384,6 +390,14 @@ namespace feeling
             }
 
             cbox_ex_cfg_cross.Checked = missionCfg.IsCross;
+
+            var interval = exMissionCfg.Interval;
+            mExpeditionInterval = interval < 60 ? 120 : interval;
+            lb_tx_interval.Text = mExpeditionInterval.ToString();
+
+            interval = exMissionCfg1.Interval;
+            mExpeditionInterval1 = interval < 60 ? 120 : interval;
+            lb_tx_interval1.Text = mExpeditionInterval1.ToString();
 
             return true;
         }
@@ -1162,6 +1176,8 @@ namespace feeling
                 tx3_ship2_cb.SelectedIndex,
                 tx3_ship2.Text.Trim()
             );
+
+            exMission.Interval = rbtn_ex_cfg1.Checked ? mExpeditionInterval1 : mExpeditionInterval;
             return exMission;
         }
         private void btn_tx_start_Click(object sender, EventArgs e)
@@ -1197,6 +1213,7 @@ namespace feeling
             if (ret == DialogResult.Yes)
             {
                 exMission.IsCross = NativeController.Instance.MyPlanet.Universe == "w1";
+                exMission.Interval = idx == 1 ? mExpeditionInterval1 : mExpeditionInterval;
                 Expedition.Save(exMission, idx);
                 RevertCfg();
             }
@@ -1262,15 +1279,16 @@ namespace feeling
                 delta = DateTime.Now - NativeController.Instance.LastExeditionTime1;
                 isClose = !cbox_tx_auto1.Checked || !mAutoExpedition1;
                 label = lb_tx_info1;
+                val = mExpeditionInterval1 - delta.TotalMinutes;
             }
             else
             {
                 delta = DateTime.Now - NativeController.Instance.LastExeditionTime;
                 isClose = !cbox_tx_auto.Checked || !mAutoExpedition;
                 label = lb_tx_info;
+                val = mExpeditionInterval - delta.TotalMinutes;
             }
 
-            val = 120 - delta.TotalMinutes;
             val = val < 0 ? 0 : val;
 
             if (OperStatus.Expedition == NativeController.Instance.MyOperStatus)
@@ -1615,6 +1633,7 @@ namespace feeling
 
             mPirateInterval = interval;
             lb_hd_interval.Text = mPirateInterval.ToString();
+            PirateUtil.SetInterval(interval, 0);
         }
 
         private void btn_hd_interval1_Click(object sender, EventArgs e)
@@ -1635,6 +1654,7 @@ namespace feeling
 
             mPirateInterval1 = interval;
             lb_hd_interval1.Text = mPirateInterval1.ToString();
+            PirateUtil.SetInterval(interval, 1);
         }
 
         private void btn_hd_stop_Click(object sender, EventArgs e)
@@ -2504,6 +2524,48 @@ namespace feeling
         private void cbox_auto_transfer_CheckedChanged(object sender, EventArgs e)
         {
             NativeController.Instance.IsAutoTransfer = cbox_auto_transfer.Checked;
+        }
+
+        private void btn_tx_interval_Click(object sender, EventArgs e)
+        {
+            var txt = txt_tx_interval.Text.Trim();
+            if (txt.Length <= 0)
+            {
+                MessageBox.Show("请输入数值");
+                return;
+            }
+
+            var interval = int.Parse(txt);
+            if (interval < 60)
+            {
+                MessageBox.Show("间隔不能小于60分钟");
+                return;
+            }
+
+            mExpeditionInterval = interval;
+            lb_tx_interval.Text = mExpeditionInterval.ToString();
+            Expedition.SetInterval(interval, 0);
+        }
+
+        private void btn_tx_interval1_Click(object sender, EventArgs e)
+        {
+            var txt = txt_tx_interval1.Text.Trim();
+            if (txt.Length <= 0)
+            {
+                MessageBox.Show("请输入数值");
+                return;
+            }
+
+            var interval = int.Parse(txt);
+            if (interval < 60)
+            {
+                MessageBox.Show("间隔不能小于60分钟");
+                return;
+            }
+
+            mExpeditionInterval1 = interval;
+            lb_tx_interval1.Text = mExpeditionInterval1.ToString();
+            Expedition.SetInterval(interval, 1);
         }
     }
 }

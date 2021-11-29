@@ -10,6 +10,8 @@ namespace feeling
     {
         public List<Mission> List= new List<Mission>();
         public bool IsCross = false;
+        public int Interval = 120; // 分钟
+
         Pos mPos = new Pos();
 
         public void Add(string planetName, int ship0, string count0, int ship1, string count1, int ship2, string count2)

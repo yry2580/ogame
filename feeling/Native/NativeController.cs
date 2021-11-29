@@ -1814,20 +1814,22 @@ namespace feeling
 
             if (!User.AutoLogout) return false;
 
-            if (IsAutoExpedition)
+            var xMissionCfg = Expedition.MyExMissionCfg;
+            if (IsAutoExpedition && null != xMissionCfg)
             {
                 hasAuto = true;
                 delta = now - LastExeditionTime;
-                val = 120 - delta.TotalMinutes;
+                val = xMissionCfg.Interval - delta.TotalMinutes;
                 val = val < 0 ? 0 : val;
                 min = Math.Min(val, min);
             }
 
-            if (IsAutoExpedition1)
+            var xMissionCfg1 = Expedition.MyExMissionCfg1;
+            if (IsAutoExpedition1 && null != xMissionCfg1)
             {
                 hasAuto = true;
                 delta = now - LastExeditionTime1;
-                val = 120 - delta.TotalMinutes;
+                val = xMissionCfg1.Interval - delta.TotalMinutes;
                 val = val < 0 ? 0 : val;
                 min = Math.Min(val, min);
             }

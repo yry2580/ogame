@@ -95,6 +95,30 @@ namespace feeling
             }
         }
 
+        public static void SetInterval(int interval, int idx = 0)
+        {
+            try
+            {
+                PirateMission mission;
+
+                if (idx == 1)
+                {
+                    mission = MyMission1;
+                }
+                else
+                {
+                    mission = MyMission;
+                }
+
+                mission.Interval = interval;
+                Save(mission, idx);
+            }
+            catch (Exception ex)
+            {
+                NativeLog.Error($"PirateUtil set interval catch {ex.Message}");
+            }
+        }
+
         public static void ParseNpc(string source, string address = "")
         {
             NativeLog.Info($"ParseNpc");

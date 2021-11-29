@@ -73,6 +73,30 @@ namespace feeling
             }
         }
 
+        public static void SetInterval(int interval, int idx = 0)
+        {
+            try
+            {
+                ExMission exMission;
+
+                if (idx == 1)
+                {
+                    exMission = MyExMissionCfg1;
+                }
+                else
+                {
+                    exMission = MyExMissionCfg;
+                }
+
+                exMission.Interval = interval;
+                Save(exMission, idx);
+            }
+            catch (Exception ex)
+            {
+                NativeLog.Error($"expedition set interval catch {ex.Message}");
+            }
+        }
+
         public static bool ReadCfg(int idx = 0)
         {
             var filePath = GetFilePath(idx);
