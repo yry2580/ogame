@@ -493,16 +493,17 @@ namespace feeling
             // 
             this.tx_content.AutoSize = true;
             this.tx_content.ForeColor = System.Drawing.Color.Black;
-            this.tx_content.Location = new System.Drawing.Point(444, 127);
+            this.tx_content.Location = new System.Drawing.Point(285, 129);
             this.tx_content.Name = "tx_content";
-            this.tx_content.Size = new System.Drawing.Size(0, 12);
+            this.tx_content.Size = new System.Drawing.Size(53, 12);
             this.tx_content.TabIndex = 47;
+            this.tx_content.Text = "提示内容";
             // 
             // label10
             // 
             this.label10.AutoSize = true;
             this.label10.ForeColor = System.Drawing.Color.Red;
-            this.label10.Location = new System.Drawing.Point(239, 127);
+            this.label10.Location = new System.Drawing.Point(238, 129);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(41, 12);
             this.label10.TabIndex = 46;

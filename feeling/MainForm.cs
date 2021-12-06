@@ -1523,7 +1523,7 @@ namespace feeling
             {
                 label.Text = $"{DateTime.Now:G}|自动海盗{index + 1}-开{(missionCfg.IsCross ? "-多维" : "")}，{Math.Ceiling(val)}分钟";
 
-                if (val <= 30 && val >= 10)
+                if (val <= 50 && val >= 10)
                 {
                     await DoAutoTransfer(index);
                 }
