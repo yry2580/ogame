@@ -19,7 +19,7 @@ namespace feeling
 
         public bool OnJSDialog(IWebBrowser chromiumWebBrowser, IBrowser browser, string originUrl, CefJsDialogType dialogType, string messageText, string defaultPromptText, IJsDialogCallback callback, ref bool suppressMessage)
         {
-            switch (dialogType)
+            /*switch (dialogType)
             {
                 case CefJsDialogType.Alert:
                     NativeLog.Info("Alert");
@@ -40,7 +40,8 @@ namespace feeling
                 default:
                     break;
             }
-            return false;
+            return false;*/
+            return true;
         }
 
         public void OnResetDialogState(IWebBrowser chromiumWebBrowser, IBrowser browser)

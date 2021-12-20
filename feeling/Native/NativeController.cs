@@ -316,19 +316,19 @@ namespace feeling
             bool needLogin = false;
 
             // 当前还在游戏页面
-            if (HtmlUtil.IsGameUrl(MyAddress))
+            if (HtmlParser.IsGameUrl(MyAddress))
             {
                 if (source.Contains("退出成功") && source.Contains("重新登录"))
                 {
                     needLogin = true;
                 }
-                else if (HtmlUtil.HasTutorial(source))
+                else if (HtmlParser.HasTutorial(source))
                 {
                     FrameRunJs(NativeScript.TutorialConfirm());
                     await Task.Delay(1500);
                     source = await GetFrameSourceAsync();
 
-                    if (HtmlUtil.IsGameUrl(MyAddress) && HtmlUtil.IsInGame(source))
+                    if (HtmlParser.IsGameUrl(MyAddress) && HtmlParser.IsInGame(source))
                     {
                         if (CanNotify)
                         {
@@ -342,7 +342,7 @@ namespace feeling
                 }
                 else
                 {
-                    if (HtmlUtil.IsGameUrl(MyAddress) && HtmlUtil.IsInGame(source))
+                    if (HtmlParser.IsGameUrl(MyAddress) && HtmlParser.IsInGame(source))
                     {
                         if (CanNotify)
                         {
@@ -374,10 +374,10 @@ namespace feeling
                 await Task.Delay(2000);
                 source = await GetFrameSourceAsync();
                 await GoHome(1000);
-                if (HtmlUtil.IsGameUrl(MyAddress))
+                if (HtmlParser.IsGameUrl(MyAddress))
                 {
                     source = await GetFrameSourceAsync();
-                    if (HtmlUtil.HasTutorial(source))
+                    if (HtmlParser.HasTutorial(source))
                     {
                         FrameRunJs(NativeScript.TutorialConfirm());
                         await Task.Delay(1500);
@@ -394,7 +394,7 @@ namespace feeling
 
         protected async Task DoLoginAsync(string account, string psw, int universe)
         {
-            if (!HtmlUtil.IsHomeUrl(MyAddress))
+            if (!HtmlParser.IsHomeUrl(MyAddress))
             {
                 MyWebBrowser.Load(NativeConst.Homepage);
                 await Task.Delay(3000);
@@ -436,7 +436,7 @@ namespace feeling
                 Reload();
                 var source = await GetFrameSourceAsync();
 
-                if (!HtmlUtil.IsGameUrl(MyAddress))
+                if (!HtmlParser.IsGameUrl(MyAddress))
                 {
                     if (CanNotify)
                     {
@@ -459,14 +459,14 @@ namespace feeling
                 }
 
                 source = await GetFrameSourceAsync();
-                if (!HtmlUtil.HasLogoutBtn(source))
+                if (!HtmlParser.HasLogoutBtn(source))
                 {
                     await GoHome();
                     await Task.Delay(1500);
                     source = await GetFrameSourceAsync();
                 }
 
-                if (!HtmlUtil.IsInGame(source))
+                if (!HtmlParser.IsInGame(source))
                 {
                     if (CanNotify)
                     {
@@ -524,7 +524,7 @@ namespace feeling
                     Reload();
                     await GoHome(1500);
 
-                    if (HtmlUtil.IsGameUrl(MyAddress))
+                    if (HtmlParser.IsGameUrl(MyAddress))
                     {
                         var source = await GetFrameSourceAsync();
                         await Task.Delay(500);
@@ -584,15 +584,15 @@ namespace feeling
                 }
 
                 Reload();
-                if (HtmlUtil.IsGameUrl(MyAddress))
+                if (HtmlParser.IsGameUrl(MyAddress))
                 {
                     source = await GetFrameSourceAsync();
-                    if (HtmlUtil.HasTutorial(source))
+                    if (HtmlParser.HasTutorial(source))
                     {
                         FrameRunJs(NativeScript.TutorialConfirm());
                         await Task.Delay(1500);
                         source = await GetFrameSourceAsync();
-                        if (!HtmlUtil.IsInGame(source))
+                        if (!HtmlParser.IsInGame(source))
                         {
                             OperTipsEvent.Invoke(OperStatus.Expedition, $"探险结束，没有登录");
                             SetLastExpeditionTime(cfgIndex);
@@ -641,7 +641,7 @@ namespace feeling
                         Reload();
                     }
                     source = await GetFrameSourceAsync();
-                    if (HtmlUtil.HasTutorial(source, mExpedition.Parser))
+                    if (HtmlParser.HasTutorial(source, mExpedition.Parser))
                     {
                         OperTipsEvent.Invoke(OperStatus.Expedition, $"存在错误");
                         FrameRunJs(NativeScript.TutorialConfirm());
@@ -652,7 +652,7 @@ namespace feeling
                     GoFleetPage();
 
                     source = await GetFrameSourceAsync();
-                    if (HtmlUtil.ParseFleetQueue(source, out FleetQueue fq))
+                    if (HtmlParser.ParseFleetQueue(source, out FleetQueue fq))
                     {
                         if (index < fq.ExCount)
                         {
@@ -677,7 +677,7 @@ namespace feeling
 
                     // 查看舰队队列
                     source = await GetFrameSourceAsync();
-                    if (!HtmlUtil.ParseFleetQueue(source, out fq))
+                    if (!HtmlParser.ParseFleetQueue(source, out fq))
                     {
                         _nextFunc(false);
                         OperTipsEvent.Invoke(OperStatus.Expedition, $"解析探险队列有误");
@@ -712,7 +712,7 @@ namespace feeling
                         var fleet = mission.FleetList[i];
                         var shipId = Ship.GetShipId(fleet.ShipType);
                         var count = fleet.Count;
-                        if (HtmlUtil.ParseShip(source, shipId, out int total))
+                        if (HtmlParser.ParseShip(source, shipId, out int total))
                         {
                             NativeLog.Info($"shipId{shipId} count{count}");
                             if (total >= count)
@@ -751,14 +751,14 @@ namespace feeling
 
                     source = await GetFrameSourceAsync();
 
-                    var confirmType = HtmlUtil.AttackConfirmType(source);
+                    var confirmType = HtmlParser.AttackConfirmType(source);
                     // 攻击确认
                     FrameRunJs(NativeScript.SetAttackConfirm(confirmType));
                     await Task.Delay(1500);
 
                     // 查看结果
                     source = await GetFrameSourceAsync();
-                    if (HtmlUtil.HasFleetSuccess(source, mExpedition.Parser))
+                    if (HtmlParser.HasFleetSuccess(source, mExpedition.Parser))
                     {
                         // Console.WriteLine($"HasFleetSuccess");
                         OperTipsEvent.Invoke(OperStatus.Expedition, $"探险派出成功");
@@ -767,7 +767,7 @@ namespace feeling
                         continue;
                     }
 
-                    if (HtmlUtil.HasTutorial(source, mExpedition.Parser))
+                    if (HtmlParser.HasTutorial(source, mExpedition.Parser))
                     {
                         OperTipsEvent.Invoke(OperStatus.Expedition, $"派遣错误");
                         FrameRunJs(NativeScript.TutorialConfirm());
@@ -852,7 +852,7 @@ namespace feeling
                 var source = await GetFrameSourceAsync();
                 await GoHome(1500);
 
-                if (HtmlUtil.IsGameUrl(MyAddress))
+                if (HtmlParser.IsGameUrl(MyAddress))
                 {
                     await GetFrameSourceAsync();
                     FrameRunJs(NativeScript.ToGalaxy());
@@ -927,15 +927,15 @@ namespace feeling
 
                 Reload();
 
-                if (HtmlUtil.IsGameUrl(MyAddress))
+                if (HtmlParser.IsGameUrl(MyAddress))
                 {
                     source = await GetFrameSourceAsync();
-                    if (HtmlUtil.HasTutorial(source))
+                    if (HtmlParser.HasTutorial(source))
                     {
                         FrameRunJs(NativeScript.TutorialConfirm());
                         await Task.Delay(1500);
                         source = await GetFrameSourceAsync();
-                        if (!HtmlUtil.IsInGame(source))
+                        if (!HtmlParser.IsInGame(source))
                         {
                             OperTipsEvent.Invoke(OperStatus.Pirate, $"海盗结束，没有登录");
                             NativeLog.Info("海盗任务结束，没有登录");
@@ -992,7 +992,7 @@ namespace feeling
                     }
 
                     source = await GetFrameSourceAsync();
-                    if (HtmlUtil.HasTutorial(source, mHtmlParser))
+                    if (HtmlParser.HasTutorial(source, mHtmlParser))
                     {
                         NativeLog.Info($"存在错误");
                         OperTipsEvent.Invoke(OperStatus.Pirate, $"存在错误");
@@ -1004,7 +1004,7 @@ namespace feeling
                     GoFleetPage();
                     NativeLog.Info($"切换舰队");
                     source = await GetFrameSourceAsync();
-                    if (index <= 1 && HtmlUtil.IsWechatCodePage(source))
+                    if (index <= 1 && HtmlParser.IsWechatCodePage(source))
                     {
                         NativeLog.Info($"在微信验证页");
                         OperTipsEvent.Invoke(OperStatus.Pirate, $"在微信验证页");
@@ -1031,7 +1031,7 @@ namespace feeling
                         source = await GetFrameSourceAsync();
                     }
 
-                    if (!HtmlUtil.ParseFleetQueue(source, out FleetQueue fq))
+                    if (!HtmlParser.ParseFleetQueue(source, out FleetQueue fq))
                     {
                         _nextFunc(false);
                         NativeLog.Info($"解析航道队列有误");
@@ -1051,7 +1051,7 @@ namespace feeling
                         break;
                     }
 
-                    if (HtmlUtil.HasAttack(source, mission.TargetPos))
+                    if (HtmlParser.HasAttack(source, mission.TargetPos))
                     {
                         NativeLog.Info($"已经存在攻击任务");
                         OperTipsEvent.Invoke(OperStatus.Pirate, $"已存在攻击目标任务");
@@ -1066,7 +1066,7 @@ namespace feeling
                         var fleet = mission.FleetList[i];
                         var shipId = Ship.GetShipId(fleet.ShipType);
                         var count = fleet.Count;
-                        if (HtmlUtil.ParseShip(source, shipId, out int total))
+                        if (HtmlParser.ParseShip(source, shipId, out int total))
                         {
                             NativeLog.Info($"shipId{shipId} count{count}");
                             if (total >= count)
@@ -1116,14 +1116,14 @@ namespace feeling
                     FrameRunJs(NativeScript.SetAttack());
                     await Task.Delay(300);
 
-                    var confirmType = HtmlUtil.AttackConfirmType(source);
+                    var confirmType = HtmlParser.AttackConfirmType(source);
                     // 攻击确认
                     FrameRunJs(NativeScript.SetAttackConfirm(confirmType));
                     await Task.Delay(1500);
 
                     // 查看结果
                     source = await GetFrameSourceAsync();
-                    if (HtmlUtil.HasFleetSuccess(source, mExpedition.Parser))
+                    if (HtmlParser.HasFleetSuccess(source, mExpedition.Parser))
                     {
                         NativeLog.Info($"派遣成功");
                         OperTipsEvent.Invoke(OperStatus.Pirate, $"派遣成功");
@@ -1132,7 +1132,7 @@ namespace feeling
                         continue;
                     }
 
-                    if (HtmlUtil.HasTutorial(source, mExpedition.Parser))
+                    if (HtmlParser.HasTutorial(source, mExpedition.Parser))
                     {
                         NativeLog.Info($"派遣错误");
                         OperTipsEvent.Invoke(OperStatus.Pirate, $"派遣错误");
@@ -1216,7 +1216,7 @@ namespace feeling
                 var source = await GetFrameSourceAsync();
                 await GoHome(1500);
 
-                if (HtmlUtil.IsGameUrl(MyAddress))
+                if (HtmlParser.IsGameUrl(MyAddress))
                 {
                     NativeLog.Info("领取海盗资源-任务礼包");
                     await GetFrameSourceAsync();
@@ -1274,7 +1274,7 @@ namespace feeling
                 FrameRunJs(NativeScript.ToCode());
                 await Task.Delay(1500);
                 source = await GetFrameSourceAsync();
-                if (HtmlUtil.IsWechatCodePage(source))
+                if (HtmlParser.IsWechatCodePage(source))
                 {
                     FrameRunJs(NativeScript.GetCode());
                     OperTipsEvent.Invoke(OperStatus.System, $"点击获取验证码");
@@ -1303,7 +1303,7 @@ namespace feeling
                 // Reload();
                 // await GoHome(1500);
                 var source = await GetFrameSourceAsync();
-                if (HtmlUtil.IsWechatCodePage(source))
+                if (HtmlParser.IsWechatCodePage(source))
                 {
                     FrameRunJs(NativeScript.AuthCode(code));
                     await Task.Delay(200);
@@ -1332,21 +1332,21 @@ namespace feeling
 
                 Reload();
 
-                if (!HtmlUtil.IsGameUrl(MyAddress))
+                if (!HtmlParser.IsGameUrl(MyAddress))
                 {
                     OperTipsEvent.Invoke(OperStatus.System, $"统治失败，可能不在游戏页");
                     return;
                 }
 
                 var source = await GetFrameSourceAsync();
-                if (!HtmlUtil.HasImperium(source))
+                if (!HtmlParser.HasImperium(source))
                 {
                     await GoHome();
                     await Task.Delay(1500);
                 }
 
                 source = await GetFrameSourceAsync();
-                if (!HtmlUtil.HasImperium(source))
+                if (!HtmlParser.HasImperium(source))
                 {
                     OperTipsEvent.Invoke(OperStatus.System, $"统治失败，没有统治按钮");
                     return;
@@ -1355,7 +1355,7 @@ namespace feeling
                 FrameRunJs(NativeScript.ToImperium());
                 await Task.Delay(1500);
                 source = await GetFrameSourceAsync();
-                if (!HtmlUtil.HasImperiumDetail(source))
+                if (!HtmlParser.HasImperiumDetail(source))
                 {
                     OperTipsEvent.Invoke(OperStatus.System, $"统治失败，没有统治详情按钮");
                     return;
@@ -1405,10 +1405,10 @@ namespace feeling
                     return;
                 }
 
-                if (HtmlUtil.IsGameUrl(MyAddress))
+                if (HtmlParser.IsGameUrl(MyAddress))
                 {
                     source = await GetFrameSourceAsync();
-                    if (HtmlUtil.HasTutorial(source))
+                    if (HtmlParser.HasTutorial(source))
                     {
                         FrameRunJs(NativeScript.TutorialConfirm());
                         await Task.Delay(1500);
@@ -1458,10 +1458,10 @@ namespace feeling
                     return;
                 }
 
-                if (HtmlUtil.IsGameUrl(MyAddress))
+                if (HtmlParser.IsGameUrl(MyAddress))
                 {
                     source = await GetFrameSourceAsync();
-                    if (HtmlUtil.HasTutorial(source))
+                    if (HtmlParser.HasTutorial(source))
                     {
                         FrameRunJs(NativeScript.TutorialConfirm());
                         await Task.Delay(1500);
@@ -1542,15 +1542,15 @@ namespace feeling
 
                 Reload();
 
-                if (HtmlUtil.IsGameUrl(MyAddress))
+                if (HtmlParser.IsGameUrl(MyAddress))
                 {
                     source = await GetFrameSourceAsync();
-                    if (HtmlUtil.HasTutorial(source))
+                    if (HtmlParser.HasTutorial(source))
                     {
                         FrameRunJs(NativeScript.TutorialConfirm());
                         await Task.Delay(1500);
                         source = await GetFrameSourceAsync();
-                        if (!HtmlUtil.IsInGame(source))
+                        if (!HtmlParser.IsInGame(source))
                         {
                             OperTipsEvent.Invoke(OperStatus.System, $"转移资源结束，没有登录");
                             NativeLog.Info("转移资源-没有登录");
@@ -1597,7 +1597,7 @@ namespace feeling
                     }
 
                     source = await GetFrameSourceAsync();
-                    if (HtmlUtil.HasTutorial(source, mHtmlParser))
+                    if (HtmlParser.HasTutorial(source, mHtmlParser))
                     {
                         NativeLog.Info($"存在错误");
                         OperTipsEvent.Invoke(OperStatus.Pirate, $"存在错误");
@@ -1609,7 +1609,7 @@ namespace feeling
                     GoFleetPage();
                     NativeLog.Info($"切换舰队");
                     source = await GetFrameSourceAsync();
-                    if (index <= 1 && HtmlUtil.IsWechatCodePage(source))
+                    if (index <= 1 && HtmlParser.IsWechatCodePage(source))
                     {
                         NativeLog.Info($"在微信验证页");
                         OperTipsEvent.Invoke(OperStatus.Pirate, $"在微信验证页");
@@ -1627,14 +1627,14 @@ namespace feeling
                         source = await GetFrameSourceAsync();
                     }
 
-                    if (HtmlUtil.IsMoon(source))
+                    if (HtmlParser.IsMoon(source))
                     {
                         NativeLog.Info($"没有能量（{planetDesc}）不需要转移");
                         _nextFunc(true);
                         continue;
                     }
 
-                    if (!HtmlUtil.ParseFleetQueue(source, out FleetQueue fq))
+                    if (!HtmlParser.ParseFleetQueue(source, out FleetQueue fq))
                     {
                         _nextFunc(false);
                         NativeLog.Info($"解析航道队列有误");
@@ -1651,7 +1651,7 @@ namespace feeling
 
                     bool flag = false;
                     var shipId = Ship.GetShipId(ShipType.LC);
-                    if (HtmlUtil.ParseShip(source, shipId, out int total))
+                    if (HtmlParser.ParseShip(source, shipId, out int total))
                     {
                         if (total > 0)
                         {
@@ -1697,14 +1697,14 @@ namespace feeling
                     FrameRunJs(NativeScript.SetMaxResource(3));
                     await Task.Delay(100);
 
-                    var confirmType = HtmlUtil.AttackConfirmType(source);
+                    var confirmType = HtmlParser.AttackConfirmType(source);
                     // 攻击确认
                     FrameRunJs(NativeScript.SetAttackConfirm(confirmType));
                     await Task.Delay(1500);
 
                     // 查看结果
                     source = await GetFrameSourceAsync();
-                    if (HtmlUtil.HasFleetSuccess(source, mExpedition.Parser))
+                    if (HtmlParser.HasFleetSuccess(source, mExpedition.Parser))
                     {
                         NativeLog.Info($"派遣成功");
                         OperTipsEvent.Invoke(OperStatus.Pirate, $"派遣成功");
@@ -1713,7 +1713,7 @@ namespace feeling
                         continue;
                     }
 
-                    if (HtmlUtil.HasTutorial(source, mExpedition.Parser))
+                    if (HtmlParser.HasTutorial(source, mExpedition.Parser))
                     {
                         NativeLog.Info($"派遣错误");
                         OperTipsEvent.Invoke(OperStatus.Pirate, $"派遣错误");
@@ -1948,7 +1948,7 @@ namespace feeling
                             await Task.Delay(1500);
                             source = await GetFrameSourceAsync();
 
-                            ret = HtmlUtil.ParseSearchCrossName(source, name, out crossName);
+                            ret = HtmlParser.ParseSearchCrossName(source, name, out crossName);
                             if (ret)
                             {
                                 arr[i].CrossName = crossName;
@@ -2006,10 +2006,10 @@ namespace feeling
             {
                 Reload();
 
-                if (HtmlUtil.IsGameUrl(MyAddress))
+                if (HtmlParser.IsGameUrl(MyAddress))
                 {
                     source = await GetFrameSourceAsync();
-                    if (HtmlUtil.HasTutorial(source))
+                    if (HtmlParser.HasTutorial(source))
                     {
                         FrameRunJs(NativeScript.TutorialConfirm());
                         await Task.Delay(1500);
@@ -2027,7 +2027,7 @@ namespace feeling
                 await Task.Delay(2000);
                 source = await GetFrameSourceAsync();
 
-                var ret = HtmlUtil.ParseRank(source, universe, ref lists);
+                var ret = HtmlParser.ParseRank(source, universe, ref lists);
             }
             catch (Exception ex)
             {

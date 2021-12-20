@@ -15,7 +15,7 @@ namespace feeling
     class OgameParser
     {
 #if !NET45
-        HtmlParser mParser = new HtmlParser();
+        AngleSharp.Html.Parser.HtmlParser mParser = new AngleSharp.Html.Parser.HtmlParser();
         IHtmlDocument mDoc;
 #else
         HtmlDocument hParser = new HtmlDocument();

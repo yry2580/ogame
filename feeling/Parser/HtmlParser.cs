@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace feeling
 {
-    class HtmlUtil
+    class HtmlParser
     {
         public static string HtmlSpace = "&nbsp;";
         public static string Space = " ";
@@ -331,13 +331,16 @@ namespace feeling
             if (string.IsNullOrWhiteSpace(source)) return false;
             var parser = new OgameParser();
             parser.LoadHtml(source);
+
+            Regex regx = new Regex(@"^['\d:\[\] ]+$");
+
 #if !NET45
             var node = parser?.QuerySelector("#fleetdelaybox");
             if (null == node) return false;
             var thQuery = parser.QuerySelectorAll("center center table tr th");
             if (null == thQuery) return false;
             var target = $"[{pos.X}:{pos.Y}:{pos.Z}]";
-            var ret = thQuery.Where(e => e.TextContent.Contains(target));
+            var ret = thQuery.Where(e => e.TextContent.Contains(target) && regx.IsMatch(e.TextContent));
             if (null == ret) return false;
 #else
             var node = parser?.QuerySelector("//*[@id='fleetdelaybox']");
@@ -345,7 +348,7 @@ namespace feeling
 
             var thQuery = parser.QuerySelectorAll("//center//center//table//tr//th");
             var target = $"[{pos.X}:{pos.Y}:{pos.Z}]";
-            var ret = thQuery.Where(e => e.InnerText.Contains(target));
+            var ret = thQuery.Where(e => e.InnerText.Contains(target) && regx.IsMatch(e.TextContent));
             if (null == ret) return false;
 #endif
             return ret.Count() > 0;

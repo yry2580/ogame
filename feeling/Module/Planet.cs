@@ -18,7 +18,7 @@ namespace feeling
         public bool Parse(string source, string address = "")
         {
             NativeLog.Info("Planet Parse");
-            if (!HtmlUtil.ParseOwnerPlanets(source, out List<string> result, mHtmlParser)) return false;
+            if (!HtmlParser.ParseOwnerPlanets(source, out List<string> result, mHtmlParser)) return false;
             if (null == result) return false;
 
             var mat = Regex.Match(address, $@"://(?<universe>\S*).cicihappy.com");

@@ -92,7 +92,7 @@ namespace feeling
 
         protected bool ParsePage(string source)
         {
-            if (!HtmlUtil.ParseGalaxyPage(source, ref mGalaxyDict, mHtmlParser))
+            if (!HtmlParser.ParseGalaxyPage(source, ref mGalaxyDict, mHtmlParser))
             {
                 return false;
             }

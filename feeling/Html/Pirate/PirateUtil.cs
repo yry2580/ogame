@@ -122,7 +122,7 @@ namespace feeling
         public static void ParseNpc(string source, string address = "")
         {
             NativeLog.Info($"ParseNpc");
-            if (!HtmlUtil.ParseNpc(source, out List<string> result, mParser)) return;
+            if (!HtmlParser.ParseNpc(source, out List<string> result, mParser)) return;
             if (null == result) return;
 
             var mat = Regex.Match(address, $@"://(?<universe>\S*).cicihappy.com");
