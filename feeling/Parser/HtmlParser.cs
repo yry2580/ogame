@@ -198,9 +198,11 @@ namespace feeling
             var alt = el.GetAttributeValue("alt", "");
 #endif
             alt.Trim();
-            var arr = alt.Split(' ');
-            if (arr.Length < 2) return false;
-            total = int.Parse(arr[1]);
+            var regx = new Regex(@"(\d+)");
+            var regxMat = regx.Match(alt);
+
+            if (!regxMat.Success) return false;
+            total = int.Parse(regxMat.Value);
             return true;
         }
 

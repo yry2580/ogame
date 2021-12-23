@@ -37,7 +37,8 @@ namespace feeling
             ShipType.LC,
             ShipType.LF,
             ShipType.DD,
-            ShipType.BC
+            ShipType.BC,
+            ShipType.SPY
         };
 
         public static List<string> GetShipOptions()

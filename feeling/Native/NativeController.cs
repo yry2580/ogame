@@ -165,7 +165,7 @@ namespace feeling
                 StopScanGalaxy();
                 if (CanNotify)
                 {
-                    MessageBox.Show("请先登录");
+                    Toast("请先登录");
                 }
                 return;
             }
@@ -204,7 +204,7 @@ namespace feeling
                         mScanDesc = "刷图完成";
                         if (CanNotify)
                         {
-                            MessageBox.Show("刷图完成");
+                            Toast("刷图完成");
                         }
                         break;
                     }
@@ -214,7 +214,7 @@ namespace feeling
                     {
                         if (CanNotify)
                         {
-                            MessageBox.Show("刷图次数过多，建议换号");
+                            Toast("刷图次数过多，建议换号");
                         }
                         break;
                     }
@@ -234,7 +234,7 @@ namespace feeling
                             mScanDesc = $"刷图异常";
                             if (CanNotify)
                             {
-                                MessageBox.Show("刷图异常，检测下再开始");
+                                Toast("刷图异常，检测下再开始");
                             }
                             break;
                         }
@@ -278,7 +278,7 @@ namespace feeling
         {
             if (mGalaxy.Count <= 0)
             {
-                MessageBox.Show("暂无可扫描的星图可以保存");
+                Toast("暂无可扫描的星图可以保存");
                 return;
             }
 
@@ -301,7 +301,7 @@ namespace feeling
             {
                 if (CanNotify)
                 {
-                    MessageBox.Show("请输入正确的账号、密码或宇宙");
+                    // Toast("请输入正确的账号、密码或宇宙");
                 }
                 OperTipsEvent.Invoke(OperStatus.System, $"请输入正确账号、密码或宇宙");
                 return;
@@ -332,7 +332,7 @@ namespace feeling
                     {
                         if (CanNotify)
                         {
-                            MessageBox.Show("已经是登录状态");
+                            Toast("已经是登录状态");
                         }
                         OperTipsEvent.Invoke(OperStatus.System, $"已经是登录状态");
                         return;
@@ -346,7 +346,7 @@ namespace feeling
                     {
                         if (CanNotify)
                         {
-                            MessageBox.Show("已经是登录状态");
+                            Toast("已经是登录状态");
                         }
                         OperTipsEvent.Invoke(OperStatus.System, $"已经是登录状态");
                         return;
@@ -440,7 +440,7 @@ namespace feeling
                 {
                     if (CanNotify)
                     {
-                        MessageBox.Show("退出失败，可能不在游戏页");
+                        Toast("退出失败，可能不在游戏页");
                     }
                     OperTipsEvent.Invoke(OperStatus.System, $"退出失败，可能不在游戏页");
                     NativeLog.Info("退出失败，可能不在游戏页");
@@ -451,7 +451,7 @@ namespace feeling
                 {
                     if (CanNotify)
                     {
-                        MessageBox.Show("当前正在忙，不建议退出");
+                        Toast("当前正在忙，不建议退出");
                     }
                     OperTipsEvent.Invoke(OperStatus.System, $"当前正在忙，不建议退出");
                     NativeLog.Info("当前正在忙，不建议退出");
@@ -470,7 +470,7 @@ namespace feeling
                 {
                     if (CanNotify)
                     {
-                        MessageBox.Show("退出失败，无退出按钮");
+                        // Toast("退出失败，无退出按钮");
                     }
                     OperTipsEvent.Invoke(OperStatus.System, $"退出失败，无退出按钮");
                     NativeLog.Info("退出失败，无退出按钮");
@@ -622,7 +622,7 @@ namespace feeling
                     {
                         if (!IsAutoExpedition && CanNotify)
                         {
-                            MessageBox.Show($"探险派出结束，请检测是否成功{_count}/{exMission.List.Count}");
+                            // Toast($"探险派出结束，请检测是否成功{_count}/{exMission.List.Count}");
                         }
                         OperTipsEvent.Invoke(OperStatus.Expedition, $"探险派出结束{_count}/{exMission.List.Count}");
                         success = true;
@@ -688,7 +688,7 @@ namespace feeling
                     {
                         if (!IsAutoExpedition && CanNotify)
                         {
-                            MessageBox.Show("探险队列已满");
+                            // Toast("探险队列已满");
                         }
                         OperTipsEvent.Invoke(OperStatus.Expedition, $"探险队列已满");
                         success = true;
@@ -699,7 +699,7 @@ namespace feeling
                     {
                         if (!IsAutoExpedition && CanNotify)
                         {
-                            MessageBox.Show("航道已满");
+                            // Toast("航道已满");
                         }
                         OperTipsEvent.Invoke(OperStatus.Expedition, $"航道已满");
                         break;
@@ -965,7 +965,7 @@ namespace feeling
                     {
                         if (!isAuto && CanNotify)
                         {
-                            MessageBox.Show($"海盗任务派出结束，请检测是否成功{_count}/{pMission.MissionCount}");
+                            // Toast($"海盗任务派出结束，请检测是否成功{_count}/{pMission.MissionCount}");
                         }
                         OperTipsEvent.Invoke(OperStatus.Pirate, $"海盗任务结束{_count}/{pMission.MissionCount}");
                         success = true;
@@ -1043,7 +1043,7 @@ namespace feeling
                     {
                         if (!isAuto && CanNotify)
                         {
-                            MessageBox.Show("航道已满");
+                            // Toast("航道已满");
                         }
                         NativeLog.Info($"航道已满");
                         OperTipsEvent.Invoke(OperStatus.Pirate, $"航道已满");
@@ -2055,6 +2055,11 @@ namespace feeling
             StopScanUser();
             StopTransfer();
             SwitchStatus(OperStatus.None);
+        }
+
+        public void Toast(string content)
+        {
+            MessageBox.Show(content);
         }
     }
 }
