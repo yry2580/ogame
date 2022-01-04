@@ -2347,6 +2347,7 @@ namespace feeling
             }
             NativeController.Instance.CanNotify = false;
             NativeController.Instance.StartScanUser();
+            // NativeController.Instance.DoGetBonus();
         }
 
         private async Task SetPirateSpeed(int index)

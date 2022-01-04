@@ -341,10 +341,24 @@ namespace feeling
             return script;
         }
 
-        public static string TaskListGetAttackHaidaoZiyuan()
+        public static string TaskListGetAttackHaidaoBonus()
         {
             var script = "doc = window.parent.frames['Hauptframe'].document;";
             script += $"doc.querySelector(\"input[onclick*='getattackhaidaoziyuan'][value*='领取资源']\").click()";
+            return script;
+        }
+
+        public static string TaskListYuanzhengTab()
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"#yuanzhengtab]\").click()";
+            return script;
+        }
+
+        public static string TaskListGetYuanzhengBonus()
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"input[onclick*='getyuanzhengziyuan'][value*='领取资源']\").click()";
             return script;
         }
     }

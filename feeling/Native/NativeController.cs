@@ -66,7 +66,7 @@ namespace feeling
 
         public int PirateSpeedIndex = 0;
 
-        public DateTime LastHaidaoZiyuanTime = DateTime.Now.AddDays(-1);
+        public DateTime LastGetBonusTime = DateTime.Now.AddDays(-1);
 
         public bool IsAutoTransfer = false;
         public DateTime LastTransferTime = DateTime.Now.AddDays(-1);
@@ -1164,7 +1164,7 @@ namespace feeling
                     autoLogout = CanAutoLogout();
                 }
 
-                await DoGetHaidaoZiyuan();
+                await DoGetBonus();
             }
 
             IsPirateWorking = false;
@@ -1200,12 +1200,12 @@ namespace feeling
             }
         }
 
-        private async Task DoGetHaidaoZiyuan()
+        private async Task DoGetBonus()
         {
             try
             {
                 var now = DateTime.Now;
-                if (LastHaidaoZiyuanTime.Date.Equals(now.Date))
+                if (LastGetBonusTime.Date.Equals(now.Date))
                 {
                     NativeLog.Info("领取海盗资源-今天处理过了");
                     return;
@@ -1228,13 +1228,28 @@ namespace feeling
                     await Task.Delay(1500);
                     source = await GetFrameSourceAsync();
                     NativeLog.Info("领取海盗资源-领取资源");
-                    FrameRunJs(NativeScript.TaskListGetAttackHaidaoZiyuan());
+                    FrameRunJs(NativeScript.TaskListGetAttackHaidaoBonus());
+                    await Task.Delay(1500);
+
+                    source = await GetFrameSourceAsync();
+                    if (HtmlParser.HasTutorial(source))
+                    {
+                        FrameRunJs(NativeScript.TutorialConfirm());
+                        await Task.Delay(1500);
+                        source = await GetFrameSourceAsync();
+                    }
+                    NativeLog.Info("领取远征资源-探险远征分页");
+                    FrameRunJs(NativeScript.TaskListYuanzhengTab());
+                    await Task.Delay(1500);
+                    source = await GetFrameSourceAsync();
+                    NativeLog.Info("领取远征资源-领取资源");
+                    FrameRunJs(NativeScript.TaskListGetYuanzhengBonus());
                     await Task.Delay(1500);
                     Reload();
                     await GetFrameSourceAsync();
 
                     // 记录
-                    LastHaidaoZiyuanTime = now;
+                    LastGetBonusTime = now;
                 }
             }
             catch (Exception ex)
