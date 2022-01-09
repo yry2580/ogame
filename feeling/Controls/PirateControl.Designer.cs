@@ -41,7 +41,7 @@ namespace feeling
             // 
             // u_count
             // 
-            this.u_count.Location = new System.Drawing.Point(103, 17);
+            this.u_count.Location = new System.Drawing.Point(103, 16);
             this.u_count.Name = "u_count";
             this.u_count.Size = new System.Drawing.Size(41, 21);
             this.u_count.TabIndex = 0;
@@ -76,7 +76,7 @@ namespace feeling
             this.u_combo_box.FormattingEnabled = true;
             this.u_combo_box.Location = new System.Drawing.Point(0, 17);
             this.u_combo_box.Name = "u_combo_box";
-            this.u_combo_box.Size = new System.Drawing.Size(97, 20);
+            this.u_combo_box.Size = new System.Drawing.Size(93, 20);
             this.u_combo_box.TabIndex = 9;
             // 
             // u_rbtn2

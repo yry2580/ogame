@@ -26,7 +26,24 @@ namespace feeling
             {
                 Universe = mat.Groups["universe"].Value;
             }
-            List = result;
+
+            List<string> list = new List<string>();
+
+            for(int i = 0; i < result.Count; i++)
+            {
+                string name = result[i];
+                var _mat = NativeConst.PlanetRegex.Match(name);
+                if (_mat.Success)
+                {
+                    list.Add(_mat.Value);
+                }
+                else
+                {
+                    list.Add(name);
+                }
+            }
+
+            List = list;
             
             NativeLog.Info("Planet Parse end");
             return true;
@@ -41,17 +58,23 @@ namespace feeling
 
         public int GetPlanetIndex(string planetName)
         {
-            return List.FindIndex(e => e.Contains(planetName));
+            return FindPlanet(planetName, List);
         }
 
         public static int FindPlanet(string planetName, List<string> list)
         {
             if (string.IsNullOrWhiteSpace(planetName)) return -1;
             if (null == list || list.Count <= 0) return -1;
-            var pos = planetName.LastIndexOf("[");
-            if (pos <= 0) return -1;
 
-            return list.FindIndex(e => e.Contains(planetName.Substring(0, pos - 1)) && e.Contains(planetName.Substring(pos)));
+            var mat = NativeConst.PlanetRegex.Match(planetName);
+            if (!mat.Success)
+            {
+                mat = NativeConst.PlanetRegex1.Match(planetName);
+            }
+            if (!mat.Success) return -1;
+            var val0 = mat.Result("$1");
+            var val1 = mat.Result("$2");
+            return list.FindIndex(e => e.Contains(val0) && e.Contains(val1));
         }
     }
 }

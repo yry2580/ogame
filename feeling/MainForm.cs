@@ -355,7 +355,7 @@ namespace feeling
                 }
 
                 var mission = missionCfg.GetMission(i);
-                var idx = planetList.FindIndex(e => e == mission.PlanetName);
+                var idx = Planet.FindPlanet(mission.PlanetName, planetList);
                 if (idx != -1)
                 {
                     (Controls.Find($"tx{i}_planet", true)[0] as ComboBox).SelectedIndex = idx;

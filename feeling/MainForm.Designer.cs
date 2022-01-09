@@ -194,7 +194,7 @@ namespace feeling
             this.w_split_container.Panel2.Controls.Add(this.w_tab);
             this.w_split_container.Panel2.Controls.Add(this.w_user_box);
             this.w_split_container.Panel2MinSize = 180;
-            this.w_split_container.Size = new System.Drawing.Size(1213, 918);
+            this.w_split_container.Size = new System.Drawing.Size(1413, 918);
             this.w_split_container.SplitterDistance = 723;
             this.w_split_container.TabIndex = 0;
             // 
@@ -1677,7 +1677,7 @@ namespace feeling
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1213, 918);
+            this.ClientSize = new System.Drawing.Size(1413, 918);
             this.Controls.Add(this.w_split_container);
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.Name = "MainForm";
