@@ -149,7 +149,7 @@ namespace feeling
             var tr = trList[idx + 1];
             var TextContent = tr.InnerText.Trim();
 #endif
-            var mat = Regex.Match(TextContent, @"舰队 (?<jd>\d{1,2}) / (?<jdMax>\d{1,2})探险 (?<tx>\d) / (?<txMax>\d)");
+            var mat = Regex.Match(TextContent, @"舰队.{0,1}(?<jd>\d{1,2}).{0,1}/.{0,1}(?<jdMax>\d{1,2}).*探险.{0,1}(?<tx>\d).{0,1}/.{0,1}(?<txMax>\d)");
             if (mat.Success)
             {
                 fleetQueue = new FleetQueue
@@ -162,7 +162,7 @@ namespace feeling
                 return true;
             }
 
-            mat = Regex.Match(TextContent, @"舰队 (?<jd>\d{1,2}) / (?<jdMax>\d{1,2})探险");
+            mat = Regex.Match(TextContent, @"舰队.{0,1}(?<jd>\d{1,2}).{0,1}/.{0,1}(?<jdMax>\d{1,2})");
             if (mat.Success)
             {
                 fleetQueue = new FleetQueue
