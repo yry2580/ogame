@@ -165,6 +165,14 @@ namespace feeling
             RedrawAccount();
             InitImperium();
             InitPirate();
+            InitGather();
+        }
+
+        private void InitGather()
+        {
+            GatherUtil.Initialize();
+
+            GatherCfg();
         }
 
         protected void InitPirate()
@@ -402,6 +410,41 @@ namespace feeling
             return true;
         }
 
+        protected bool GatherCfg()
+        {
+            int idx = 0;
+
+            NativeLog.Info($"读取集中配置，当前配置：{idx + 1}");
+            
+            var pMissionCfg = GatherUtil.MyMission;
+            var pMissionCfg1 = GatherUtil.MyMission1;
+
+            // if (null == pMissionCfg) return false;
+
+            var missionCfg = idx == 1 ? pMissionCfg1 : pMissionCfg;
+
+            var planetList = NativeController.Instance.MyPlanet.List;
+            
+            var list = missionCfg.List;
+
+            for (int i = 0; i < 2; i++)
+            {
+                GatherControl control = Controls.Find($"w_gather{i}", true)[0] as GatherControl;
+                if (null == control) continue;
+
+                var gather = i < list.Count ? list[i] : new Gather();
+
+                control.SetAllOptions(planetList);
+                control.SetPlanets(planetList);
+
+                control.MyCount = gather.Count;
+                control.MyPlanet = gather.PlanetName;
+                control.MyOptions = gather.Options;
+            }
+
+            return true;
+        }
+
         protected void InitWebHandler()
         {
             mWebBrowser.JsDialogHandler = new JsDialogHandler();
@@ -471,6 +514,7 @@ namespace feeling
                         btn_transfer.Enabled = false;
                         cbox_auto_transfer.Enabled = false;
                         SetQuickBtn(false);
+                        SetGatherButton(false);
                         break;
                     case OperStatus.Galaxy:
                         btn_galaxy_start.Enabled = false;
@@ -484,6 +528,7 @@ namespace feeling
                         btn_transfer.Enabled = false;
                         cbox_auto_transfer.Enabled = false;
                         SetQuickBtn(false);
+                        SetGatherButton(false);
                         break;
                     case OperStatus.Expedition:
                         btn_galaxy_start.Enabled = false;
@@ -497,6 +542,7 @@ namespace feeling
                         btn_transfer.Enabled = false;
                         cbox_auto_transfer.Enabled = false;
                         SetQuickBtn(false);
+                        SetGatherButton(false);
                         break;
                     case OperStatus.Pirate:
                         btn_galaxy_start.Enabled = false;
@@ -510,6 +556,7 @@ namespace feeling
                         btn_transfer.Enabled = false;
                         cbox_auto_transfer.Enabled = false;
                         SetQuickBtn(false);
+                        SetGatherButton(false);
                         break;
                     case OperStatus.None:
                     default:
@@ -524,6 +571,7 @@ namespace feeling
                         btn_transfer.Enabled = true;
                         cbox_auto_transfer.Enabled = true;
                         SetQuickBtn(true);
+                        SetGatherButton(true);
                         enabled = true;
                         break;
                 }
@@ -588,6 +636,7 @@ namespace feeling
 
             RevertCfg();
             PirateCfg();
+            GatherCfg();
             SendData();
         }
 
@@ -640,6 +689,15 @@ namespace feeling
             rbtn_cfg0.Enabled = enabled;
             rbtn_cfg1.Enabled = enabled;
             hd_speed_cb.Enabled = enabled;
+        }
+
+        public void SetGatherButton(bool enabled)
+        {
+            btn_gather_read.Enabled = enabled;
+            btn_gather_save.Enabled = enabled;
+            btn_gather_start.Enabled = enabled;
+            btn_hd_refresh.Enabled = enabled;
+            cbox_auto_gather.Enabled = enabled;
         }
 
         public void SetExpeditionButton(bool enabled, bool canStop = false)
@@ -2567,6 +2625,79 @@ namespace feeling
             mExpeditionInterval1 = interval;
             lb_tx_interval1.Text = mExpeditionInterval1.ToString();
             Expedition.SetInterval(interval, 1);
+        }
+
+        private GatherMission GetGatherMission()
+        {
+            GatherMission gMission = new GatherMission();
+
+            for (int i = 0; i < 2; i++)
+            {
+                GatherControl control = Controls.Find($"w_gather{i}", true)[0] as GatherControl;
+                if (null == control) continue;
+
+                gMission.Add(new Gather
+                {
+                    Count = control.MyCount,
+                    Options = control.MyOptions,
+                    PlanetName = control.MyPlanet,
+                    AllOptions = control.AllOptions
+                });
+            }
+
+            return gMission;
+        }
+
+        private void DoGather()
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
+
+            var gMission = GetGatherMission();
+            NativeController.Instance.StartGather(gMission);
+            Redraw();
+        }
+
+        private void btn_gather_start_Click(object sender, EventArgs e)
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                MessageBox.Show("当前正在忙，暂不能操作");
+                return;
+            }
+
+            var gMission = GetGatherMission();
+            if (gMission.MissionCount <= 0)
+            {
+                MessageBox.Show("集中任务配置无效，请检测后再开始");
+                return;
+            }
+
+            NativeController.Instance.CanNotify = true;
+
+            DoGather();
+        }
+
+        private void btn_gather_save_Click(object sender, EventArgs e)
+        {
+            int idx = 0;
+            var ret = MessageBox.Show($"确定保存配置吗", "提示", MessageBoxButtons.YesNo);
+            if (ret == DialogResult.Yes)
+            {
+                var gMission = GetGatherMission();
+                GatherUtil.Save(gMission, idx);
+                GatherCfg();
+            }
+        }
+
+        private void btn_gather_read_Click(object sender, EventArgs e)
+        {
+            var ret = MessageBox.Show($"确定读取配置吗", "提示", MessageBoxButtons.YesNo);
+            if (DialogResult.Yes != ret) return;
+
+            if (!GatherCfg())
+            {
+                MessageBox.Show($"读取还原配置配置失败");
+            }
         }
     }
 }

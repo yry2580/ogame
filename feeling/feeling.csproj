@@ -107,6 +107,12 @@
     <Compile Include="Common\HotKey.cs" />
     <Compile Include="Common\Network.cs" />
     <Compile Include="Common\Singleton.cs" />
+    <Compile Include="Controls\GatherControl.cs">
+      <SubType>UserControl</SubType>
+    </Compile>
+    <Compile Include="Controls\GatherControl.Designer.cs">
+      <DependentUpon>GatherControl.cs</DependentUpon>
+    </Compile>
     <Compile Include="Handler\DownloadHandler.cs" />
     <Compile Include="Handler\JsDialogHandler.cs" />
     <Compile Include="Handler\MenuHandler.cs" />
@@ -114,6 +120,9 @@
     <Compile Include="Html\Expedition\ExMission.cs" />
     <Compile Include="Html\Expedition\Expedition.cs" />
     <Compile Include="Html\Galaxy\Galaxy.cs" />
+    <Compile Include="Html\Gather\Gather.cs" />
+    <Compile Include="Html\Gather\GatherMission.cs" />
+    <Compile Include="Html\Gather\GatherUtil.cs" />
     <Compile Include="Html\Imperium\Imperium.cs" />
     <Compile Include="Html\Imperium\ImperiumUtil.cs" />
     <Compile Include="Html\Rank\RankUser.cs" />
@@ -151,6 +160,9 @@
     <Compile Include="Util\IoUtil.cs" />
     <Compile Include="Native\NativeLog.cs" />
     <Compile Include="Util\SystemSleep.cs" />
+    <EmbeddedResource Include="Controls\GatherControl.resx">
+      <DependentUpon>GatherControl.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Controls\PirateControl.resx">
       <DependentUpon>PirateControl.cs</DependentUpon>
     </EmbeddedResource>

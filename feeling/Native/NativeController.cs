@@ -72,6 +72,8 @@ namespace feeling
         public DateTime LastTransferTime = DateTime.Now.AddDays(-1);
         public DateTime LastTransferTime1 = DateTime.Now.AddDays(-1);
 
+        public DateTime LastGatherTime = DateTime.Now.AddDays(-1);
+
         public void HandleWebBrowserFrameEnd(string url)
         {
             MyAddress = MyWebBrowser.Address;
@@ -940,7 +942,7 @@ namespace feeling
                             OperTipsEvent.Invoke(OperStatus.Pirate, $"海盗结束，没有登录");
                             NativeLog.Info("海盗任务结束，没有登录");
                             SetLastPirateTime(cfgIndex);
-                            IsExpeditionWorking = false;
+                            IsPirateWorking = false;
                             SwitchStatus(OperStatus.None);
                             return;
                         }
@@ -951,7 +953,7 @@ namespace feeling
                     OperTipsEvent.Invoke(OperStatus.Pirate, $"海盗结束，没有登录");
                     NativeLog.Info("海盗任务结束，没有登录");
                     SetLastPirateTime(cfgIndex);
-                    IsExpeditionWorking = false;
+                    IsPirateWorking = false;
                     SwitchStatus(OperStatus.None);
                     return;
                 }
@@ -1653,14 +1655,14 @@ namespace feeling
                     {
                         _nextFunc(false);
                         NativeLog.Info($"解析航道队列有误");
-                        OperTipsEvent.Invoke(OperStatus.Pirate, $"解析航道队列有误");
+                        OperTipsEvent.Invoke(OperStatus.System, $"解析航道队列有误");
                         continue;
                     }
 
                     if (fq.Count >= fq.MaxCount)
                     {
                         NativeLog.Info($"航道已满");
-                        OperTipsEvent.Invoke(OperStatus.Pirate, $"航道已满");
+                        OperTipsEvent.Invoke(OperStatus.System, $"航道已满");
                         break;
                     }
 
@@ -1722,7 +1724,7 @@ namespace feeling
                     if (HtmlParser.HasFleetSuccess(source, mExpedition.Parser))
                     {
                         NativeLog.Info($"派遣成功");
-                        OperTipsEvent.Invoke(OperStatus.Pirate, $"派遣成功");
+                        OperTipsEvent.Invoke(OperStatus.System, $"派遣成功");
                         _nextFunc(true);
                         _count++;
                         continue;
@@ -1731,7 +1733,7 @@ namespace feeling
                     if (HtmlParser.HasTutorial(source, mExpedition.Parser))
                     {
                         NativeLog.Info($"派遣错误");
-                        OperTipsEvent.Invoke(OperStatus.Pirate, $"派遣错误");
+                        OperTipsEvent.Invoke(OperStatus.System, $"派遣错误");
                         FrameRunJs(NativeScript.TutorialConfirm());
                         await Task.Delay(1500);
                     }
@@ -2069,6 +2071,7 @@ namespace feeling
             StopPirate();
             StopScanUser();
             StopTransfer();
+            StopGather();
             SwitchStatus(OperStatus.None);
         }
 
@@ -2076,5 +2079,273 @@ namespace feeling
         {
             MessageBox.Show(content);
         }
+
+        internal void StartGather(GatherMission gMission)
+        {
+            SwitchStatus(OperStatus.System);
+            IsWorking = true;
+            Task.Run(() =>
+            {
+                DoGather(gMission);
+            });
+        }
+
+        internal void StopGather()
+        {
+            if (!IsWorking) return;
+            IsWorking = false;
+        }
+
+        protected async void DoGather(GatherMission gMission)
+        {
+            int index = 0;
+            int _count = 0;
+            bool lastErr = false;
+            string source = "";
+            bool success = false;
+
+            var _nextFunc = new Action<bool>(isSkip =>
+            {
+                if (lastErr || isSkip)
+                {
+                    lastErr = false;
+                    index++;
+                }
+                else
+                {
+                    lastErr = true;
+                }
+            });
+
+            try
+            {
+                OperTipsEvent.Invoke(OperStatus.System, $"开始集中资源");
+                NativeLog.Info("开始集中资源");
+
+                if (gMission.MissionCount <= 0)
+                {
+                    OperTipsEvent.Invoke(OperStatus.System, $"没有集中任务");
+                    NativeLog.Info("没有集中任务");
+                    StopGather();
+                    SwitchStatus(OperStatus.None);
+                    return;
+                }
+
+                Reload();
+
+                if (HtmlParser.IsGameUrl(MyAddress))
+                {
+                    source = await GetFrameSourceAsync();
+                    if (HtmlParser.HasTutorial(source))
+                    {
+                        FrameRunJs(NativeScript.TutorialConfirm());
+                        await Task.Delay(1500);
+                        source = await GetFrameSourceAsync();
+                        if (!HtmlParser.IsInGame(source))
+                        {
+                            OperTipsEvent.Invoke(OperStatus.System, $"集中任务结束，没有登录");
+                            NativeLog.Info("集中任务结束，没有登录");
+                            StopGather();
+                            SwitchStatus(OperStatus.None);
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+                    OperTipsEvent.Invoke(OperStatus.System, $"集中任务结束，没有登录");
+                    NativeLog.Info("集中任务结束，没有登录");
+                    StopGather();
+                    SwitchStatus(OperStatus.None);
+                    return;
+                }
+
+                await GoHome(1500);
+
+                do
+                {
+                    NativeLog.Info($"GatherMission index{index}");
+                    if (index >= gMission.MissionCount)
+                    {
+                        OperTipsEvent.Invoke(OperStatus.System, $"集中任务结束{_count}/{gMission.MissionCount}");
+                        success = true;
+                        break;
+                    }
+
+                    OperTipsEvent.Invoke(OperStatus.System, $"集中任务{index + 1}/{gMission.MissionCount}");
+
+                    if (!IsWorking)
+                    {
+                        OperTipsEvent.Invoke(OperStatus.System, $"集中任务停止");
+                        success = true;
+                        break;
+                    }
+
+                    var mission = gMission.GetMission(index);
+
+                    NativeLog.Info($"mission {JsonConvert.SerializeObject(mission)}");
+
+                    if (lastErr)
+                    {
+                        Reload();
+                        NativeLog.Info($"重载");
+                    }
+
+                    source = await GetFrameSourceAsync();
+                    if (HtmlParser.HasTutorial(source, mHtmlParser))
+                    {
+                        NativeLog.Info($"存在错误");
+                        OperTipsEvent.Invoke(OperStatus.System, $"存在错误");
+                        FrameRunJs(NativeScript.TutorialConfirm());
+                        await Task.Delay(1500);
+                    }
+
+                    // 切换舰队页面
+                    GoFleetPage();
+                    NativeLog.Info($"切换舰队");
+                    source = await GetFrameSourceAsync();
+                    if (index <= 1 && HtmlParser.IsWechatCodePage(source))
+                    {
+                        NativeLog.Info($"在微信验证页");
+                        OperTipsEvent.Invoke(OperStatus.System, $"在微信验证页");
+                        success = true;
+                        break;
+                    }
+
+                    // 切换触发球
+                    int idx = mPlanet.GetPlanetIndex(mission.PlanetName);
+                    if (idx < 0)
+                    {
+                        _nextFunc(false);
+                        continue;
+                    }
+
+                    FrameRunJs(NativeScript.SelectPlanet(idx));
+                    await Task.Delay(1500);
+
+                    // 查看舰队队列
+                    source = await GetFrameSourceAsync();
+                    if (!source.Contains("id=\"fleetdelaybox\""))
+                    {
+                        GoFleetPage();
+                        source = await GetFrameSourceAsync();
+                    }
+
+                    if (!HtmlParser.ParseFleetQueue(source, out FleetQueue fq))
+                    {
+                        _nextFunc(false);
+                        NativeLog.Info($"解析航道队列有误");
+                        OperTipsEvent.Invoke(OperStatus.System, $"解析航道队列有误");
+                        continue;
+                    }
+
+                    if (fq.Count >= fq.MaxCount)
+                    {
+                        NativeLog.Info($"航道已满");
+                        OperTipsEvent.Invoke(OperStatus.System, $"航道已满");
+                        success = true;
+                        break;
+                    }
+
+                    // 派遣任务
+                    bool flag = true;
+                    for (var i = 0; i < mission.FleetList.Count; i++)
+                    {
+                        var fleet = mission.FleetList[i];
+                        var shipId = Ship.GetShipId(fleet.ShipType);
+                        var count = fleet.Count;
+                        if (HtmlParser.ParseShip(source, shipId, out int total))
+                        {
+                            NativeLog.Info($"shipId{shipId} count{count}");
+                            count = count <= 0 ? total : count;
+                            if (total >= count && count > 0)
+                            {
+                                FrameRunJs(NativeScript.SetShip(shipId, count));
+                                await Task.Delay(100);
+                                continue;
+                            }
+                        }
+
+                        flag = false;
+                        break;
+                    }
+
+                    if (!flag)
+                    {
+                        NativeLog.Info($"没有大型运输机");
+                        OperTipsEvent.Invoke(OperStatus.Pirate, $"没有大型运输机");
+                        _nextFunc(true);
+                        continue;
+                    }
+                    await Task.Delay(500);
+
+                    // 继续
+                    FrameRunJs(NativeScript.SetShipNext());
+                    await Task.Delay(1500);
+
+                    source = await GetFrameSourceAsync();
+
+                    // 设置目标点
+                    FrameRunJs(NativeScript.SetTarget(mission.X, mission.Y, mission.Z, (int)PlanetType.Moon));
+                    await Task.Delay(500);
+                    source = await GetFrameSourceAsync();
+                    
+                    // 设置目标继续
+                    FrameRunJs(NativeScript.SetTargetNext());
+                    await Task.Delay(1500);
+
+                    source = await GetFrameSourceAsync();
+
+                    // 运输
+                    FrameRunJs(NativeScript.SetTransfer());
+                    await Task.Delay(300);
+
+                    FrameRunJs(NativeScript.SetMaxResource(1));
+                    await Task.Delay(100);
+                    FrameRunJs(NativeScript.SetMaxResource(2));
+                    await Task.Delay(100);
+                    FrameRunJs(NativeScript.SetMaxResource(3));
+                    await Task.Delay(100);
+
+                    var confirmType = HtmlParser.AttackConfirmType(source);
+                    // 确认
+                    FrameRunJs(NativeScript.SetAttackConfirm(confirmType));
+                    await Task.Delay(1500);
+
+                    // 查看结果
+                    source = await GetFrameSourceAsync();
+                    if (HtmlParser.HasFleetSuccess(source, mExpedition.Parser))
+                    {
+                        NativeLog.Info($"派遣成功");
+                        OperTipsEvent.Invoke(OperStatus.Pirate, $"派遣成功");
+                        _nextFunc(true);
+                        _count++;
+                        continue;
+                    }
+
+                    if (HtmlParser.HasTutorial(source, mExpedition.Parser))
+                    {
+                        NativeLog.Info($"派遣错误");
+                        OperTipsEvent.Invoke(OperStatus.System, $"派遣错误");
+                        FrameRunJs(NativeScript.TutorialConfirm());
+                        await Task.Delay(1500);
+                    }
+
+                    _nextFunc(false);
+                } while (true);
+            }
+            catch (Exception ex)
+            {
+                NativeLog.Error($"DoGather catch {ex.Message}");
+            }
+
+            OperTipsEvent.Invoke(OperStatus.System, $"集中任务结束{_count}/{gMission.MissionCount}");
+            NativeLog.Info($"集中任务结束{_count}-{success}");
+
+            LastTransferTime = DateTime.Now;
+            StopGather();
+            SwitchStatus(OperStatus.None);
+        }
+
     }
 }
