@@ -46,6 +46,7 @@ namespace OgameService
         MorningIdle,
         Transfer,
         AutoTransferOpen,
+        Gather,
     }
 
     public enum StatusEnum

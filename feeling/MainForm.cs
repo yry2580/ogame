@@ -919,6 +919,10 @@ namespace feeling
                         NativeController.Instance.CanNotify = false;
                         await SetAutoTransferOpen(data.AutoTransferOpen);
                         break;
+                    case CmdEnum.Gather:
+                        NativeController.Instance.CanNotify = false;
+                        DoGather();
+                        break;
                     default:
                         break;
                 }

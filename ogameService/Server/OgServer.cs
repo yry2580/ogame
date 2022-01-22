@@ -1009,6 +1009,34 @@ namespace OgameService
             return false;
         }
 
+        public bool OperGather(string id, string key)
+        {
+            LogUtil.Warn($"OperGather {id}");
+            try
+            {
+                if (string.IsNullOrWhiteSpace(id) || string.IsNullOrWhiteSpace(key)) return false;
+
+                mCellDict.TryGetValue(key, out OgCell result);
+                // var result = mCellList.Find(c => c.Id == id && c.SessionKey == key);
+                if (null == result || null == result.MySession)
+                {
+                    LogUtil.Warn($"OperGather 没取到对应cell");
+                    return false;
+                }
+
+                OgameData data = new OgameData();
+                data.Cmd = CmdEnum.Gather;
+
+                mServer.SendTo(result.MySession, OgameData.ToBytes(data));
+                return true;
+            }
+            catch (Exception ex)
+            {
+                LogUtil.Error($"OperGather {key} catch {ex.Message}");
+            }
+            return false;
+        }
+
         public void ShowAllCell()
         {
             LogUtil.Warn("=============== ShowAllCell =====================");
