@@ -2342,7 +2342,7 @@ namespace feeling
             OperTipsEvent.Invoke(OperStatus.System, $"集中任务结束{_count}/{gMission.MissionCount}");
             NativeLog.Info($"集中任务结束{_count}-{success}");
 
-            LastTransferTime = DateTime.Now;
+            LastGatherTime = DateTime.Now;
             StopGather();
             SwitchStatus(OperStatus.None);
         }

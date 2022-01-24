@@ -2652,9 +2652,14 @@ namespace feeling
             return gMission;
         }
 
-        private void DoGather()
+        private async void DoGather(bool isAuto = false)
         {
             if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
+            NativeController.Instance.CanNotify = false;
+            if (!isAuto)
+            {
+                await TryLogin();
+            }
 
             var gMission = GetGatherMission();
             NativeController.Instance.StartGather(gMission);
