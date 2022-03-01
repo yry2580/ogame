@@ -108,7 +108,21 @@ namespace feeling
             this.btn_hd_revert = new System.Windows.Forms.Button();
             this.btn_hd_save = new System.Windows.Forms.Button();
             this.btn_hd_start = new System.Windows.Forms.Button();
+            this.w_pirate4 = new feeling.PirateControl();
+            this.w_pirate3 = new feeling.PirateControl();
+            this.w_pirate2 = new feeling.PirateControl();
+            this.w_pirate1 = new feeling.PirateControl();
+            this.w_pirate0 = new feeling.PirateControl();
             this.w_galaxy = new System.Windows.Forms.TabPage();
+            this.groupBox1 = new System.Windows.Forms.GroupBox();
+            this.btn_detect_stop = new System.Windows.Forms.Button();
+            this.btn_detect_start = new System.Windows.Forms.Button();
+            this.txt_detect_count = new System.Windows.Forms.TextBox();
+            this.label28 = new System.Windows.Forms.Label();
+            this.label26 = new System.Windows.Forms.Label();
+            this.txt_detect_y = new System.Windows.Forms.TextBox();
+            this.txt_detect_x = new System.Windows.Forms.TextBox();
+            this.label24 = new System.Windows.Forms.Label();
             this.btn_galaxy_open = new System.Windows.Forms.Button();
             this.w_galaxy_status_lb = new System.Windows.Forms.Label();
             this.btn_galaxy_save = new System.Windows.Forms.Button();
@@ -135,6 +149,8 @@ namespace feeling
             this.cbox_auto_gather = new System.Windows.Forms.CheckBox();
             this.btn_gather_start = new System.Windows.Forms.Button();
             this.btn_gather_save = new System.Windows.Forms.Button();
+            this.w_gather1 = new feeling.GatherControl();
+            this.w_gather0 = new feeling.GatherControl();
             this.cbox_auto_transfer = new System.Windows.Forms.CheckBox();
             this.btn_transfer = new System.Windows.Forms.Button();
             this.w_info = new System.Windows.Forms.TabPage();
@@ -167,13 +183,6 @@ namespace feeling
             this.label5 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
-            this.w_pirate4 = new feeling.PirateControl();
-            this.w_pirate3 = new feeling.PirateControl();
-            this.w_pirate2 = new feeling.PirateControl();
-            this.w_pirate1 = new feeling.PirateControl();
-            this.w_pirate0 = new feeling.PirateControl();
-            this.w_gather1 = new feeling.GatherControl();
-            this.w_gather0 = new feeling.GatherControl();
             ((System.ComponentModel.ISupportInitialize)(this.w_split_container)).BeginInit();
             this.w_split_container.Panel2.SuspendLayout();
             this.w_split_container.SuspendLayout();
@@ -181,6 +190,7 @@ namespace feeling
             this.tab_tanxian.SuspendLayout();
             this.tab_haidao.SuspendLayout();
             this.w_galaxy.SuspendLayout();
+            this.groupBox1.SuspendLayout();
             this.w_imperium.SuspendLayout();
             this.w_oper.SuspendLayout();
             this.w_info.SuspendLayout();
@@ -1032,8 +1042,74 @@ namespace feeling
             this.btn_hd_start.UseVisualStyleBackColor = true;
             this.btn_hd_start.Click += new System.EventHandler(this.btn_hd_start_Click);
             // 
+            // w_pirate4
+            // 
+            this.w_pirate4.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.w_pirate4.Location = new System.Drawing.Point(846, 0);
+            this.w_pirate4.MyCount = 0;
+            this.w_pirate4.MyMode = 0;
+            this.w_pirate4.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate4.MyOptions")));
+            this.w_pirate4.MyPlanet = "";
+            this.w_pirate4.MyTitle = "银河系5";
+            this.w_pirate4.Name = "w_pirate4";
+            this.w_pirate4.Size = new System.Drawing.Size(150, 150);
+            this.w_pirate4.TabIndex = 4;
+            // 
+            // w_pirate3
+            // 
+            this.w_pirate3.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.w_pirate3.Location = new System.Drawing.Point(693, 0);
+            this.w_pirate3.MyCount = 0;
+            this.w_pirate3.MyMode = 0;
+            this.w_pirate3.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate3.MyOptions")));
+            this.w_pirate3.MyPlanet = "";
+            this.w_pirate3.MyTitle = "银河系4";
+            this.w_pirate3.Name = "w_pirate3";
+            this.w_pirate3.Size = new System.Drawing.Size(150, 150);
+            this.w_pirate3.TabIndex = 3;
+            // 
+            // w_pirate2
+            // 
+            this.w_pirate2.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.w_pirate2.Location = new System.Drawing.Point(539, 0);
+            this.w_pirate2.MyCount = 0;
+            this.w_pirate2.MyMode = 0;
+            this.w_pirate2.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate2.MyOptions")));
+            this.w_pirate2.MyPlanet = "";
+            this.w_pirate2.MyTitle = "银河系3";
+            this.w_pirate2.Name = "w_pirate2";
+            this.w_pirate2.Size = new System.Drawing.Size(150, 150);
+            this.w_pirate2.TabIndex = 2;
+            // 
+            // w_pirate1
+            // 
+            this.w_pirate1.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.w_pirate1.Location = new System.Drawing.Point(386, 0);
+            this.w_pirate1.MyCount = 0;
+            this.w_pirate1.MyMode = 0;
+            this.w_pirate1.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate1.MyOptions")));
+            this.w_pirate1.MyPlanet = "";
+            this.w_pirate1.MyTitle = "银河系2";
+            this.w_pirate1.Name = "w_pirate1";
+            this.w_pirate1.Size = new System.Drawing.Size(150, 150);
+            this.w_pirate1.TabIndex = 1;
+            // 
+            // w_pirate0
+            // 
+            this.w_pirate0.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.w_pirate0.Location = new System.Drawing.Point(233, 0);
+            this.w_pirate0.MyCount = 0;
+            this.w_pirate0.MyMode = 0;
+            this.w_pirate0.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate0.MyOptions")));
+            this.w_pirate0.MyPlanet = "";
+            this.w_pirate0.MyTitle = "银河系1";
+            this.w_pirate0.Name = "w_pirate0";
+            this.w_pirate0.Size = new System.Drawing.Size(150, 150);
+            this.w_pirate0.TabIndex = 0;
+            // 
             // w_galaxy
             // 
+            this.w_galaxy.Controls.Add(this.groupBox1);
             this.w_galaxy.Controls.Add(this.btn_galaxy_open);
             this.w_galaxy.Controls.Add(this.w_galaxy_status_lb);
             this.w_galaxy.Controls.Add(this.btn_galaxy_save);
@@ -1052,9 +1128,100 @@ namespace feeling
             this.w_galaxy.Text = "星图";
             this.w_galaxy.UseVisualStyleBackColor = true;
             // 
+            // groupBox1
+            // 
+            this.groupBox1.Controls.Add(this.btn_detect_stop);
+            this.groupBox1.Controls.Add(this.btn_detect_start);
+            this.groupBox1.Controls.Add(this.txt_detect_count);
+            this.groupBox1.Controls.Add(this.label28);
+            this.groupBox1.Controls.Add(this.label26);
+            this.groupBox1.Controls.Add(this.txt_detect_y);
+            this.groupBox1.Controls.Add(this.txt_detect_x);
+            this.groupBox1.Controls.Add(this.label24);
+            this.groupBox1.Location = new System.Drawing.Point(241, 0);
+            this.groupBox1.Name = "groupBox1";
+            this.groupBox1.Size = new System.Drawing.Size(212, 150);
+            this.groupBox1.TabIndex = 10;
+            this.groupBox1.TabStop = false;
+            this.groupBox1.Text = "侦查";
+            // 
+            // btn_detect_stop
+            // 
+            this.btn_detect_stop.Location = new System.Drawing.Point(102, 85);
+            this.btn_detect_stop.Name = "btn_detect_stop";
+            this.btn_detect_stop.Size = new System.Drawing.Size(69, 22);
+            this.btn_detect_stop.TabIndex = 12;
+            this.btn_detect_stop.Text = "停 止";
+            this.btn_detect_stop.UseVisualStyleBackColor = true;
+            this.btn_detect_stop.Click += new System.EventHandler(this.btn_detect_stop_Click);
+            // 
+            // btn_detect_start
+            // 
+            this.btn_detect_start.Location = new System.Drawing.Point(6, 85);
+            this.btn_detect_start.Name = "btn_detect_start";
+            this.btn_detect_start.Size = new System.Drawing.Size(69, 22);
+            this.btn_detect_start.TabIndex = 11;
+            this.btn_detect_start.Text = "开 始";
+            this.btn_detect_start.UseVisualStyleBackColor = true;
+            this.btn_detect_start.Click += new System.EventHandler(this.btn_detect_start_Click);
+            // 
+            // txt_detect_count
+            // 
+            this.txt_detect_count.Location = new System.Drawing.Point(53, 44);
+            this.txt_detect_count.MaxLength = 2;
+            this.txt_detect_count.Name = "txt_detect_count";
+            this.txt_detect_count.Size = new System.Drawing.Size(26, 21);
+            this.txt_detect_count.TabIndex = 5;
+            this.txt_detect_count.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.w_count_KeyPress);
+            // 
+            // label28
+            // 
+            this.label28.AutoSize = true;
+            this.label28.Location = new System.Drawing.Point(6, 47);
+            this.label28.Name = "label28";
+            this.label28.Size = new System.Drawing.Size(41, 12);
+            this.label28.TabIndex = 4;
+            this.label28.Text = "页数：";
+            // 
+            // label26
+            // 
+            this.label26.AutoSize = true;
+            this.label26.Location = new System.Drawing.Point(85, 23);
+            this.label26.Name = "label26";
+            this.label26.Size = new System.Drawing.Size(11, 12);
+            this.label26.TabIndex = 3;
+            this.label26.Text = ":";
+            // 
+            // txt_detect_y
+            // 
+            this.txt_detect_y.Location = new System.Drawing.Point(102, 20);
+            this.txt_detect_y.MaxLength = 3;
+            this.txt_detect_y.Name = "txt_detect_y";
+            this.txt_detect_y.Size = new System.Drawing.Size(31, 21);
+            this.txt_detect_y.TabIndex = 2;
+            this.txt_detect_y.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.w_count_KeyPress);
+            // 
+            // txt_detect_x
+            // 
+            this.txt_detect_x.Location = new System.Drawing.Point(53, 19);
+            this.txt_detect_x.MaxLength = 1;
+            this.txt_detect_x.Name = "txt_detect_x";
+            this.txt_detect_x.Size = new System.Drawing.Size(26, 21);
+            this.txt_detect_x.TabIndex = 1;
+            this.txt_detect_x.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.w_count_KeyPress);
+            // 
+            // label24
+            // 
+            this.label24.AutoSize = true;
+            this.label24.Location = new System.Drawing.Point(6, 22);
+            this.label24.Name = "label24";
+            this.label24.Size = new System.Drawing.Size(41, 12);
+            this.label24.TabIndex = 0;
+            this.label24.Text = "起点：";
+            // 
             // btn_galaxy_open
             // 
-            this.btn_galaxy_open.Location = new System.Drawing.Point(243, 120);
+            this.btn_galaxy_open.Location = new System.Drawing.Point(83, 122);
             this.btn_galaxy_open.Name = "btn_galaxy_open";
             this.btn_galaxy_open.Size = new System.Drawing.Size(75, 22);
             this.btn_galaxy_open.TabIndex = 9;
@@ -1073,7 +1240,7 @@ namespace feeling
             // 
             // btn_galaxy_save
             // 
-            this.btn_galaxy_save.Location = new System.Drawing.Point(168, 120);
+            this.btn_galaxy_save.Location = new System.Drawing.Point(6, 122);
             this.btn_galaxy_save.Name = "btn_galaxy_save";
             this.btn_galaxy_save.Size = new System.Drawing.Size(69, 22);
             this.btn_galaxy_save.TabIndex = 8;
@@ -1092,7 +1259,7 @@ namespace feeling
             // 
             // btn_galaxy_stop
             // 
-            this.btn_galaxy_stop.Location = new System.Drawing.Point(87, 120);
+            this.btn_galaxy_stop.Location = new System.Drawing.Point(81, 87);
             this.btn_galaxy_stop.Name = "btn_galaxy_stop";
             this.btn_galaxy_stop.Size = new System.Drawing.Size(75, 22);
             this.btn_galaxy_stop.TabIndex = 7;
@@ -1111,7 +1278,7 @@ namespace feeling
             // 
             // btn_galaxy_start
             // 
-            this.btn_galaxy_start.Location = new System.Drawing.Point(8, 120);
+            this.btn_galaxy_start.Location = new System.Drawing.Point(6, 87);
             this.btn_galaxy_start.Name = "btn_galaxy_start";
             this.btn_galaxy_start.Size = new System.Drawing.Size(69, 22);
             this.btn_galaxy_start.TabIndex = 6;
@@ -1319,6 +1486,30 @@ namespace feeling
             this.btn_gather_save.Text = "集中保存";
             this.btn_gather_save.UseVisualStyleBackColor = true;
             this.btn_gather_save.Click += new System.EventHandler(this.btn_gather_save_Click);
+            // 
+            // w_gather1
+            // 
+            this.w_gather1.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.w_gather1.Location = new System.Drawing.Point(563, 0);
+            this.w_gather1.MyCount = 0;
+            this.w_gather1.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_gather1.MyOptions")));
+            this.w_gather1.MyPlanet = "";
+            this.w_gather1.MyTitle = "集中2";
+            this.w_gather1.Name = "w_gather1";
+            this.w_gather1.Size = new System.Drawing.Size(200, 150);
+            this.w_gather1.TabIndex = 51;
+            // 
+            // w_gather0
+            // 
+            this.w_gather0.BackColor = System.Drawing.SystemColors.ControlLight;
+            this.w_gather0.Location = new System.Drawing.Point(357, 0);
+            this.w_gather0.MyCount = 0;
+            this.w_gather0.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_gather0.MyOptions")));
+            this.w_gather0.MyPlanet = "";
+            this.w_gather0.MyTitle = "集中1";
+            this.w_gather0.Name = "w_gather0";
+            this.w_gather0.Size = new System.Drawing.Size(200, 150);
+            this.w_gather0.TabIndex = 50;
             // 
             // cbox_auto_transfer
             // 
@@ -1660,95 +1851,6 @@ namespace feeling
             this.label1.TabIndex = 10;
             this.label1.Text = "账 号:";
             // 
-            // w_pirate4
-            // 
-            this.w_pirate4.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.w_pirate4.Location = new System.Drawing.Point(846, 0);
-            this.w_pirate4.MyCount = 0;
-            this.w_pirate4.MyMode = 0;
-            this.w_pirate4.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate4.MyOptions")));
-            this.w_pirate4.MyPlanet = "";
-            this.w_pirate4.MyTitle = "银河系5";
-            this.w_pirate4.Name = "w_pirate4";
-            this.w_pirate4.Size = new System.Drawing.Size(150, 150);
-            this.w_pirate4.TabIndex = 4;
-            // 
-            // w_pirate3
-            // 
-            this.w_pirate3.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.w_pirate3.Location = new System.Drawing.Point(693, 0);
-            this.w_pirate3.MyCount = 0;
-            this.w_pirate3.MyMode = 0;
-            this.w_pirate3.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate3.MyOptions")));
-            this.w_pirate3.MyPlanet = "";
-            this.w_pirate3.MyTitle = "银河系4";
-            this.w_pirate3.Name = "w_pirate3";
-            this.w_pirate3.Size = new System.Drawing.Size(150, 150);
-            this.w_pirate3.TabIndex = 3;
-            // 
-            // w_pirate2
-            // 
-            this.w_pirate2.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.w_pirate2.Location = new System.Drawing.Point(539, 0);
-            this.w_pirate2.MyCount = 0;
-            this.w_pirate2.MyMode = 0;
-            this.w_pirate2.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate2.MyOptions")));
-            this.w_pirate2.MyPlanet = "";
-            this.w_pirate2.MyTitle = "银河系3";
-            this.w_pirate2.Name = "w_pirate2";
-            this.w_pirate2.Size = new System.Drawing.Size(150, 150);
-            this.w_pirate2.TabIndex = 2;
-            // 
-            // w_pirate1
-            // 
-            this.w_pirate1.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.w_pirate1.Location = new System.Drawing.Point(386, 0);
-            this.w_pirate1.MyCount = 0;
-            this.w_pirate1.MyMode = 0;
-            this.w_pirate1.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate1.MyOptions")));
-            this.w_pirate1.MyPlanet = "";
-            this.w_pirate1.MyTitle = "银河系2";
-            this.w_pirate1.Name = "w_pirate1";
-            this.w_pirate1.Size = new System.Drawing.Size(150, 150);
-            this.w_pirate1.TabIndex = 1;
-            // 
-            // w_pirate0
-            // 
-            this.w_pirate0.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.w_pirate0.Location = new System.Drawing.Point(233, 0);
-            this.w_pirate0.MyCount = 0;
-            this.w_pirate0.MyMode = 0;
-            this.w_pirate0.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_pirate0.MyOptions")));
-            this.w_pirate0.MyPlanet = "";
-            this.w_pirate0.MyTitle = "银河系1";
-            this.w_pirate0.Name = "w_pirate0";
-            this.w_pirate0.Size = new System.Drawing.Size(150, 150);
-            this.w_pirate0.TabIndex = 0;
-            // 
-            // w_gather1
-            // 
-            this.w_gather1.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.w_gather1.Location = new System.Drawing.Point(563, 0);
-            this.w_gather1.MyCount = 0;
-            this.w_gather1.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_gather1.MyOptions")));
-            this.w_gather1.MyPlanet = "";
-            this.w_gather1.MyTitle = "集中2";
-            this.w_gather1.Name = "w_gather1";
-            this.w_gather1.Size = new System.Drawing.Size(200, 150);
-            this.w_gather1.TabIndex = 51;
-            // 
-            // w_gather0
-            // 
-            this.w_gather0.BackColor = System.Drawing.SystemColors.ControlLight;
-            this.w_gather0.Location = new System.Drawing.Point(357, 0);
-            this.w_gather0.MyCount = 0;
-            this.w_gather0.MyOptions = ((System.Collections.Generic.List<string>)(resources.GetObject("w_gather0.MyOptions")));
-            this.w_gather0.MyPlanet = "";
-            this.w_gather0.MyTitle = "集中1";
-            this.w_gather0.Name = "w_gather0";
-            this.w_gather0.Size = new System.Drawing.Size(200, 150);
-            this.w_gather0.TabIndex = 50;
-            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -1773,6 +1875,8 @@ namespace feeling
             this.tab_haidao.PerformLayout();
             this.w_galaxy.ResumeLayout(false);
             this.w_galaxy.PerformLayout();
+            this.groupBox1.ResumeLayout(false);
+            this.groupBox1.PerformLayout();
             this.w_imperium.ResumeLayout(false);
             this.w_imperium.PerformLayout();
             this.w_oper.ResumeLayout(false);
@@ -1931,5 +2035,14 @@ namespace feeling
         private System.Windows.Forms.Button btn_gather_start;
         private System.Windows.Forms.CheckBox cbox_auto_gather;
         private System.Windows.Forms.Button btn_gather_read;
+        private System.Windows.Forms.GroupBox groupBox1;
+        private System.Windows.Forms.TextBox txt_detect_x;
+        private System.Windows.Forms.Label label24;
+        private System.Windows.Forms.TextBox txt_detect_y;
+        private System.Windows.Forms.Label label26;
+        private System.Windows.Forms.Label label28;
+        private System.Windows.Forms.TextBox txt_detect_count;
+        private System.Windows.Forms.Button btn_detect_stop;
+        private System.Windows.Forms.Button btn_detect_start;
     }
 }

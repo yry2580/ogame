@@ -361,5 +361,12 @@ namespace feeling
             script += $"doc.querySelector(\"input[onclick*='getyuanzhengziyuan'][value*='领取资源']\").click()";
             return script;
         }
+
+        public static string SpyGalaxyDetect(int z)
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelectorAll(\"#galaxypage>tbody>tr>th>a>img[title='侦查']\")[{z}].click()";
+            return script;
+        }
     }
 }

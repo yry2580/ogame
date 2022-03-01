@@ -26,6 +26,7 @@ namespace feeling
         public volatile bool IsExpeditionWorking = false;
         public volatile bool IsUserWorking = false;
         public volatile bool IsTransferWorking = false;
+        public volatile bool IsDetectWorking = false;
 
         public volatile string MyAddress = "";
         public DelegateStatusChange StatusChangeEvent;
@@ -1788,7 +1789,7 @@ namespace feeling
         {
             int n = 0;
             string source;
-            
+
             do
             {
                 try
@@ -1937,7 +1938,7 @@ namespace feeling
             string crossName = "";
             var ret = false;
             bool lastError = false;
-            
+
             try
             {
                 OperTipsEvent.Invoke(OperStatus.System, $"收集用户开始");
@@ -2072,6 +2073,7 @@ namespace feeling
             StopScanUser();
             StopTransfer();
             StopGather();
+            StopDetect();
             SwitchStatus(OperStatus.None);
         }
 
@@ -2289,7 +2291,7 @@ namespace feeling
                     FrameRunJs(NativeScript.SetTarget(mission.X, mission.Y, mission.Z, (int)PlanetType.Moon));
                     await Task.Delay(500);
                     source = await GetFrameSourceAsync();
-                    
+
                     // 设置目标继续
                     FrameRunJs(NativeScript.SetTargetNext());
                     await Task.Delay(1500);
@@ -2347,5 +2349,166 @@ namespace feeling
             SwitchStatus(OperStatus.None);
         }
 
+        internal void StartDetect(int x, int y, int count)
+        {
+            SwitchStatus(OperStatus.System);
+            IsDetectWorking = true;
+            IsWorking = true;
+            Task.Run(() =>
+            {
+                DoDetect(x, y, count);
+            });
+        }
+
+        internal void StopDetect()
+        {
+            IsDetectWorking = false;
+            if (!IsWorking) return;
+            IsWorking = false;
+        }
+
+        protected async void DoDetect(int x, int y, int count)
+        {
+            string source = "";
+
+            try
+            {
+                OperTipsEvent.Invoke(OperStatus.System, $"开始侦查任务{x}:{y}-{count}");
+                NativeLog.Info($"开始侦查{x}:{y}-{count}");
+
+                if (x <= 0 || x > 9 || y <= 0 || y > 499 || count <= 0)
+                {
+                    OperTipsEvent.Invoke(OperStatus.System, $"侦查任务不符合格式");
+                    NativeLog.Info("侦查任务不符合格式");
+                    StopDetect();
+                    SwitchStatus(OperStatus.None);
+                    return;
+                }
+
+                Reload();
+
+                if (HtmlParser.IsGameUrl(MyAddress))
+                {
+                    source = await GetFrameSourceAsync();
+                    if (HtmlParser.HasTutorial(source))
+                    {
+                        FrameRunJs(NativeScript.TutorialConfirm());
+                        await Task.Delay(1500);
+                        source = await GetFrameSourceAsync();
+                        if (!HtmlParser.IsInGame(source))
+                        {
+                            OperTipsEvent.Invoke(OperStatus.System, $"侦查任务，没有登录");
+                            NativeLog.Info("侦查任务，没有登录");
+                            StopDetect();
+                            SwitchStatus(OperStatus.None);
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+                    OperTipsEvent.Invoke(OperStatus.System, $"集中任务结束，没有登录");
+                    NativeLog.Info("集中任务结束，没有登录");
+                    StopDetect();
+                    SwitchStatus(OperStatus.None);
+                    return;
+                }
+
+                FrameRunJs(NativeScript.ToGalaxy());
+                Thread.Sleep(1500);
+
+                int _x = x;
+                int _y = y - 1;
+
+                for (int i = 0; i < count; i++)
+                {
+                    _y++;
+                    if (_y > 499)
+                    {
+                        _y = 1;
+                        _x++;
+                    }
+
+                    if (_x <= 9)
+                    {
+                        await DoDetectTask(_x, _y);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                NativeLog.Error($"DoDetect catch {ex.Message}");
+            }
+
+            StopDetect();
+            SwitchStatus(OperStatus.None);
+        }
+
+        private async Task DoDetectTask(int x, int y, bool isRetry = false)
+        {
+            try
+            {
+                await Task.Delay(1000);
+                if (!IsDetectWorking) return;
+
+                NativeLog.Info($"DoDetectTask {x}:{y}-{isRetry}");
+
+                string source = await GetFrameSourceAsync();
+                if (HtmlParser.HasTutorial(source))
+                {
+                    FrameRunJs(NativeScript.TutorialConfirm());
+                    await Task.Delay(1500);
+                    source = await GetFrameSourceAsync();
+                }
+
+                // if not in galaxy page, go to galaxy page
+                if (!HtmlParser.IsGalaxyPage(source))
+                {
+                    FrameRunJs(NativeScript.ToGalaxy());
+                    Thread.Sleep(1500);
+                }
+
+                FrameRunJs(NativeScript.RefreshGalaxy(x, y));
+                await Task.Delay(200);
+                FrameRunJs(NativeScript.RefreshGalaxySubmit());
+                await Task.Delay(1500);
+                source = await GetFrameSourceAsync();
+                var mat = Regex.Match(source, $@"太阳系 {x}:{y}");
+                if (!mat.Success)
+                {
+                    if (!isRetry)
+                    {
+                        await DoDetectTask(x, y, true);
+                    }
+
+                    return;
+                }
+
+                var ret = HtmlParser.ParseGalaxyDelectCount(source, out int count);
+                if (!ret)
+                {
+                    if (!isRetry)
+                    {
+                        await DoDetectTask(x, y, true);
+                    }
+
+                    return;
+                }
+
+                NativeLog.Info($"DoDetectTask count:{count}");
+                for (int i = 0; i < count; i++)
+                {
+                    if (!IsDetectWorking) return;
+
+                    NativeLog.Info($"DoDetectTask count:{count} i: {i}");
+                    FrameRunJs(NativeScript.SpyGalaxyDetect(i));
+                    await Task.Delay(1000);
+                }
+            }
+            catch(Exception ex)
+            {
+                NativeLog.Error($"DoDetectTask catch {ex.Message}");
+            }
+        }
     }
 }

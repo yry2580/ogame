@@ -515,6 +515,7 @@ namespace feeling
                         cbox_auto_transfer.Enabled = false;
                         SetQuickBtn(false);
                         SetGatherButton(false);
+                        SetDetectButton(false);
                         break;
                     case OperStatus.Galaxy:
                         btn_galaxy_start.Enabled = false;
@@ -529,6 +530,7 @@ namespace feeling
                         cbox_auto_transfer.Enabled = false;
                         SetQuickBtn(false);
                         SetGatherButton(false);
+                        SetDetectButton(false);
                         break;
                     case OperStatus.Expedition:
                         btn_galaxy_start.Enabled = false;
@@ -543,6 +545,7 @@ namespace feeling
                         cbox_auto_transfer.Enabled = false;
                         SetQuickBtn(false);
                         SetGatherButton(false);
+                        SetDetectButton(false);
                         break;
                     case OperStatus.Pirate:
                         btn_galaxy_start.Enabled = false;
@@ -557,6 +560,7 @@ namespace feeling
                         cbox_auto_transfer.Enabled = false;
                         SetQuickBtn(false);
                         SetGatherButton(false);
+                        SetDetectButton(false);
                         break;
                     case OperStatus.None:
                     default:
@@ -572,6 +576,7 @@ namespace feeling
                         cbox_auto_transfer.Enabled = true;
                         SetQuickBtn(true);
                         SetGatherButton(true);
+                        SetDetectButton(true);
                         enabled = true;
                         break;
                 }
@@ -708,6 +713,17 @@ namespace feeling
             btn_tx_planet.Enabled = enabled;
             cbox_tx_auto.Enabled = enabled;
             btn_tx_stop.Enabled = !enabled && canStop;
+        }
+
+        public void SetDetectButton(bool enabled)
+        {
+            bool canStop = NativeController.Instance.IsDetectWorking && !enabled;
+
+            btn_detect_start.Enabled = enabled;
+            btn_detect_stop.Enabled = canStop;
+            txt_detect_x.Enabled = enabled;
+            txt_detect_y.Enabled = enabled;
+            txt_detect_count.Enabled = enabled;
         }
 
         protected void RedrawAccount()
@@ -2707,6 +2723,78 @@ namespace feeling
             {
                 MessageBox.Show($"读取还原配置配置失败");
             }
+        }
+
+        private void btn_detect_start_Click(object sender, EventArgs e)
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                MessageBox.Show("当前正在忙，暂不能操作");
+                return;
+            }
+
+            int x = 0;
+            int y = 0;
+            int count = 0;
+
+            var text = txt_detect_x.Text.Trim();
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                MessageBox.Show("请输入侦查开始坐标 X");
+                return;
+            }
+
+            x = int.Parse(text);
+
+            text = txt_detect_y.Text.Trim();
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                MessageBox.Show("请输入侦查开始坐标 Y");
+                return;
+            }
+
+            y = int.Parse(text);
+
+            text = txt_detect_count.Text.Trim();
+            if (string.IsNullOrWhiteSpace(text))
+            {
+                MessageBox.Show("请输入侦查页数");
+                return;
+            }
+
+            count = int.Parse(text);
+
+            if (x <= 0 || x > 9 || y <= 0 || y > 499)
+            {
+                MessageBox.Show("请输入合法坐标");
+                return;
+            }
+
+            if (count <= 0 || count > 10)
+            {
+                MessageBox.Show("请页数不能小于0或者大于10");
+                return;
+            }
+
+            var ret = MessageBox.Show($"确定侦查吗", "提示", MessageBoxButtons.YesNo);
+            if (DialogResult.Yes != ret) return;
+
+            NativeController.Instance.StartDetect(x, y, count);
+            
+            Redraw();
+        }
+
+        private void btn_detect_stop_Click(object sender, EventArgs e)
+        {
+            if (OperStatus.System != NativeController.Instance.MyOperStatus || 
+                ! NativeController.Instance.IsDetectWorking)
+            {
+                MessageBox.Show("当前不是侦查状态");
+                return;
+            }
+
+            NativeController.Instance.StopScanGalaxy();
+            Redraw();
         }
     }
 }

@@ -224,6 +224,11 @@ namespace feeling
             return false;
         }
 
+        public static bool IsGalaxyPage(string source)
+        {
+            return source.Contains("id=\"galaxypage\"");
+        }
+
         public static bool ParseGalaxyPage(string source, ref IDictionary<string, string> dict, OgameParser parser = null)
         {
 #if !NET45
@@ -521,6 +526,25 @@ namespace feeling
 #endif
             if (text == "0") return true;
             return false;
+        }
+
+        public static bool ParseGalaxyDelectCount(string source, out int count)
+        {
+            count = 0;
+#if !NET45
+            if (string.IsNullOrWhiteSpace(source)) return false;
+            var parser = new OgameParser();
+            parser.LoadHtml(source);
+            var nodes = parser?.QuerySelectorAll("#galaxypage>tbody>tr>th>a>img[title='侦查']");
+            if (null == nodes) return false;
+
+            count = nodes.Length;
+
+            return true;
+#else
+            return false;
+
+#endif
         }
     }
 }
