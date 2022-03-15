@@ -1601,7 +1601,7 @@ namespace feeling
             {
                 label.Text = $"{DateTime.Now:G}|自动海盗{index + 1}-开{(missionCfg.IsCross ? "-多维" : "")}，{Math.Ceiling(val)}分钟";
 
-                if (val <= 50 && val >= 10)
+                if (val <= 40 && val >= 10)
                 {
                     await DoAutoTransfer(index);
                 }
@@ -2546,7 +2546,6 @@ namespace feeling
             var now = DateTime.Now;
 
             if (!NativeController.Instance.IsAutoTransfer) return;
-            if (now.Hour < 20) return;
             if (OperStatus.None != NativeController.Instance.MyOperStatus) return;
 
             DateTime lastTime = NativeController.Instance.LastTransferTime;
@@ -2558,6 +2557,21 @@ namespace feeling
 
             if (lastTime.Date.Equals(now.Date))
             {
+                if (now.Hour >= 12 && now.Hour < 20)
+                {
+                    return;
+                }
+
+                if (lastTime.Hour >= 20)
+                {
+                    return;
+                }
+
+                if (lastTime.Hour < 12 && now.Hour < 20)
+                {
+                    return;
+                }
+
                 return;
             }
 
