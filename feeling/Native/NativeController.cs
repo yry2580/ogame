@@ -153,17 +153,19 @@ namespace feeling
             SwitchStatus(OperStatus.Galaxy);
 
             Reload();
+
             FrameRunJs(NativeScript.ToGalaxy());
             Thread.Sleep(1500);
 
-            int universe = 0;
-            var mat = Regex.Match(MyAddress, $@"u(?<universe>\S*).cicihappy.com");
+            var universeName = "";
+
+            var mat = Regex.Match(MyAddress, $@"://(?<universe>\S*).cicihappy.com");
             if (mat.Success)
             {
-                universe = int.Parse(mat.Groups["universe"].Value);
+                universeName = mat.Groups["universe"].Value;
             }
 
-            if (universe == 0)
+            if (string.IsNullOrWhiteSpace(universeName))
             {
                 StopScanGalaxy();
                 if (CanNotify)
@@ -173,7 +175,6 @@ namespace feeling
                 return;
             }
 
-            var universeName = $"u{universe}";
             mScanUniverse = universeName;
 
             if (mGalaxy.UniverseName != universeName)
