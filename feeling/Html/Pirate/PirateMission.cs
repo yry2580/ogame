@@ -49,6 +49,7 @@ namespace feeling
                 {
                     if (!mPos.Parse(e)) return;
                     if (e.Contains("海盗王")) return;
+                    if (e.Contains("待建")) return;
 
                     Mission mission = new Mission();
                     mission.AddFleet(ShipType.SC, count);
