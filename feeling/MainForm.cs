@@ -42,6 +42,8 @@ namespace feeling
 
         bool mIsBusy = false;
 
+        DateTime mAutoStartTime = DateTime.Now.AddDays(-1);
+
 #if !NET45
         OgClient mClient;
 #endif
@@ -122,13 +124,27 @@ namespace feeling
             }
         }
 
+        private void UpdateDayStartTime()
+        {
+            var now = DateTime.Now;
+
+            if (mAutoStartTime.Date.Equals(now.Date)) return;
+
+            var minute = new Random().Next(60);
+
+            var desc = $"{now:yyyy-MM-dd} 05:{minute:D2}:00";
+            mAutoStartTime = Convert.ToDateTime(desc);
+        }
+
         private bool CheckCanAuto()
         {
             var dt = DateTime.Now;
 
             if (NativeController.User.MorningIdle)
             {
-                if (dt.Hour >= 23 || dt.Hour < 5)
+                UpdateDayStartTime();
+
+                if (dt.Hour >= 23 || dt.CompareTo(mAutoStartTime) < 0)
                 {
                     NativeLog.Info("凌晨空闲模式");
                     return false;
