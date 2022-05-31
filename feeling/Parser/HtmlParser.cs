@@ -141,6 +141,23 @@ namespace feeling
             var idx = trList.FindIndex(e => e.Id == "fleetdelaybox");
             var tr = trList[idx + 1];
             var TextContent = tr.TextContent;
+
+            var reg = new Regex(@"舰队.{0,1}(?<jd>\d{1,2}).{0,1}/.{0,1}(?<jdMax>\d{1,2})");
+
+            var _tr = trList.Find(e => reg.IsMatch(e.TextContent));
+            if (null == _tr)
+            {
+                trList = parser.QuerySelectorAll("#pagecontent>center>table>tbody>tr>td>table>tbody>tr").ToList();
+                _tr = trList.Find(e => reg.IsMatch(e.TextContent));
+                if (null != _tr)
+                {
+                    TextContent = _tr.TextContent;
+                }
+            }
+            else
+            {
+                TextContent = _tr.TextContent;
+            }
 #else
             var node = parser?.QuerySelector("//*[@id='fleetdelaybox']");
             if (null == node) return false;
@@ -162,7 +179,8 @@ namespace feeling
                 return true;
             }
 
-            mat = Regex.Match(TextContent, @"舰队.{0,1}(?<jd>\d{1,2}).{0,1}/.{0,1}(?<jdMax>\d{1,2})");
+            // mat = Regex.Match(TextContent, @"舰队.{0,1}(?<jd>\d{1,2}).{0,1}/.{0,1}(?<jdMax>\d{1,2})");
+            mat = reg.Match(TextContent);
             if (mat.Success)
             {
                 fleetQueue = new FleetQueue

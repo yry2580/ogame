@@ -1594,6 +1594,10 @@ namespace feeling
             if (isClose)
             {
                 label.Text = $"{DateTime.Now:G}|自动海盗{index + 1}-关{(missionCfg.IsCross ? "-多维": "")}，{Math.Ceiling(val)}分钟";
+                if (!missionCfg.IsCross)
+                {
+                    await DoAutoTransfer(index);
+                }
                 return;
             }
 
