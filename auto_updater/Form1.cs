@@ -77,12 +77,21 @@ namespace auto_updater
             Thread.Sleep(500);
 
             var dir = AppDomain.CurrentDomain.BaseDirectory;
-            var confg = new UpdateConfig
+/*            var confg = new UpdateConfig
             {
                 AppName = "feeling.exe",
                 VersionLocalPath = dir + "appsettings.json",
                 VersionUrl = "http://bkbibi.teammvp.beer/netcore/feeling/version.json",
                 PatchNetDir = "http://bkbibi.teammvp.beer/netcore/feeling/patch/",
+                IsUpdater = true,
+            };*/
+
+            var confg = new UpdateConfig
+            {
+                AppName = "BibiDriver.exe",
+                VersionLocalPath = dir + "appsettings.json",
+                VersionUrl = "http://bkbibi.teammvp.beer/netcore/driver/version.json",
+                PatchNetDir = "http://bkbibi.teammvp.beer/netcore/driver/patch/",
                 IsUpdater = true,
             };
 

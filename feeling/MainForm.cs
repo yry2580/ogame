@@ -114,6 +114,7 @@ namespace feeling
                     await doAutoExpedtion(1);
                     await doAutoPirate(1);
                     await doAutoImperium();
+                    await doOneClickExpedition();
                 }
 
                 SendData();
@@ -729,6 +730,7 @@ namespace feeling
             btn_tx_planet.Enabled = enabled;
             cbox_tx_auto.Enabled = enabled;
             btn_tx_stop.Enabled = !enabled && canStop;
+            btn_tx_one_click_expedition.Enabled = enabled;
         }
 
         public void SetDetectButton(bool enabled)
@@ -1370,14 +1372,14 @@ namespace feeling
 
             if (index == 1)
             {
-                delta = DateTime.Now - NativeController.Instance.LastExeditionTime1;
+                delta = DateTime.Now - NativeController.Instance.LastExpeditionTime1;
                 isClose = !cbox_tx_auto1.Checked || !mAutoExpedition1;
                 label = lb_tx_info1;
                 val = mExpeditionInterval1 - delta.TotalMinutes;
             }
             else
             {
-                delta = DateTime.Now - NativeController.Instance.LastExeditionTime;
+                delta = DateTime.Now - NativeController.Instance.LastExpeditionTime;
                 isClose = !cbox_tx_auto.Checked || !mAutoExpedition;
                 label = lb_tx_info;
                 val = mExpeditionInterval - delta.TotalMinutes;
@@ -1905,7 +1907,7 @@ namespace feeling
             
             mIsBusy = false;
 
-            await DoImperium(true);
+            await DoImperium(true);                                                                                    
         }
 
         private async Task DoImperium(bool isAuto = false)
@@ -2828,6 +2830,64 @@ namespace feeling
             }
 
             NativeController.Instance.StopScanGalaxy();
+            Redraw();
+        }
+
+        private async Task doOneClickExpedition()
+        {
+            var delta = DateTime.Now - NativeController.Instance.LastOneClickExpeditionTime;
+            var val = 40 - delta.TotalMinutes;
+            val = val < 0 ? 0 : val;
+
+            if (mIsBusy) return;
+
+            if (!cbox_tx_one_click_expedition.Checked)
+            {
+                lb_one_click_expedition.Text = $"{DateTime.Now:G}|一键远征-关，{Math.Ceiling(val)}分钟";
+                return;
+            }
+
+            if (val > 0)
+            {
+                lb_one_click_expedition.Text = $"{DateTime.Now:G}|一键远征-开，{Math.Ceiling(val)}分钟";
+                return;
+            }
+
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                lb_one_click_expedition.Text = $"{DateTime.Now:G}|其他操作正忙";
+                return;
+            }
+
+            if (!Network.IsConnected)
+            {
+                lb_one_click_expedition.Text = $"{DateTime.Now:G}|网络异常";
+                return;
+            }
+
+            mIsBusy = true;
+
+            NativeController.Instance.CanNotify = false;
+
+            await BackUniverse();
+            await SureLogin();
+
+            mIsBusy = false;
+
+            NativeController.Instance.StartOneClickExpedition();
+
+            Redraw();
+        }
+
+        private void btn_tx_one_click_expedition_Click(object sender, EventArgs e)
+        {
+            if (OperStatus.None != NativeController.Instance.MyOperStatus)
+            {
+                MessageBox.Show("当前正在忙，暂不能操作");
+                return;
+            }
+
+            NativeController.Instance.StartOneClickExpedition();
             Redraw();
         }
     }

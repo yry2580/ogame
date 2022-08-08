@@ -368,5 +368,19 @@ namespace feeling
             script += $"doc.querySelectorAll(\"#galaxypage>tbody>tr>th>a>img[title='侦查']\")[{z}].click()";
             return script;
         }
+
+        public static string OnClickExpedition()
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"#pagecontent a[href='fleetexpeditiongroup.php']\").click()";
+            return script;
+        }
+
+        public static string OnClickDWExpedition()
+        {
+            var script = "doc = window.parent.frames['Hauptframe'].document;";
+            script += $"doc.querySelector(\"#pagecontent input[name='startdwexpedition'][type='button']\").click()";
+            return script;
+        }
     }
 }

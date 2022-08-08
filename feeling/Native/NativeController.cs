@@ -52,8 +52,8 @@ namespace feeling
         // auto
         public bool IsAutoExpedition = false;
         public bool IsAutoExpedition1 = false;
-        public DateTime LastExeditionTime = DateTime.Now;
-        public DateTime LastExeditionTime1 = DateTime.Now;
+        public DateTime LastExpeditionTime = DateTime.Now;
+        public DateTime LastExpeditionTime1 = DateTime.Now;
 
         public bool IsAutoPirate = false;
         public bool IsAutoPirate1 = false;
@@ -74,6 +74,7 @@ namespace feeling
         public DateTime LastTransferTime1 = DateTime.Now.AddDays(-1);
 
         public DateTime LastGatherTime = DateTime.Now.AddDays(-1);
+        public DateTime LastOneClickExpeditionTime = DateTime.Now;
 
         public void HandleWebBrowserFrameEnd(string url)
         {
@@ -819,11 +820,11 @@ namespace feeling
         {
             if (index == 1)
             {
-                LastExeditionTime1 = DateTime.Now;
+                LastExpeditionTime1 = DateTime.Now;
             }
             else
             {
-                LastExeditionTime = DateTime.Now;
+                LastExpeditionTime = DateTime.Now;
             }
         }
 
@@ -1837,7 +1838,7 @@ namespace feeling
             if (IsAutoExpedition && null != xMissionCfg)
             {
                 hasAuto = true;
-                delta = now - LastExeditionTime;
+                delta = now - LastExpeditionTime;
                 val = xMissionCfg.Interval - delta.TotalMinutes;
                 val = val < 0 ? 0 : val;
                 min = Math.Min(val, min);
@@ -1847,7 +1848,7 @@ namespace feeling
             if (IsAutoExpedition1 && null != xMissionCfg1)
             {
                 hasAuto = true;
-                delta = now - LastExeditionTime1;
+                delta = now - LastExpeditionTime1;
                 val = xMissionCfg1.Interval - delta.TotalMinutes;
                 val = val < 0 ? 0 : val;
                 min = Math.Min(val, min);
@@ -1895,7 +1896,7 @@ namespace feeling
 
             if (IsAutoExpedition)
             {
-                LastExeditionTime = dt;
+                LastExpeditionTime = dt;
             }
 
             if (IsAutoPirate)
@@ -1905,7 +1906,7 @@ namespace feeling
 
             if (IsAutoExpedition1)
             {
-                LastExeditionTime1 = dt;
+                LastExpeditionTime1 = dt;
             }
 
             if (IsAutoPirate1)
@@ -2509,6 +2510,108 @@ namespace feeling
             catch(Exception ex)
             {
                 NativeLog.Error($"DoDetectTask catch {ex.Message}");
+            }
+        }
+
+        internal void StartOneClickExpedition()
+        {
+            IsWorking = true;
+            SwitchStatus(OperStatus.System);
+            Task.Run(() =>
+            {
+                DoOneClickExpedition();
+            });
+        }
+
+        protected async void DoOneClickExpedition()
+        {
+            string source = "";
+
+            try
+            {
+                OperTipsEvent.Invoke(OperStatus.System, $"开始一键远征");
+                NativeLog.Info("开始一键远征");
+
+                Reload();
+
+                if (HtmlParser.IsGameUrl(MyAddress))
+                {
+                    source = await GetFrameSourceAsync();
+                    if (HtmlParser.HasTutorial(source))
+                    {
+                        FrameRunJs(NativeScript.TutorialConfirm());
+                        await Task.Delay(1500);
+                        source = await GetFrameSourceAsync();
+                        if (!HtmlParser.IsInGame(source))
+                        {
+                            OperTipsEvent.Invoke(OperStatus.System, $"一键远征结束，没有登录");
+                            NativeLog.Info("一键远征结束，没有登录");
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+                    OperTipsEvent.Invoke(OperStatus.System, $"一键远征结束，没有登录");
+                    NativeLog.Info("一键远征结束，没有登录");
+                    return;
+                }
+
+                await GoHome(1500);
+
+                /*Reload();
+                NativeLog.Info($"重载");*/
+
+                source = await GetFrameSourceAsync();
+                if (HtmlParser.HasTutorial(source, mHtmlParser))
+                {
+                    NativeLog.Info($"存在错误");
+                    OperTipsEvent.Invoke(OperStatus.System, $"存在错误");
+                    FrameRunJs(NativeScript.TutorialConfirm());
+                    await Task.Delay(1500);
+                }
+
+                // 切换舰队页面
+                GoFleetPage();
+                NativeLog.Info($"切换舰队");
+                source = await GetFrameSourceAsync();
+                if (HtmlParser.IsWechatCodePage(source))
+                {
+                    NativeLog.Info($"在微信验证页");
+                    OperTipsEvent.Invoke(OperStatus.System, $"在微信验证页");
+                    return;
+                }
+
+                // 一键远征
+                FrameRunJs(NativeScript.OnClickExpedition());
+                await Task.Delay(1500);
+
+                source = await GetFrameSourceAsync();
+
+                // 一键多维拉资源
+                FrameRunJs(NativeScript.OnClickDWExpedition());
+                await Task.Delay(1500);
+
+                // 查看结果
+                source = await GetFrameSourceAsync();
+                if (HtmlParser.HasTutorial(source, mHtmlParser))
+                {
+                    NativeLog.Info($"一键远征结束错误");
+                    OperTipsEvent.Invoke(OperStatus.System, $"一键远征结束");
+                    FrameRunJs(NativeScript.TutorialConfirm());
+                    await Task.Delay(1500);
+                }
+            }
+            catch (Exception ex)
+            {
+                NativeLog.Error($"DoOneClickExpedition catch {ex.Message}");
+            }
+            finally
+            {
+                OperTipsEvent.Invoke(OperStatus.System, $"一键远征结束");
+                NativeLog.Info($"一键远征结束");
+                LastOneClickExpeditionTime = DateTime.Now;
+                SwitchStatus(OperStatus.None);
             }
         }
     }

@@ -33,6 +33,8 @@ namespace feeling
             this.w_split_container = new System.Windows.Forms.SplitContainer();
             this.w_tab = new System.Windows.Forms.TabControl();
             this.tab_tanxian = new System.Windows.Forms.TabPage();
+            this.cbox_tx_one_click_expedition = new System.Windows.Forms.CheckBox();
+            this.btn_tx_one_click_expedition = new System.Windows.Forms.Button();
             this.lb_tx_interval1 = new System.Windows.Forms.Label();
             this.btn_tx_interval1 = new System.Windows.Forms.Button();
             this.txt_tx_interval1 = new System.Windows.Forms.TextBox();
@@ -183,6 +185,8 @@ namespace feeling
             this.label5 = new System.Windows.Forms.Label();
             this.label3 = new System.Windows.Forms.Label();
             this.label1 = new System.Windows.Forms.Label();
+            this.lb_one_click_expedition = new System.Windows.Forms.Label();
+            this.label30 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.w_split_container)).BeginInit();
             this.w_split_container.Panel2.SuspendLayout();
             this.w_split_container.SuspendLayout();
@@ -231,6 +235,8 @@ namespace feeling
             // 
             // tab_tanxian
             // 
+            this.tab_tanxian.Controls.Add(this.cbox_tx_one_click_expedition);
+            this.tab_tanxian.Controls.Add(this.btn_tx_one_click_expedition);
             this.tab_tanxian.Controls.Add(this.lb_tx_interval1);
             this.tab_tanxian.Controls.Add(this.btn_tx_interval1);
             this.tab_tanxian.Controls.Add(this.txt_tx_interval1);
@@ -290,6 +296,26 @@ namespace feeling
             this.tab_tanxian.TabIndex = 1;
             this.tab_tanxian.Text = "探险";
             this.tab_tanxian.UseVisualStyleBackColor = true;
+            // 
+            // cbox_tx_one_click_expedition
+            // 
+            this.cbox_tx_one_click_expedition.AutoSize = true;
+            this.cbox_tx_one_click_expedition.Location = new System.Drawing.Point(310, 113);
+            this.cbox_tx_one_click_expedition.Name = "cbox_tx_one_click_expedition";
+            this.cbox_tx_one_click_expedition.Size = new System.Drawing.Size(96, 16);
+            this.cbox_tx_one_click_expedition.TabIndex = 79;
+            this.cbox_tx_one_click_expedition.Text = "自动一键远征";
+            this.cbox_tx_one_click_expedition.UseVisualStyleBackColor = true;
+            // 
+            // btn_tx_one_click_expedition
+            // 
+            this.btn_tx_one_click_expedition.Location = new System.Drawing.Point(241, 109);
+            this.btn_tx_one_click_expedition.Name = "btn_tx_one_click_expedition";
+            this.btn_tx_one_click_expedition.Size = new System.Drawing.Size(63, 23);
+            this.btn_tx_one_click_expedition.TabIndex = 78;
+            this.btn_tx_one_click_expedition.Text = "一键远征";
+            this.btn_tx_one_click_expedition.UseVisualStyleBackColor = true;
+            this.btn_tx_one_click_expedition.Click += new System.EventHandler(this.btn_tx_one_click_expedition_Click);
             // 
             // lb_tx_interval1
             // 
@@ -487,7 +513,7 @@ namespace feeling
             // 
             // btn_tx_planet
             // 
-            this.btn_tx_planet.Location = new System.Drawing.Point(6, 77);
+            this.btn_tx_planet.Location = new System.Drawing.Point(0, 77);
             this.btn_tx_planet.Name = "btn_tx_planet";
             this.btn_tx_planet.Size = new System.Drawing.Size(50, 22);
             this.btn_tx_planet.TabIndex = 49;
@@ -509,7 +535,7 @@ namespace feeling
             // 
             this.tx_content.AutoSize = true;
             this.tx_content.ForeColor = System.Drawing.Color.Black;
-            this.tx_content.Location = new System.Drawing.Point(285, 129);
+            this.tx_content.Location = new System.Drawing.Point(285, 134);
             this.tx_content.Name = "tx_content";
             this.tx_content.Size = new System.Drawing.Size(53, 12);
             this.tx_content.TabIndex = 47;
@@ -519,7 +545,7 @@ namespace feeling
             // 
             this.label10.AutoSize = true;
             this.label10.ForeColor = System.Drawing.Color.Red;
-            this.label10.Location = new System.Drawing.Point(238, 129);
+            this.label10.Location = new System.Drawing.Point(238, 134);
             this.label10.Name = "label10";
             this.label10.Size = new System.Drawing.Size(41, 12);
             this.label10.TabIndex = 46;
@@ -607,7 +633,7 @@ namespace feeling
             // 
             this.tx3_ship0_cb.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
             this.tx3_ship0_cb.FormattingEnabled = true;
-            this.tx3_ship0_cb.Location = new System.Drawing.Point(241, 87);
+            this.tx3_ship0_cb.Location = new System.Drawing.Point(241, 85);
             this.tx3_ship0_cb.Name = "tx3_ship0_cb";
             this.tx3_ship0_cb.Size = new System.Drawing.Size(100, 20);
             this.tx3_ship0_cb.TabIndex = 39;
@@ -1534,6 +1560,8 @@ namespace feeling
             // 
             // w_info
             // 
+            this.w_info.Controls.Add(this.lb_one_click_expedition);
+            this.w_info.Controls.Add(this.label30);
             this.w_info.Controls.Add(this.lb_quick_auto);
             this.w_info.Controls.Add(this.label13);
             this.w_info.Controls.Add(this.btn_quick_auto_start);
@@ -1851,6 +1879,25 @@ namespace feeling
             this.label1.TabIndex = 10;
             this.label1.Text = "账 号:";
             // 
+            // lb_one_click_expedition
+            // 
+            this.lb_one_click_expedition.AutoSize = true;
+            this.lb_one_click_expedition.Location = new System.Drawing.Point(463, 11);
+            this.lb_one_click_expedition.Name = "lb_one_click_expedition";
+            this.lb_one_click_expedition.Size = new System.Drawing.Size(17, 12);
+            this.lb_one_click_expedition.TabIndex = 71;
+            this.lb_one_click_expedition.Text = "无";
+            // 
+            // label30
+            // 
+            this.label30.AutoSize = true;
+            this.label30.ForeColor = System.Drawing.Color.Red;
+            this.label30.Location = new System.Drawing.Point(392, 11);
+            this.label30.Name = "label30";
+            this.label30.Size = new System.Drawing.Size(65, 12);
+            this.label30.TabIndex = 70;
+            this.label30.Text = "一键远征：";
+            // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
@@ -2044,5 +2091,9 @@ namespace feeling
         private System.Windows.Forms.TextBox txt_detect_count;
         private System.Windows.Forms.Button btn_detect_stop;
         private System.Windows.Forms.Button btn_detect_start;
+        private System.Windows.Forms.Button btn_tx_one_click_expedition;
+        private System.Windows.Forms.CheckBox cbox_tx_one_click_expedition;
+        private System.Windows.Forms.Label lb_one_click_expedition;
+        private System.Windows.Forms.Label label30;
     }
 }
