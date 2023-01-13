@@ -808,7 +808,7 @@ namespace feeling
                 {
                     AppName = "feeling.exe",
                     VersionLocalPath = CfgSettings.SettingFile,
-                    VersionUrl = "http://bkbibi.teammvp.beer/netcore/feeling/version.json",
+                    VersionUrl = "http://life-cool.yury.cn/feeling/version.json",
                 };
 
                 if (File.Exists(updater) && AutoUpdate.NeedUpdate(confg))
