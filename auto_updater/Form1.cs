@@ -79,10 +79,10 @@ namespace auto_updater
             var dir = AppDomain.CurrentDomain.BaseDirectory;
             var confg = new UpdateConfig
             {
-                AppName = "feeling.exe",
+                AppName = "life-cool.exe",
                 VersionLocalPath = dir + "appsettings.json",
-                VersionUrl = "http://life-cool.yury.cn/feeling/version.json",
-                PatchNetDir = "http://life-cool.yury.cn/feeling/patch/",
+                VersionUrl = "http://life-cool.yury.cn/life-cool/version.json",
+                PatchNetDir = "http://life-cool.yury.cn/life-cool/patch/",
                 IsUpdater = true,
             };
 

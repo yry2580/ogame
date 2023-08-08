@@ -477,6 +477,7 @@ namespace feeling
             settings.CefCommandLineArgs.Add("disable-gpu-compositing", "1");
             settings.CefCommandLineArgs.Add("enable-begin-frame-scheduling", "1");
             settings.CefCommandLineArgs.Add("disable-gpu-vsync", "1");
+            settings.WindowlessRenderingEnabled = true;
 
             Cef.Initialize(settings);
             mWebBrowser = new ChromiumWebBrowser(NativeConst.Homepage);

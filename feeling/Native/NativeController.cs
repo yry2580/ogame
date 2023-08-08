@@ -320,6 +320,8 @@ namespace feeling
             source = await GetFrameSourceAsync();
             bool needLogin = false;
 
+            NativeLog.Info($"LoginAsync {MyAddress}");
+
             // 当前还在游戏页面
             if (HtmlParser.IsGameUrl(MyAddress))
             {
@@ -340,6 +342,7 @@ namespace feeling
                             Toast("已经是登录状态");
                         }
                         OperTipsEvent.Invoke(OperStatus.System, $"已经是登录状态");
+                        NativeLog.Info("已经是登录状态 111");
                         return;
                     }
 
@@ -354,6 +357,7 @@ namespace feeling
                             Toast("已经是登录状态");
                         }
                         OperTipsEvent.Invoke(OperStatus.System, $"已经是登录状态");
+                        NativeLog.Info("已经是登录状态 222");
                         return;
                     }
                     needLogin = true;
