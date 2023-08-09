@@ -1801,7 +1801,9 @@ namespace feeling
                 try
                 {
                     var _task = GetHauptframe()?.GetSourceAsync();
-                    if (_task == await Task.WhenAny(_task, Task.Delay(30000)))
+                    await Task.WhenAny(_task, Task.Delay(30000));
+
+                    if (null != _task && _task.IsCompleted)
                     {
                         source = await _task;
                     }
@@ -1810,21 +1812,23 @@ namespace feeling
                         NativeLog.Error($"GetFrameSourceAsync 超时");
                         source = "";
                     }
-                    // source = await GetHauptframe()?.GetSourceAsync();
+
+                    if (!string.IsNullOrWhiteSpace(source))
+                    {
+                        break;
+                    }
                 }
                 catch (Exception ex)
                 {
                     NativeLog.Error($"GetFrameSourceAsync catch {ex.Message}");
                     source = "";
                 }
-                if (!string.IsNullOrWhiteSpace(source))
-                {
-                    break;
-                }
 
                 await Task.Delay(1000);
                 n++;
             } while (n < retry);
+
+            NativeLog.Error($"GetFrameSourceAsync end");
             return source;
         }
 
