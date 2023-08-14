@@ -77,23 +77,23 @@ namespace auto_updater
             Thread.Sleep(500);
 
             var dir = AppDomain.CurrentDomain.BaseDirectory;
-            var confg = new UpdateConfig
-            {
-                AppName = "life-cool.exe",
-                VersionLocalPath = dir + "appsettings.json",
-                VersionUrl = "http://life-cool.yury.cn/life-cool/version.json",
-                PatchNetDir = "http://life-cool.yury.cn/life-cool/patch/",
-                IsUpdater = true,
-            };
-
             /*            var confg = new UpdateConfig
                         {
-                            AppName = "BibiDriver.exe",
+                            AppName = "life-cool.exe",
                             VersionLocalPath = dir + "appsettings.json",
-                            VersionUrl = "http://bkbibi.teammvp.beer/netcore/driver/version.json",
-                            PatchNetDir = "http://bkbibi.teammvp.beer/netcore/driver/patch/",
+                            VersionUrl = "http://life-cool.yury.cn/life-cool/version.json",
+                            PatchNetDir = "http://life-cool.yury.cn/life-cool/patch/",
                             IsUpdater = true,
                         };*/
+
+            var confg = new UpdateConfig
+            {
+                AppName = "feeling.exe",
+                VersionLocalPath = dir + "appsettings.json",
+                VersionUrl = "http://life-cool.yury.cn/feeling/version.json",
+                PatchNetDir = "http://life-cool.yury.cn/feeling/patch/",
+                IsUpdater = true,
+            };
 
             AutoUpdate.HandleUpdate(confg);
             Thread.Sleep(100);

@@ -204,10 +204,6 @@
       <Project>{7910855f-0402-4ed9-bf81-498f8c7e7625}</Project>
       <Name>auto_update</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ogameService\OgameService.csproj">
-      <Project>{f41a3506-72f5-49d4-b4f1-55504c9e3ff2}</Project>
-      <Name>OgameService</Name>
-    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <BootstrapperPackage Include=".NETFramework,Version=v4.6">

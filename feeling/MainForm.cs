@@ -15,9 +15,6 @@ using CefSharp;
 using CefSharp.WinForms;
 using Newtonsoft.Json;
 using auto_update;
-#if !NET45
-using OgameService;
-#endif
 
 namespace feeling
 {
@@ -44,9 +41,6 @@ namespace feeling
 
         DateTime mAutoStartTime = DateTime.Now.AddDays(-1);
 
-#if !NET45
-        OgClient mClient;
-#endif
         string mLastContent = "";
 
         public MainForm()
@@ -785,12 +779,8 @@ namespace feeling
             mThread = new Thread(LookBackThread);
             mThread.IsBackground = true;
             mThread.Start();
-#if !NET45
-            mClient = new OgClient();
-            mClient.Connected += OnServerConnected;
-            mClient.DataReceived += OnServerReceived;
-            mClient.HeartbeatHandler += onHeartbeat;
-#endif
+
+            DoUpdate();
 
 #if !DEBUG
             DoUpdate();
@@ -829,234 +819,9 @@ namespace feeling
             }
         }
 
-#if !NET45
-        private void OnServerReceived(OgameData data)
-        {
-            Invoke(new Action(() => {
-                DoServerReceived(data);
-            }));
-        }
-
-        private void onHeartbeat()
-        {
-            Invoke(new Action(() => {
-                SendData(CmdEnum.Hello.ToString());
-            }));
-        }
-
-        private async void DoServerReceived(OgameData data)
-        {
-            try
-            {
-                if (OperStatus.None != NativeController.Instance.MyOperStatus)
-                {
-                    SendData();
-                    return;
-                }
-
-                if (mIsBusy) return;
-
-                switch (data.Cmd)
-                {
-                    case CmdEnum.Login:
-                        NativeController.Instance.CanNotify = false;
-                        await TryLogin();
-                        break;
-                    case CmdEnum.Logout:
-                        NativeController.Instance.CanNotify = false;
-                        await TryLogout();
-                        break;
-                    case CmdEnum.Pirate:
-                        NativeController.Instance.CanNotify = false;
-                        doPirate();
-                        break;
-                    case CmdEnum.Expedition:
-                        NativeController.Instance.CanNotify = false;
-                        doExpedtion();
-                        break;
-                    case CmdEnum.GetCode:
-                        NativeController.Instance.CanNotify = false;
-                        await TryGetAuth();
-                        break;
-                    case CmdEnum.AuthCode:
-                        NativeController.Instance.CanNotify = false;
-                        await TryAuthCode(data.Content);
-                        break;
-                    case CmdEnum.Imperium:
-                        NativeController.Instance.CanNotify = false;
-                        await DoImperium();
-                        break;
-                    case CmdEnum.Npc:
-                        NativeController.Instance.CanNotify = false;
-                        doRefreshNpc();
-                        break;
-                    case CmdEnum.AutoPirateOpen:
-                        NativeController.Instance.CanNotify = false;
-                        await SetAutoPirateOpen(data.AutoPirateOpen);
-                        break;
-                    case CmdEnum.AutoPirateOpen1:
-                        NativeController.Instance.CanNotify = false;
-                        await SetAutoPirateOpen1(data.AutoPirateOpen1);
-                        break;
-                    case CmdEnum.PirateCfg:
-                        NativeController.Instance.CanNotify = false;
-                        await SetPirateCfg(data.PirateCfgIndex);
-                        break;
-                    case CmdEnum.AutoExpeditionOpen:
-                        NativeController.Instance.CanNotify = false;
-                        await SetAutoExpeditionOpen(data.AutoExpeditionOpen);
-                        break;
-                    case CmdEnum.AutoExpeditionOpen1:
-                        NativeController.Instance.CanNotify = false;
-                        await SetAutoExpeditionOpen1(data.AutoExpeditionOpen1);
-                        break;
-                    case CmdEnum.GoCross:
-                        NativeController.Instance.CanNotify = false;
-                        await GoCross();
-                        break;
-                    case CmdEnum.BackUniverse:
-                        NativeController.Instance.CanNotify = false;
-                        await BackUniverse();
-                        break;
-                    case CmdEnum.ExpeditionCfg:
-                        NativeController.Instance.CanNotify = false;
-                        await SetExpeditionCfg(data.ExpeditionCfgIndex);
-                        break;
-                    case CmdEnum.AutoLogoutOpen:
-                        NativeController.Instance.CanNotify = false;
-                        await SetAutoLogoutOpen(data.AutoLogoutOpen);
-                        break;
-                    case CmdEnum.AutoImperiumOpen:
-                        NativeController.Instance.CanNotify = false;
-                        await SetAutoImperiumOpen(data.AutoImperiumOpen);
-                        break;
-                    case CmdEnum.QuickAutoCheck:
-                        DoQuickAutoCheck();
-                        break;
-                    case CmdEnum.QuickAutoUncheck:
-                        DoQuickAutoUncheck();
-                        break;
-                    case CmdEnum.QuickAutoStart:
-                        DoQuickAutoStart();
-                        break;
-                    case CmdEnum.PirateSpeed:
-                        await SetPirateSpeed(data.PirateSpeedIndex);
-                        break;
-                    case CmdEnum.MorningIdle:
-                        NativeController.Instance.CanNotify = false;
-                        await SetMorningIdle(data.MorningIdle);
-                        break;
-                    case CmdEnum.Transfer:
-                        NativeController.Instance.CanNotify = false;
-                        DoTransfer();
-                        break;
-                    case CmdEnum.AutoTransferOpen:
-                        NativeController.Instance.CanNotify = false;
-                        await SetAutoTransferOpen(data.AutoTransferOpen);
-                        break;
-                    case CmdEnum.Gather:
-                        NativeController.Instance.CanNotify = false;
-                        DoGather();
-                        break;
-                    default:
-                        break;
-                }
-            }
-            catch (Exception ex)
-            {
-                NativeLog.Error($"feeling OnServerReceived catch {ex.Message}");
-            }
-
-            SendData();
-        }
-#endif
-
         private void SendData(string cmd = "Data")
         {
-#if !NET45
-            CmdEnum cmdEnum;
-
-            try
-            {
-                cmdEnum = (CmdEnum)Enum.Parse(typeof(CmdEnum), cmd);
-            }
-            catch(Exception)
-            {
-                cmdEnum = CmdEnum.Data;
-            }
-
-            var operStatus = (int)NativeController.Instance.MyOperStatus;
-            var status = (StatusEnum)operStatus;
-
-            var fleetContent = "";
-            var content = tx_content.Text.Trim();
-
-            if (content.Contains("|"))
-            {
-                content = content.Substring(content.IndexOf("|") + 1);
-            }
-
-            fleetContent = content;
-
-            content = w_hd_tips.Text.Trim();
-            if (content.Length > 0)
-            {
-                if (content.Contains("|"))
-                {
-                    content = content.Substring(content.IndexOf("|") + 1);
-                }
-                
-                fleetContent = fleetContent.Length > 0 ? $"{fleetContent}|{content}" : content;
-            }
-
-            var url = mWebBrowser?.Address ?? "";
-            var mat = Regex.Match(url, $@"://(?<universe>\S*).cicihappy.com");
-            var universe = "";
-            if (mat.Success)
-            {
-                universe = mat.Groups["universe"].Value;
-            }
-
-            var gameData = new OgameData
-            {
-                Cmd = cmdEnum,
-                Status = status,
-                Content = mLastContent,
-                Universe = universe,
-                NpcUniverse = PirateUtil.Universe,
-                PlanetUniverse = NativeController.Instance.MyPlanet.Universe,
-
-                FleetContent = fleetContent,
-                PirateCfgIndex = rbtn_cfg1.Checked ? 1 : 0,
-                ExpeditionCfgIndex = rbtn_ex_cfg1.Checked ? 1 : 0,
-                PirateSpeedIndex = NativeController.Instance.PirateSpeedIndex,
-
-                AutoLogoutOpen = NativeController.User.AutoLogout,
-                AutoPirateOpen = mAutoPirate,
-                AutoPirateOpen1 = mAutoPirate1,
-                AutoExpeditionOpen = mAutoExpedition,
-                AutoExpeditionOpen1 = mAutoExpedition1,
-                AutoImperiumOpen = mAutoImperium,
-                AutoTransferOpen = NativeController.Instance.IsAutoTransfer,
-
-                PirateAutoMsg = lb_hd_info.Text.Trim(),
-                PirateAutoMsg1 = lb_hd_info1.Text.Trim(),
-                ExpeditionAutoMsg = lb_tx_info.Text.Trim(),
-                ExpeditionAutoMsg1 = lb_tx_info1.Text.Trim(),
-
-                MorningIdle = NativeController.User.MorningIdle,
-            };
-
-            mClient?.SendData(gameData);
-#endif
         }
-
-#if !NET45
-        private void OnServerConnected()
-        {
-            SendData(CmdEnum.Auth.ToString());
-        }
-#endif
 
         private void btn_galaxy_open_Click(object sender, EventArgs e)
         {
