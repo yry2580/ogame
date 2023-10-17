@@ -460,6 +460,7 @@ namespace feeling
         {
             mWebBrowser.JsDialogHandler = new JsDialogHandler();
             mWebBrowser.LifeSpanHandler = new OpenPageSelf();
+            mWebBrowser.KeyboardHandler = new KeyboardHandler();
         }
 
         protected void InitBrowser()

@@ -193,7 +193,8 @@ namespace feeling
         public static string SetMaxResource(int val)
         {
             var script = "doc = window.parent.frames['Hauptframe'].document;";
-            script += $"doc.querySelector(\"a[href*=\\\"maxResource('{val}')\\\"]\").click()";
+            /*script += $"doc.querySelector(\"a[href*=\\\"maxResource('{val}')\\\"]\").click()";*/
+            script += $"doc.querySelector(\"a[href*=maxResource][href*='{val}']\").click()";
             return script;
         }
 

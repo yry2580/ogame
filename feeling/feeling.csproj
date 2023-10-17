@@ -115,6 +115,7 @@
     </Compile>
     <Compile Include="Handler\DownloadHandler.cs" />
     <Compile Include="Handler\JsDialogHandler.cs" />
+    <Compile Include="Handler\KeyboardHandler.cs" />
     <Compile Include="Handler\MenuHandler.cs" />
     <Compile Include="Handler\OpenPageSelf.cs" />
     <Compile Include="Html\Expedition\ExMission.cs" />
