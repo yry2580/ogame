@@ -861,6 +861,13 @@ namespace feeling
                 var source = await GetFrameSourceAsync();
                 await GoHome(1500);
 
+                if (HtmlParser.HasTutorial(source))
+                {
+                    FrameRunJs(NativeScript.TutorialConfirm());
+                    await Task.Delay(1500);
+                    source = await GetFrameSourceAsync();
+                }
+
                 if (HtmlParser.IsGameUrl(MyAddress))
                 {
                     await GetFrameSourceAsync();
